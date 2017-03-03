@@ -24,11 +24,5 @@ namespace AttributeBasedAC.Core.JsonABAC
         public string AttributeCompareCategory { get; set; }
 
         public string AttributeCompareID { get; set; }
-
-        public bool CheckClause()
-        {
-
-            return true;
-        }
     }
 }

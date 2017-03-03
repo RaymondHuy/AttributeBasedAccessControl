@@ -1,2 +1,3 @@
-#:F:\Project\AttributeBasedAccessControl\AttributeBasedAC\src\AttributeBasedAC.Test\AttributeBasedAC.Test.xproj
-F:\Project\AttributeBasedAccessControl\AttributeBasedAC\src\AttributeBasedAC.Test\AttributeBasedAC.Test.xproj|F:\Project\AttributeBasedAccessControl\AttributeBasedAC\src\AttributeBasedAC.Core\AttributeBasedAC.Core.xproj
+#:D:\Tutorial\LVTN\AttributeBasedAccessControl\AttributeBasedAC\src\AttributeBasedAC.Core\AttributeBasedAC.Core.xproj
+#:D:\Tutorial\LVTN\AttributeBasedAccessControl\AttributeBasedAC\src\AttributeBasedAC.Test\AttributeBasedAC.Test.xproj
+D:\Tutorial\LVTN\AttributeBasedAccessControl\AttributeBasedAC\src\AttributeBasedAC.Test\AttributeBasedAC.Test.xproj|D:\Tutorial\LVTN\AttributeBasedAccessControl\AttributeBasedAC\src\AttributeBasedAC.Core\AttributeBasedAC.Core.xproj

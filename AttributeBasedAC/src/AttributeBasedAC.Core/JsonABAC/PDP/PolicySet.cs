@@ -1,5 +1,5 @@
 ﻿using AttributeBasedAC.Core.Exceptions;
-using AttributeBasedAC.Core.JsonABAC.PDP.Algorithms;
+using AttributeBasedAC.Core.JsonABAC;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System;

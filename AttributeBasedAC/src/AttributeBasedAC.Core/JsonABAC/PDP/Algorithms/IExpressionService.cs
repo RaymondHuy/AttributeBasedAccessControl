@@ -5,10 +5,8 @@ using System.Threading.Tasks;
 
 namespace AttributeBasedAC.Core.JsonABAC
 {
-    public interface ICombiningAlgorithm
+    public interface IExpressionService
     {
-        Effect Execute(Policy policy);
-
-        Effect Execute(PolicySet policySet);
+        bool Evaluate(Expression expression);
     }
 }

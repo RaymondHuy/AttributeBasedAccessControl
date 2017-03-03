@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AttributeBasedAC.Core.JsonABAC.PDP.Algorithms
+namespace AttributeBasedAC.Core.JsonABAC
 {
-    public class DenyOverridesAlgorithm : ICombiningAlgorithm
+    internal class DenyOverridesAlgorithm : ICombiningAlgorithm
     {
         Effect ICombiningAlgorithm.Execute(PolicySet policySet)
         {

@@ -5,10 +5,7 @@ using System.Threading.Tasks;
 
 namespace AttributeBasedAC.Core.JsonABAC
 {
-    public interface ICombiningAlgorithm
+    public interface ISubjectRepository
     {
-        Effect Execute(Policy policy);
-
-        Effect Execute(PolicySet policySet);
     }
 }
