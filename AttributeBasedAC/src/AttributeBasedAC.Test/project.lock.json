@@ -2265,18 +2265,17 @@
       },
       "AttributeBasedAC.Core/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.6",
+        "framework": ".NETCoreApp,Version=v1.0",
         "dependencies": {
-          "NETStandard.Library": "1.6.0",
+          "Microsoft.NETCore.App": "1.0.1",
           "Newtonsoft.Json": "9.0.1",
-          "System.Runtime": "4.1.0",
           "mongocsharpdriver": "2.4.3"
         },
         "compile": {
-          "netstandard1.6/AttributeBasedAC.Core.dll": {}
+          "netcoreapp1.0/AttributeBasedAC.Core.dll": {}
         },
         "runtime": {
-          "netstandard1.6/AttributeBasedAC.Core.dll": {}
+          "netcoreapp1.0/AttributeBasedAC.Core.dll": {}
         }
       }
     }

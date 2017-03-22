@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace AttributeBasedAC.Core.JsonAC
 {
-    public static class UserDefinedFunctionFactory
+    public class UserDefinedFunctionFactory
     {
         #region Equality Predicate
         public static bool Equal(string a, string b)
@@ -75,5 +75,26 @@ namespace AttributeBasedAC.Core.JsonAC
         }
         #endregion
 
+        public static bool Or(params string[] arr)
+        {
+            bool result = false;
+            foreach (var c in arr)
+            {
+                result = c == "True" ? true : false;
+                if (result) break;
+            }
+            return result;
+        }
+
+        public static bool And(params string[] arr)
+        {
+            bool result = false;
+            foreach (var c in arr)
+            {
+                result = c == "False" ? false : true;
+                if (!result) break;
+            }
+            return result;
+        }
     }
 }

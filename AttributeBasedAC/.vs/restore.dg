@@ -1,2 +1,3 @@
-#:F:\Project\AttributeBasedAccessControl\AttributeBasedAC\src\AttributeBasedAC.Test\AttributeBasedAC.Test.xproj
-F:\Project\AttributeBasedAccessControl\AttributeBasedAC\src\AttributeBasedAC.Test\AttributeBasedAC.Test.xproj|F:\Project\AttributeBasedAccessControl\AttributeBasedAC\src\AttributeBasedAC.Core\AttributeBasedAC.Core.xproj
+#:F:\Project\AttributeBasedAccessControl\AttributeBasedAC\src\AttributeBasedAC.WebSPA\src\AspCoreServer\AspCoreServer.xproj
+#:F:\Project\AttributeBasedAccessControl\AttributeBasedAC\src\AttributeBasedAC.WebSPA\test\AspCoreServer.Test\AspCoreServer.Test.xproj
+F:\Project\AttributeBasedAccessControl\AttributeBasedAC\src\AttributeBasedAC.WebSPA\test\AspCoreServer.Test\AspCoreServer.Test.xproj|F:\Project\AttributeBasedAccessControl\AttributeBasedAC\src\AttributeBasedAC.WebSPA\src\AspCoreServer\AspCoreServer.xproj

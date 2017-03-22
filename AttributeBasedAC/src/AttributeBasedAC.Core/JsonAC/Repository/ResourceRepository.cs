@@ -20,7 +20,13 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
 
         JObject[] IResourceRepository.GetCollectionDataWithCustomFilter(string collectionName, FilterDefinition<BsonDocument> filter)
         {
-            var data = _mongoClient.GetDatabase(JsonAccessControlSetting.UserDefaultDatabaseName)
+            var data = filter == null ?
+                _mongoClient.GetDatabase(JsonAccessControlSetting.UserDefaultDatabaseName)
+                                   .GetCollection<BsonDocument>(collectionName)
+                                   .Find(_ => true)
+                                   .ToList()
+
+               : _mongoClient.GetDatabase(JsonAccessControlSetting.UserDefaultDatabaseName)
                                    .GetCollection<BsonDocument>(collectionName)
                                    .Find(filter)
                                    .ToList();

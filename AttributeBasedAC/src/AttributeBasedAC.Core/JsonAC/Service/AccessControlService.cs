@@ -44,6 +44,11 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                         & builder.Eq("collection_name", request.Resource.Name);
             var policies = _accessControlPolicyRepository.GetPolicies(filter);
 
+            foreach (var row in resource)
+            {
+                bool Permit = _expressionService.Evaluate(policies.ElementAt(0).RecordRules, user, row, request.EnvironmentData);
+            }
+
             return null;
         }
 

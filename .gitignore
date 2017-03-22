@@ -2,3 +2,5 @@
 /AttributeBasedAC/src/AttributeBasedAC.Core/bin/Debug/*.*
 /AttributeBasedAC/src/AttributeBasedAC.Test/obj/Debug/**/*.*
 /AttributeBasedAC/src/AttributeBasedAC.Core/obj/Debug/**/*.*
+/AttributeBasedAC/src/AttributeBasedAC.WebAPI/bin/Debug/**/*.*
+/AttributeBasedAC/src/AttributeBasedAC.WebAPI/obj/Debug/**/*.*

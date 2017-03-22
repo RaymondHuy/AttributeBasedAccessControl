@@ -11,6 +11,7 @@ using Autofac;
 using AttributeBasedAC.Core.JsonAC.Repository;
 using AttributeBasedAC.Core.JsonAC.Service;
 using AttributeBasedAC.Core.JsonAC;
+using System.Reflection;
 
 namespace AttributeBasedAC.Test
 {
@@ -35,6 +36,7 @@ namespace AttributeBasedAC.Test
 
         public static void Main(string[] args)
         {
+            //test();
             var builder = new ContainerBuilder();
 
             builder.RegisterType<MongoClient>().As<IMongoClient>();
@@ -55,30 +57,20 @@ namespace AttributeBasedAC.Test
                 RequestContext req = new RequestContext(sub, resource, action, environment);
                 service.GetDataForSubject(req);
             }
-
         }
-        //public void test()
-        //{
-        //    Policy p = new Policy();
-        //    IMongoClient _client = new MongoClient();
-        //    IMongoDatabase _database = _client.GetDatabase("myfirstdb");
-
-        //    //            var textSearchCommand = new CommandDocument
-        //    //{
-        //    //  { "find", "Equity" }
-        //    //};
-        //    var _collection = _database.GetCollection<BsonDocument>("XACML");
-        //    var filter = Builders<BsonDocument>.Filter.Eq("_id", "58b319bc7bd047899a8057f3");
-        //    var result = _collection.Find(filter).ToList().ToJson();
-        //    //string json = @"[{'a': 'a1', 'b': 'b1'}]";
-        //    JArray j = JArray.Parse(result);
-        //    //JToken jt = j[0];
-        //    //Console.WriteLine(jt["b"]);
-        //    //var _collection = _database.GetCollection<PolicySet>("XACML").Find(_ => true).ToList();
-        //    foreach (var policy in result)
-        //    {
-        //        Console.WriteLine(policy);
-        //    }
-        //}
+        public static void test()
+        {
+            string json = @"{
+  'Name': 'Bad Boys',
+  'ReleaseDate': '1995-4-7T00:00:00',
+  'Genres': [
+    'Action',
+    'Comedy'
+  ]
+}";
+            JObject a = JObject.Parse(json);
+            Console.WriteLine(a.SelectToken("Name"));
+            Console.WriteLine(a.SelectToken("aaa") == null ? "null" : "a");
+        }
     }
 }
