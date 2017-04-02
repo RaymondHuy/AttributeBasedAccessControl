@@ -13,7 +13,7 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
     {
         ICollection<TargetSubject> GetAllTargetSubjects();
 
-        ICollection<PolicyAccessControl> GetPolicies(FilterDefinition<PolicyAccessControl> filter);
+        ICollection<PolicyAccessControl> GetPolicies(string collectionName, string action);
         
     }
 }

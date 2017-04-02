@@ -28,8 +28,13 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
             return data;
         }
 
-        ICollection<PolicyAccessControl> IAccessControlPolicyRepository.GetPolicies(FilterDefinition<PolicyAccessControl> filter)
+        ICollection<PolicyAccessControl> IAccessControlPolicyRepository.GetPolicies(string collectionName, string action)
         {
+            //low performance
+            var builder = Builders<PolicyAccessControl>.Filter;
+            var filter = builder.Eq("collection_name", collectionName)
+                       & builder.Eq("action_subject", action);
+
             var data = _mongoClient.GetDatabase(JsonAccessControlSetting.AccessControlDatabaseName)
                                    .GetCollection<PolicyAccessControl>("PolicyExpression")
                                    .Find(filter)

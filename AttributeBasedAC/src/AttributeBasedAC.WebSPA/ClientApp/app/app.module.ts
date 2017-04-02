@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { UniversalModule } from 'angular2-universal';
 import { AppComponent } from './components/app/app.component'
 import { NavMenuComponent } from './components/navmenu/navmenu.component';
@@ -7,6 +8,9 @@ import { HomeComponent } from './components/home/home.component';
 import { FetchDataComponent } from './components/fetchdata/fetchdata.component';
 import { CounterComponent } from './components/counter/counter.component';
 import { studentsComponent } from './components/students/students.component';
+
+import { PrimeComponent } from './components/prime/prime.component';
+import { ButtonModule, GrowlModule } from 'primeng/primeng';
 
 @NgModule({
     bootstrap: [ AppComponent ],
@@ -16,7 +20,8 @@ import { studentsComponent } from './components/students/students.component';
         CounterComponent,
         FetchDataComponent,
         HomeComponent,
-        studentsComponent
+        studentsComponent,
+        PrimeComponent
     ],
     imports: [
         UniversalModule, // Must be first import. This automatically imports BrowserModule, HttpModule, and JsonpModule too.
@@ -26,8 +31,12 @@ import { studentsComponent } from './components/students/students.component';
             { path: 'counter', component: CounterComponent },
             { path: 'fetch-data', component: FetchDataComponent },
             { path: 'students', component: studentsComponent }, 
-            { path: '**', redirectTo: 'home' }
-        ])
+            { path: 'prime', component: PrimeComponent },
+            { path: '**', redirectTo: 'home' },
+        ]),
+        FormsModule,
+        ButtonModule,
+        GrowlModule
     ]
 })
 export class AppModule {

@@ -10,7 +10,7 @@ module.exports = {
     },
     module: {
         loaders: [
-            { test: /\.(png|woff|woff2|eot|ttf|svg)(\?|$)/, loader: 'url-loader?limit=100000' },
+            { test: /\.(png|gif|woff|woff2|eot|ttf|svg)(\?|$)/, loader: 'url-loader?limit=100000' },
             { test: /\.css(\?|$)/, loader: extractCSS.extract(['css']) }
         ]
     },
@@ -31,6 +31,10 @@ module.exports = {
             'es6-shim',
             'es6-promise',
             'jquery',
+            'font-awesome/css/font-awesome.css',
+            'primeng/primeng',
+            'primeng/resources/themes/omega/theme.css',
+            'primeng/resources/primeng.css',
             'zone.js',
         ]
     },
