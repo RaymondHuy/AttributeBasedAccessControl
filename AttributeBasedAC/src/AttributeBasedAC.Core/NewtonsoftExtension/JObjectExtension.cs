@@ -10,47 +10,46 @@ namespace AttributeBasedAC.Core.NewtonsoftExtension
     {
         public static void AddNewFieldFromPath(this JObject jObject, string pathField, JObject rawObject)
         {
-            string[] nestedFields = pathField.Split(new char[] { '.'});
-            string pathFieldCur = nestedFields[0];
+            var nestedFields = pathField.Split(new char[] { '.' });
+            jObject.AddNewFieldFromPath(rawObject, nestedFields, 0);
+        }
+        private static void AddNewFieldFromPath(this JObject privacyObject, JObject rawObject, string[] pathField, int startIndex)
+        {
+            var field = pathField[startIndex];
+            var token = rawObject.SelectToken(field);
 
-            var jObjectCur = jObject;
-
-            for (int i = 0; i < nestedFields.Length; i++)
+            if (token is JArray)
             {
-                string field = nestedFields[i];
+                privacyObject[field] = privacyObject[field] ?? new JArray();
 
-                if (rawObject.SelectToken(pathFieldCur) is JArray)
+                var rawArray = (JArray)rawObject.SelectToken(field);
+                var privacyArray = (JArray)privacyObject.SelectToken(field);
+                int currentIndex = 0;
+
+                foreach (var element in rawArray)
                 {
-                    if (jObjectCur[field] == null)
-                        jObjectCur[field] = new JArray();
+                    var nextRawObject = (JObject)element;
+                    var pathIndexObject = field + "[" + currentIndex + "]";
 
-                    var array = (JArray)rawObject.SelectToken(pathFieldCur);
-                    int currentIndex = 0;
-                    foreach (var token in array)
-                    {
-                        JObject element = (JObject)token;
-                        string pathObject = pathFieldCur + "[" + currentIndex + "]";
-                        string pathRemaining = String.Empty;
-                        for (int j = i + 1; j < nestedFields.Length; j++)
-                        {
-                            pathRemaining += nestedFields[j];
-                        }
-                        element.AddNewFieldFromPath(pathRemaining, (JObject)rawObject.SelectToken(pathObject));
-                        ++currentIndex;
-                    }
-                    break;
+                    if (privacyObject.SelectToken(pathIndexObject) == null)
+                        privacyArray.Add(new JObject());
+
+                    var nextPrivacyObject = (JObject)privacyObject.SelectToken(pathIndexObject);
+                    nextPrivacyObject.AddNewFieldFromPath(nextRawObject, pathField, startIndex + 1);
+
+                    ++currentIndex;
                 }
-
-                if (jObjectCur[field] == null)
-                    jObjectCur[field] = new JObject();
-
-                if (i != nestedFields.Length - 1)
-                    jObjectCur = (JObject)jObjectCur[field];
-
-                pathFieldCur += "." + field;
             }
-            string lastField = nestedFields.Last();
-            //jObjectCur[lastField] = value;
+            else if (token is JObject)
+            {
+                privacyObject[field] = privacyObject[field] ?? new JObject();
+
+                var nextPrivacyObject = (JObject)privacyObject[field];
+                var nextRawObject = (JObject)rawObject[field];
+
+                nextPrivacyObject.AddNewFieldFromPath(nextRawObject, pathField, startIndex + 1);
+            }
+            else privacyObject[field] = rawObject[field];
         }
     }
 }

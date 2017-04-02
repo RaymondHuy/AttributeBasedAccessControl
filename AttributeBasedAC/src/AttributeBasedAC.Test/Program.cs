@@ -64,38 +64,38 @@ namespace AttributeBasedAC.Test
 
         public static void Main(string[] args)
         {
-            test();
-            //var builder = new ContainerBuilder();
+            //test();
+            var builder = new ContainerBuilder();
 
-            //builder.RegisterType<MongoClient>().As<IMongoClient>();
+            builder.RegisterType<MongoClient>().As<IMongoClient>();
 
-            //builder.RegisterType<EnvironmentRepository>().As<IEnvironmentRepository>();
-            //builder.RegisterType<SubjectRepository>().As<ISubjectRepository>();
-            //builder.RegisterType<ResourceRepository>().As<IResourceRepository>();
-            //builder.RegisterType<AccessControlPolicyRepository>().As<IAccessControlPolicyRepository>();
+            builder.RegisterType<EnvironmentRepository>().As<IEnvironmentRepository>();
+            builder.RegisterType<SubjectRepository>().As<ISubjectRepository>();
+            builder.RegisterType<ResourceRepository>().As<IResourceRepository>();
+            builder.RegisterType<AccessControlPolicyRepository>().As<IAccessControlPolicyRepository>();
 
-            //builder.RegisterType<ExpressionService>().As<IExpressionService>();
-            //builder.RegisterType<AccessControlPrivacyService>().As<IAccessControlPrivacyService>();
+            builder.RegisterType<ExpressionService>().As<IExpressionService>();
+            builder.RegisterType<AccessControlPrivacyService>().As<IAccessControlPrivacyService>();
 
-            //var container = builder.Build();
+            var container = builder.Build();
 
-            //using (var scope = container.BeginLifetimeScope())
-            //{
-            //    var service = scope.Resolve<IAccessControlPrivacyService>();
-            //    var subjectRepository = scope.Resolve<ISubjectRepository>();
-            //    var resourceRepository = scope.Resolve<IResourceRepository>();
-            //    var user = subjectRepository.GetUniqueUser(sub.Name, sub.FilterCondition);
-            //    var resource = resourceRepository.GetCollectionDataWithCustomFilter(res.Name, res.FilterCondition);
-            //    Stopwatch s = new Stopwatch();
-            //    s.Start();
-            //    ICollection<JObject> result = service.ExecuteSecurityProcess(user, resource, action, res.Name, environment);
-            //    s.Stop();
-            //    Console.WriteLine(s.Elapsed);
-            //    foreach (var item in result)
-            //    {
-            //        Console.WriteLine(item);
-            //    }
-            //}
+            using (var scope = container.BeginLifetimeScope())
+            {
+                var service = scope.Resolve<IAccessControlPrivacyService>();
+                var subjectRepository = scope.Resolve<ISubjectRepository>();
+                var resourceRepository = scope.Resolve<IResourceRepository>();
+                var user = subjectRepository.GetUniqueUser(sub.Name, sub.FilterCondition);
+                var resource = resourceRepository.GetCollectionDataWithCustomFilter(res.Name, res.FilterCondition);
+                Stopwatch s = new Stopwatch();
+                s.Start();
+                ICollection<JObject> result = service.ExecuteSecurityProcess(user, resource, action, res.Name, environment);
+                s.Stop();
+                Console.WriteLine(s.Elapsed);
+                foreach (var item in result)
+                {
+                    Console.WriteLine(item);
+                }
+            }
         }
         public static void test()
         {
@@ -111,13 +111,7 @@ namespace AttributeBasedAC.Test
             JObject aPrivacy = new JObject();
             JToken j = a.SelectToken("Genres");
             Console.WriteLine(a.SelectToken("Genres") is JArray);
-            JArray array = (JArray)a.SelectToken("Genres");
-            var listToken = array.Children();
-            foreach (var token in listToken)
-            {
-                JObject element = (JObject)token;
-                Console.WriteLine(element);
-            }
+            Console.WriteLine(a.SelectToken("Genres[0]"));
             a["item"] = new JArray();
             JArray item = (JArray)a["item"];
             item.Add(new JObject(new JProperty("a", "k")));

@@ -7,12 +7,12 @@
                 <span class='icon-bar'></span>
                 <span class='icon-bar'></span>
             </button>
-            <a class='navbar-brand' [routerLink]="['/home']">Angular2ASPCORE</a>
+            <a class='navbar-brand' [routerLink]="['/home']">Privacy Access Control</a>
         </div>
         <div class='clearfix'></div>
         <div class='navbar-collapse collapse'>
             <ul class='nav navbar-nav'>
-                <li [routerLinkActive]="['link-active']">
+                <!--<li [routerLinkActive]="['link-active']">
                     <a [routerLink]="['/home']">
                         <span class='glyphicon glyphicon-home'></span> Home hello
                     </a>
@@ -35,6 +35,22 @@
                 <li [routerLinkActive]="['link-active']">
                     <a [routerLink]="['/prime']">
                         <span class='glyphicon glyphicon-th-list'></span> Prime
+                    </a>
+                </li>-->
+
+                <li [routerLinkActive]="['link-active']">
+                    <a [routerLink]="['/privacy_checking']">
+                        <span class='glyphicon glyphicon-th-list'></span> Privacy Checking
+                    </a>
+                </li>
+                <li [routerLinkActive]="['link-active']">
+                    <a [routerLink]="['/privacy_rule']">
+                        <span class='glyphicon glyphicon-th-list'></span> Privacy Rules
+                    </a>
+                </li>
+                <li [routerLinkActive]="['link-active']">
+                    <a [routerLink]="['/policy_review']">
+                        <span class='glyphicon glyphicon-th-list'></span> Policy Review
                     </a>
                 </li>
             </ul>

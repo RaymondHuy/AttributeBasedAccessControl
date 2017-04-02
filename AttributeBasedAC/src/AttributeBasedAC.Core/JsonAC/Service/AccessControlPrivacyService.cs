@@ -43,9 +43,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
 
         private ICollection<PolicyAccessControl> GetPolicies()
         {
-            var policies = _accessControlPolicyRepository.GetPolicies(_collectionName, _action);
-
-            return policies;
+            return _accessControlPolicyRepository.GetPolicies(_collectionName, _action);
         }
 
         ICollection<JObject> IAccessControlPrivacyService.ExecuteSecurityProcess(JObject user, JObject[] resource, string action, string collectionName, JObject environment)
@@ -57,7 +55,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             environment.AddAnnotation(action);
             _environment = environment;
             var privacyRecords = new List<JObject>();
-            var policies = GetPolicies();
+            ICollection<PolicyAccessControl> policies = GetPolicies();
 
             _collectionPrivacyRules = FilterFieldCollectionEffects(policies);
             //Parallel.ForEach(_resource, record =>
@@ -100,10 +98,9 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                 {
                     privacyRules.Add(field.Name, field.FunctionApply);
                 }
-                else
+                else if (field.FunctionApply == "Hide")
                 {
-                    if (field.FunctionApply == "Hide")
-                        privacyRules[field.Name] = field.FunctionApply;
+                    privacyRules[field.Name] = field.FunctionApply;
                 }
             }
         }

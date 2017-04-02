@@ -1,0 +1,51 @@
+﻿<div class="row">
+    <div class="col-lg-12"><h1 class="text-center">Privacy Checking</h1></div>
+
+    <div class="col-lg-12"><h3><span class="label label-primary">Subject Condition</span></h3></div>
+
+    <div class="col-lg-12">
+        <div class="col-xs-6 col-lg-4 form-group">
+            <label for="ddlUserAttribute">Unique Field: </label>
+            <p-dropdown [options]="user_attributes" [(ngModel)]="user_selected_attribute"></p-dropdown>
+        </div>
+        <div class="col-xs-6 col-lg-8 form-group">
+            <label for="ddlUserAttribute">Value :</label>
+            <p-autoComplete [(ngModel)]="city" [suggestions]="filteredCountriesSingle" (completeMethod)="filterCountrySingle($event)" field="label" [size]="30"
+                            placeholder="Cities" [minLength]="1"></p-autoComplete>
+        </div>
+    </div>
+
+    <div class="col-lg-12"><h3><span class="label label-warning">Resource Condition</span></h3></div>
+
+    <div class="col-lg-12">
+        <div class="col-xs-12 form-group">
+            <label>Collection Name :</label>
+            <p-dropdown [options]="collection_names" [(ngModel)]="collection_selected_name"></p-dropdown>
+        </div>
+        <div class="col-xs-4 form-group">
+            <label>Resource Field: </label>
+            <p-dropdown [options]="resource_fields" [(ngModel)]="resource_selected_field"></p-dropdown>
+        </div>
+        <div class="col-xs-4 form-group">
+            <label>Operator :</label>
+            <p-dropdown [options]="resource_operators" [(ngModel)]="resource_selected_operator"></p-dropdown>
+        </div>
+        <div class="col-xs-4 form-group">
+            <label>Value :</label>
+            <input id="in" type="text" size="25" pInputText [(ngModel)]="resource_values" />
+        </div>
+    </div>
+
+    <div class="col-lg-12"><h3><span class="label label-success">Environment Condition</span></h3></div>
+
+    <div class="col-lg-12">
+        <div class="col-xs-4 form-group">
+            <label>Field :</label>
+            <input id="in" type="text" size="25" pInputText [(ngModel)]="environment_field" />
+        </div>
+        <div class="col-xs-4 form-group">
+            <label>Value :</label>
+            <input id="in" type="text" size="25" pInputText [(ngModel)]="environment_value" />
+        </div>
+    </div>
+</div>
