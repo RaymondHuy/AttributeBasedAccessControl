@@ -16,7 +16,6 @@ namespace AttributeBasedAC.Core.JsonAC.Service
     {
         private readonly ISubjectRepository _subjectRepository;
         private readonly IResourceRepository _resourceRepository;
-        private readonly IEnvironmentRepository _environmentRepository;
         private readonly IAccessControlPolicyRepository _accessControlPolicyRepository;
         private readonly IExpressionService _expressionService;
 
@@ -30,20 +29,13 @@ namespace AttributeBasedAC.Core.JsonAC.Service
         public AccessControlPrivacyService(
             ISubjectRepository subjectRepository,
             IResourceRepository resourceRepository,
-            IEnvironmentRepository environmentRepository,
             IAccessControlPolicyRepository accessControlPolicyRepository,
             IExpressionService expressionService)
         {
             _subjectRepository = subjectRepository;
             _resourceRepository = resourceRepository;
-            _environmentRepository = environmentRepository;
             _accessControlPolicyRepository = accessControlPolicyRepository;
             _expressionService = expressionService;
-        }
-
-        private ICollection<PolicyAccessControl> GetPolicies()
-        {
-            return _accessControlPolicyRepository.GetPolicies(_collectionName, _action);
         }
 
         ICollection<JObject> IAccessControlPrivacyService.ExecuteSecurityProcess(JObject user, JObject[] resource, string action, string collectionName, JObject environment)
@@ -57,7 +49,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             var privacyRecords = new List<JObject>();
             ICollection<PolicyAccessControl> policies = GetPolicies();
 
-            _collectionPrivacyRules = FilterFieldCollectionEffects(policies);
+            _collectionPrivacyRules = GetFieldCollectionRules(policies);
             //Parallel.ForEach(_resource, record =>
             //{
             //    var privacyField = GetPrivacyRecordField(record, policies);
@@ -67,14 +59,21 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             //});
             foreach (var record in _resource)
             {
-                var privacyField = GetPrivacyRecordField(record, policies);
-                var privacyRecord = PrivacyProcessing(record, privacyField);
+                var privacyFields = GetPrivacyRecordField(record, policies);
+                var privacyRecord = PrivacyProcessing(record, privacyFields);
                 privacyRecords.Add(privacyRecord);
             }
             return privacyRecords;
         }
 
-        private IDictionary<string, string> FilterFieldCollectionEffects(ICollection<PolicyAccessControl> policies)
+        private ICollection<PolicyAccessControl> GetPolicies()
+        {
+            return _accessControlPolicyRepository.GetPolicies(_collectionName, _action);
+        }
+        /// <summary>Get the privacy rule of collection fields
+        /// <para>List policy Access Control</para>
+        /// </summary>
+        private IDictionary<string, string> GetFieldCollectionRules(ICollection<PolicyAccessControl> policies)
         {
             var fieldCollectionRules = new Dictionary<string, string>();
             foreach (var policy in policies)
@@ -124,13 +123,13 @@ namespace AttributeBasedAC.Core.JsonAC.Service
 
         private JObject PrivacyProcessing(JObject record, IDictionary<string, string> privacyField)
         {
-            JObject privacyRecord = new JObject();
+            var privacyRecord = new JObject();
             
             foreach (var fieldName in privacyField.Keys)
             {
-                if (privacyField[fieldName] == "Show")
+                if (privacyField[fieldName] != "Optional")
                 {
-                    privacyRecord.AddNewFieldFromPath(fieldName, record);
+                    privacyRecord.AddNewFieldFromPath(fieldName, record, privacyField[fieldName]);
                 }
             }
             return privacyRecord;
@@ -138,18 +137,17 @@ namespace AttributeBasedAC.Core.JsonAC.Service
 
         private void CombinePrivacyFields(IDictionary<string, string> privacyRules, ICollection<FieldEffect> bonusFields)
         {
-            foreach (var fieldEffect in bonusFields)
+            foreach (FieldEffect fieldEffect in bonusFields)
             {
-                if (privacyRules[fieldEffect.Name] == "Optional")
-                {
-                    privacyRules[fieldEffect.Name] = fieldEffect.FunctionApply;
-                }
-                else if (privacyRules[fieldEffect.Name] == "Show" && fieldEffect.FunctionApply == "Hide")
+                if (fieldEffect.FunctionApply == "Hide")
                 {
                     privacyRules[fieldEffect.Name] = "Hide";
                 }
+                else if (privacyRules[fieldEffect.Name] != "Hide")
+                {
+                    privacyRules[fieldEffect.Name] = fieldEffect.FunctionApply;
+                }
             }
         }
-        
     }
 }

@@ -13,28 +13,24 @@ namespace AttributeBasedAC.Core.JsonAC.Service
     {
         private readonly ISubjectRepository _subjectRepository;
         private readonly IResourceRepository _resourceRepository;
-        private readonly IEnvironmentRepository _environmentRepository;
-
+        
         public ExpressionService(
             ISubjectRepository subjectRepository,
-            IResourceRepository resourceRepository,
-            IEnvironmentRepository environmentRepository)
+            IResourceRepository resourceRepository)
         {
             _subjectRepository = subjectRepository;
             _resourceRepository = resourceRepository;
-            _environmentRepository = environmentRepository;
         }
-
+        
         bool IExpressionService.Evaluate(Function function, JObject user, JObject resource, JObject environment)
         {
-            List<string> parameters = new List<string>();
+            var parameters = new List<string>();
 
             foreach (var param in function.Parameters)
             {
                 // if parameter is another function
                 if (param.Value == null)
                 {
-                    // need checking for faster evaluate
                     parameters.Add(InvokeFunction(param, user, resource, environment));
                 }
                 else
@@ -66,12 +62,9 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                     }
                 }
             }
-
             MethodInfo method = typeof(UserDefinedFunctionFactory).GetMethod(function.FunctionName);
-            //string[] arr = parameters.ToArray();
-            bool result = (bool)method.Invoke(null, new object[] { parameters.ToArray()});
 
-            return result;
+            return (bool)method.Invoke(null, new object[] { parameters.ToArray() });
         }
 
         private string InvokeFunction(Function function, JObject user, JObject resource, JObject environment)
@@ -125,7 +118,6 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                     }
                 }
             }
-
             MethodInfo method = typeof(UserDefinedFunctionFactory).GetMethod(function.FunctionName);
             result = method.Invoke(null, parameters.ToArray()).ToString();
 

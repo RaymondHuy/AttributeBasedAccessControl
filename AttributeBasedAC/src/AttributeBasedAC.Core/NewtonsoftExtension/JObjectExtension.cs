@@ -1,19 +1,21 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using AttributeBasedAC.Core.JsonAC;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace AttributeBasedAC.Core.NewtonsoftExtension
 {
     public static class JObjectExtension
     {
-        public static void AddNewFieldFromPath(this JObject jObject, string pathField, JObject rawObject)
+        public static void AddNewFieldFromPath(this JObject jObject, string pathField, JObject rawObject, string privacyFunction)
         {
             var nestedFields = pathField.Split(new char[] { '.' });
-            jObject.AddNewFieldFromPath(rawObject, nestedFields, 0);
+            jObject.AddNewFieldFromPath(rawObject, nestedFields, 0, privacyFunction);
         }
-        private static void AddNewFieldFromPath(this JObject privacyObject, JObject rawObject, string[] pathField, int startIndex)
+        private static void AddNewFieldFromPath(this JObject privacyObject, JObject rawObject, string[] pathField, int startIndex, string privacyFunction)
         {
             var field = pathField[startIndex];
             var token = rawObject.SelectToken(field);
@@ -35,7 +37,7 @@ namespace AttributeBasedAC.Core.NewtonsoftExtension
                         privacyArray.Add(new JObject());
 
                     var nextPrivacyObject = (JObject)privacyObject.SelectToken(pathIndexObject);
-                    nextPrivacyObject.AddNewFieldFromPath(nextRawObject, pathField, startIndex + 1);
+                    nextPrivacyObject.AddNewFieldFromPath(nextRawObject, pathField, startIndex + 1, privacyFunction);
 
                     ++currentIndex;
                 }
@@ -47,9 +49,15 @@ namespace AttributeBasedAC.Core.NewtonsoftExtension
                 var nextPrivacyObject = (JObject)privacyObject[field];
                 var nextRawObject = (JObject)rawObject[field];
 
-                nextPrivacyObject.AddNewFieldFromPath(nextRawObject, pathField, startIndex + 1);
+                nextPrivacyObject.AddNewFieldFromPath(nextRawObject, pathField, startIndex + 1, privacyFunction);
             }
-            else privacyObject[field] = rawObject[field];
+            else
+            {
+                MethodInfo method = typeof(UserDefinedFunctionFactory).GetMethod(privacyFunction);
+                string param = rawObject[field].ToString();
+                string result = (string)method.Invoke(null, new object[] { param });
+                privacyObject[field] = result;
+            } 
         }
     }
 }

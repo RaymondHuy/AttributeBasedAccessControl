@@ -46,13 +46,13 @@ namespace AttributeBasedAC.Test
     public class Program
     {
 
-        static CollectionRequestInfo sub = new CollectionRequestInfo()
+        static CollectionRequestInfo subjest = new CollectionRequestInfo()
         {
             Name = "User",
             FilterCondition = Builders<BsonDocument>.Filter.Eq("access_token", "5f229d5b-a6c5-4c72-a151-34e121690e19")
         };
 
-        static CollectionRequestInfo res = new CollectionRequestInfo()
+        static CollectionRequestInfo resourceInfo = new CollectionRequestInfo()
         {
             Name = "Department",
             FilterCondition = Builders<BsonDocument>.Filter.Gt("dept_id", 5)
@@ -64,12 +64,10 @@ namespace AttributeBasedAC.Test
 
         public static void Main(string[] args)
         {
-            //test();
             var builder = new ContainerBuilder();
 
             builder.RegisterType<MongoClient>().As<IMongoClient>();
-
-            builder.RegisterType<EnvironmentRepository>().As<IEnvironmentRepository>();
+            
             builder.RegisterType<SubjectRepository>().As<ISubjectRepository>();
             builder.RegisterType<ResourceRepository>().As<IResourceRepository>();
             builder.RegisterType<AccessControlPolicyRepository>().As<IAccessControlPolicyRepository>();
@@ -84,11 +82,11 @@ namespace AttributeBasedAC.Test
                 var service = scope.Resolve<IAccessControlPrivacyService>();
                 var subjectRepository = scope.Resolve<ISubjectRepository>();
                 var resourceRepository = scope.Resolve<IResourceRepository>();
-                var user = subjectRepository.GetUniqueUser(sub.Name, sub.FilterCondition);
-                var resource = resourceRepository.GetCollectionDataWithCustomFilter(res.Name, res.FilterCondition);
-                Stopwatch s = new Stopwatch();
+                var user = subjectRepository.GetUniqueUser(subjest.Name, subjest.FilterCondition);
+                var resource = resourceRepository.GetCollectionDataWithCustomFilter(resourceInfo.Name, resourceInfo.FilterCondition);
+                var s = new Stopwatch();
                 s.Start();
-                ICollection<JObject> result = service.ExecuteSecurityProcess(user, resource, action, res.Name, environment);
+                ICollection<JObject> result = service.ExecuteSecurityProcess(user, resource, action, resourceInfo.Name, environment);
                 s.Stop();
                 Console.WriteLine(s.Elapsed);
                 foreach (var item in result)
@@ -96,49 +94,6 @@ namespace AttributeBasedAC.Test
                     Console.WriteLine(item);
                 }
             }
-        }
-        public static void test()
-        {
-            string json = @"{
-  'Name': 'Bad Boys',
-  'ReleaseDate': '1995-4-7T00:00:00',
-  'Genres': [
-    {'test2': {'c': 'd'}, 'array': [{'arr1': {'a1': 'b1'}}, {'arr2': {'a2': 'b2'}}]}
-  ],
-  'test': {'A': 'B'}
-}";
-            JObject a = JObject.Parse(json);
-            JObject aPrivacy = new JObject();
-            JToken j = a.SelectToken("Genres");
-            Console.WriteLine(a.SelectToken("Genres") is JArray);
-            Console.WriteLine(a.SelectToken("Genres[0]"));
-            a["item"] = new JArray();
-            JArray item = (JArray)a["item"];
-            item.Add(new JObject(new JProperty("a", "k")));
-            item.Add(new JObject(new JProperty("a", "k")));
-            item.Add("Item 2");
-            Console.WriteLine(a);
-            //string original = "{\"d\":{\"results\":[{\"__metadata\":{},\"remove\":\"done\",\"prop1\":\"value1\",\"prop2\":\"value2\",\"__some\":\"value\"},{\"__metadata\":{},\"prop3\":\"value1\",\"prop4\":\"value2\",\"__some\":\"value\"}],\"__metadata\":{\"prop3\":\"value1\",\"prop4\":\"value2\"}}}";
-            //string actual = JToken.Parse(original).RemoveFields(new string[] { "results" }).ToString(Formatting.None);
-            //foreach (var token in a.Properties())
-            //{
-            //    Console.WriteLine(token);
-            //    foreach (var t in token.Children())
-            //    {
-            //        Console.WriteLine(t);
-            //    }
-            //}
-        }
-        public static void test2()
-        {
-            JObject c = new JObject();
-            if (c["demo"] == null)
-                c["demo"] = new JObject();
-            JObject temp = (JObject)c["demo"];
-            temp["d[0]"] = "a";
-            temp["d[1]"] = "b";
-            temp["a"] = "2";
-            Console.WriteLine(c);
         }
     }
 }

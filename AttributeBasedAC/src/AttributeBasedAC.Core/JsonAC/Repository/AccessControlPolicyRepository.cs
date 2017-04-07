@@ -30,7 +30,6 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
 
         ICollection<PolicyAccessControl> IAccessControlPolicyRepository.GetPolicies(string collectionName, string action)
         {
-            //low performance
             var builder = Builders<PolicyAccessControl>.Filter;
             var filter = builder.Eq("collection_name", collectionName)
                        & builder.Eq("action_subject", action);
