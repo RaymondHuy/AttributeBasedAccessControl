@@ -16,6 +16,17 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
         {
             _mongoClient = mongoClient;
         }
+
+        JArray ISubjectRepository.GetAllUsers(string collectionName)
+        {
+            var user = _mongoClient.GetDatabase(JsonAccessControlSetting.UserDefaultDatabaseName)
+                                    .GetCollection<BsonDocument>(collectionName)
+                                    .Find(_ => true)
+                                    .ToList();
+
+            return JArray.Parse(user.ToJson());
+        }
+
         JObject ISubjectRepository.GetUniqueUser(string collectionName, FilterDefinition<BsonDocument> filterByKey)
         {
             var user = _mongoClient.GetDatabase(JsonAccessControlSetting.UserDefaultDatabaseName)

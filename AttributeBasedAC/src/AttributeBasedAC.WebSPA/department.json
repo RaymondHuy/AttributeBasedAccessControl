@@ -1,0 +1,65 @@
+﻿[
+  {
+    "_id": "587507b16eca86ffa34ac11e",
+    "dept_id": 10,
+    "dept_no": "D10",
+    "dept_name": "ACCOUNTING",
+    "location": "NEW YORK",
+    "leader": {
+      "name": "John",
+      "phone": "1221315456"
+    },
+    "projects": [
+      {
+        "name": "ERP",
+        "language": "English"
+      },
+      {
+        "name": "ERP2",
+        "language": "Spanish"
+      }
+    ]
+  },
+  {
+    "_id": "587508056eca86ffa34ac12e",
+    "dept_id": 40,
+    "dept_no": "D40",
+    "dept_name": "OPERATIONS",
+    "location": "BOSTON",
+    "leader": {
+      "name": "Alice",
+      "phone": "00265959"
+    },
+    "projects": [
+      {
+        "name": "CRM",
+        "language": "English"
+      },
+      {
+        "name": "CRM2",
+        "language": "Spanish"
+      }
+    ]
+  },
+  {
+    "_id": "5895eb617d01761d804c89a3",
+    "dept_id": 20,
+    "dept_no": null,
+    "dept_name": null,
+    "location": null,
+    "leader": {
+      "name": "Bob",
+      "phone": "0326154531"
+    },
+    "projects": [
+      {
+        "name": "Banking",
+        "language": "English"
+      },
+      {
+        "name": "Banking2",
+        "language": "Spanish"
+      }
+    ]
+  }
+]

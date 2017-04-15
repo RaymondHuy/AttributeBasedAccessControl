@@ -1,0 +1,165 @@
+﻿{
+    "_id" : "58c50fad97d77972765c8e9f",
+    "collection_name" : "Department",
+    "description" : ".....",
+    "action_subject" : "read",
+    "target_subject" : {
+        "function_name" : "Equal",
+        "parameters" : [ 
+            {
+                "value" : "role",
+                "resource_id" : "Subject"
+            },
+          {
+            "value": "intern",
+            "resource_id": null
+          }
+        ]
+    },
+    "record_rules" : [ 
+        {
+            "field_effects" : [ 
+                {
+                    "name" : "dept_id",
+                    "effect_function" : "Hide"
+                }, 
+                {
+                    "name" : "_id",
+                    "effect_function" : "Hide"
+                }, 
+                {
+                    "name" : "dept_no",
+                    "effect_function" : "Show"
+                }, 
+                {
+                    "name" : "dept_name",
+                    "effect_function" : "Show"
+                }, 
+                {
+                    "name" : "location",
+                    "effect_function" : "Hide"
+                }, 
+                {
+                    "name" : "leader.name",
+                    "effect_function" : "Show"
+                }, 
+                {
+                    "name" : "leader.phone",
+                    "effect_function" : "Hide"
+                }, 
+                {
+                    "name" : "projects.name",
+                    "effect_function" : "Show"
+                }, 
+                {
+                    "name" : "projects.language",
+                    "effect_function" : "CustomFunction"
+                }
+            ],
+            "rules" : {
+                "function_name" : "Or",
+                "parameters" : [ 
+                    {
+                        "function_name" : "Equal",
+                        "parameters" : [ 
+                            {
+                                "value" : "_id",
+                                "resource_id" : "Subject"
+                            }, 
+                            {
+                                "value" : "_id",
+                                "resource_id" : "Department"
+                            }
+                        ]
+                    }, 
+                    {
+                        "function_name" : "Equal",
+                        "parameters" : [ 
+                            {
+                                "value" : "dept_name",
+                                "resource_id" : "Department"
+                            }, 
+                            {
+                                "value" : "OPERATIONS",
+                                "resource_id" : null
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    ],
+    "collection_field_rules" : [ 
+        {
+            "field_effects" : [ 
+                {
+                    "name" : "dept_id",
+                    "effect_function" : "Hide"
+                }, 
+                {
+                    "name" : "_id",
+                    "effect_function" : "Show"
+                }, 
+                {
+                    "name" : "dept_no",
+                    "effect_function" : "Show"
+                }, 
+                {
+                    "name" : "dept_name",
+                    "effect_function" : "Optional"
+                }, 
+                {
+                    "name" : "location",
+                    "effect_function" : "Optional"
+                }, 
+                {
+                    "name" : "leader.name",
+                    "effect_function" : "Show"
+                }, 
+                {
+                    "name" : "leader.phone",
+                    "effect_function" : "Show"
+                }, 
+                {
+                    "name" : "projects.name",
+                    "effect_function" : "Show"
+                }, 
+                {
+                    "name" : "projects.language",
+                    "effect_function" : "Show"
+                }
+            ],
+            "rules" : {
+                "function_name" : "Or",
+                "parameters" : [ 
+                    {
+                        "function_name" : "GreaterThan",
+                        "parameters" : [ 
+                            {
+                                "value" : "age",
+                                "resource_id" : "Subject"
+                            }, 
+                            {
+                                "value" : "18",
+                                "resource_id" : null
+                            }
+                        ]
+                    }, 
+                    {
+                        "function_name" : "Equal",
+                        "parameters" : [ 
+                            {
+                                "value" : "purpose",
+                                "resource_id" : "Environment"
+                            }, 
+                            {
+                                "value" : "analysis",
+                                "resource_id" : null
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

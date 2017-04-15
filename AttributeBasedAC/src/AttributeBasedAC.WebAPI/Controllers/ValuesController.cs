@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using AttributeBasedAC.WebAPI.Utilities;
 
 namespace AttributeBasedAC.WebAPI.Controllers
 {
@@ -13,6 +14,9 @@ namespace AttributeBasedAC.WebAPI.Controllers
         [HttpGet]
         public IEnumerable<string> Get()
         {
+            //var ex = new ExpressionParser();
+            //string condition = "NOT( ( a OR b ) AND c )";
+            //ex.ParseCondition(condition);
             return new string[] { "value1", "value2" };
         }
 

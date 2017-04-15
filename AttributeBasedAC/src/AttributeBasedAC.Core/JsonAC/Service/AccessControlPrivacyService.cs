@@ -18,6 +18,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
         private readonly IResourceRepository _resourceRepository;
         private readonly IAccessControlPolicyRepository _accessControlPolicyRepository;
         private readonly IExpressionService _expressionService;
+        private readonly IPrivacyFunctionRepository _privacyFunctionRepository;
 
         private JObject _user;
         private JObject[] _resource;
@@ -30,12 +31,14 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             ISubjectRepository subjectRepository,
             IResourceRepository resourceRepository,
             IAccessControlPolicyRepository accessControlPolicyRepository,
-            IExpressionService expressionService)
+            IExpressionService expressionService,
+            IPrivacyFunctionRepository privacyFunctionRepository)
         {
             _subjectRepository = subjectRepository;
             _resourceRepository = resourceRepository;
             _accessControlPolicyRepository = accessControlPolicyRepository;
             _expressionService = expressionService;
+            _privacyFunctionRepository = privacyFunctionRepository;
         }
 
         ICollection<JObject> IAccessControlPrivacyService.ExecuteSecurityProcess(JObject user, JObject[] resource, string action, string collectionName, JObject environment)
@@ -70,6 +73,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
         {
             return _accessControlPolicyRepository.GetPolicies(_collectionName, _action);
         }
+
         /// <summary>Get the privacy rule of collection fields
         /// <para>List policy Access Control</para>
         /// </summary>
@@ -97,9 +101,19 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                 {
                     privacyRules.Add(field.Name, field.FunctionApply);
                 }
-                else if (field.FunctionApply == "Hide")
+                else if (field.FunctionApply == "DefaultPrivacyFunction.Hide")
                 {
                     privacyRules[field.Name] = field.FunctionApply;
+                }
+                else if (privacyRules[field.Name] != "DefaultDomainPrivacy.Hide")
+                {
+                    //resolve conflict
+                    if (privacyRules[field.Name].Contains("DefaultDomainPrivacy")
+                        || privacyRules[field.Name].Equals("Optional"))
+                    {
+                        privacyRules[field.Name] = field.FunctionApply;
+                    }
+                    else privacyRules[field.Name] = _privacyFunctionRepository.ComparePrivacyFunction(privacyRules[field.Name], field.FunctionApply);
                 }
             }
         }
@@ -139,13 +153,19 @@ namespace AttributeBasedAC.Core.JsonAC.Service
         {
             foreach (FieldEffect fieldEffect in bonusFields)
             {
-                if (fieldEffect.FunctionApply == "Hide")
+                if (fieldEffect.FunctionApply == "DefaultDomainPrivacy.Hide")
                 {
-                    privacyRules[fieldEffect.Name] = "Hide";
+                    privacyRules[fieldEffect.Name] = "DefaultDomainPrivacy.Hide";
                 }
-                else if (privacyRules[fieldEffect.Name] != "Hide")
+                else if (privacyRules[fieldEffect.Name] != "DefaultDomainPrivacy.Hide")
                 {
-                    privacyRules[fieldEffect.Name] = fieldEffect.FunctionApply;
+                    //resolve conflict
+                    if (privacyRules[fieldEffect.Name].Contains("DefaultDomainPrivacy")
+                        || privacyRules[fieldEffect.Name].Equals("Optional"))
+                    {
+                        privacyRules[fieldEffect.Name] = fieldEffect.FunctionApply;
+                    }
+                    else privacyRules[fieldEffect.Name] = _privacyFunctionRepository.ComparePrivacyFunction(privacyRules[fieldEffect.Name], fieldEffect.FunctionApply);        
                 }
             }
         }

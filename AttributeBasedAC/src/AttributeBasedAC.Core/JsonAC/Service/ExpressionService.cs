@@ -62,7 +62,8 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                     }
                 }
             }
-            MethodInfo method = typeof(UserDefinedFunctionFactory).GetMethod(function.FunctionName);
+            Type type = Type.GetType("AttributeBasedAC.Core.JsonAC.UserDefinedFunctionFactory");
+            MethodInfo method = type.GetMethod(function.FunctionName);
 
             return (bool)method.Invoke(null, new object[] { parameters.ToArray() });
         }
@@ -118,9 +119,9 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                     }
                 }
             }
-            MethodInfo method = typeof(UserDefinedFunctionFactory).GetMethod(function.FunctionName);
+            Type type = Type.GetType("AttributeBasedAC.Core.JsonAC.UserDefinedFunctionFactory");
+            MethodInfo method = type.GetMethod(function.FunctionName);
             result = method.Invoke(null, parameters.ToArray()).ToString();
-
             return result;
         }
     }

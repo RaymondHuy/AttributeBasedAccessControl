@@ -18,7 +18,7 @@ namespace AttributeBasedAC.Core.JsonAC.Model
         [BsonElement("description")]
         public string Description { get; set; }
 
-        [BsonElement("action_subject")]
+        [BsonElement("action")]
         public string ActionSubject { get; set; }
 
         [BsonElement("collection_field_rules")]

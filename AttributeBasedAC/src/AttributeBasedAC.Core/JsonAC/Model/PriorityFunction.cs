@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 namespace AttributeBasedAC.Core.JsonAC.Model
 {
     [BsonIgnoreExtraElements]
-    public class FieldCondition
+    public class PriorityFunction
     {
-        [BsonElement("field_effects")]
-        public ICollection<FieldEffect> FieldEffects { get; set; }
-        
-        [BsonElement("rule")]
-        public Function Rules { get; set; }
+        [BsonElement("name")]
+        public string Name { get; set; }
+
+        [BsonElement("priority")]
+        public int Priority { get; set; }
     }
 }

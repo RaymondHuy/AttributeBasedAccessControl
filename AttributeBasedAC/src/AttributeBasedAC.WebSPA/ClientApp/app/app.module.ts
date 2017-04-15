@@ -13,7 +13,10 @@ import { PrimeComponent } from './components/prime/prime.component';
 import { PrivacyComponent } from './components/privacy_access_control/privacy_checking.component';
 import { PolicyReviewComponent } from './components/privacy_access_control/policy_review.component';
 import { PrivacyRuleComponent } from './components/privacy_access_control/privacy_rule.component';
-import { ButtonModule, GrowlModule, DropdownModule, AutoCompleteModule, InputTextModule } from 'primeng/primeng';
+import {
+    ButtonModule, GrowlModule, DropdownModule, AutoCompleteModule, InputTextModule, DataTableModule,
+    SharedModule, InputTextareaModule
+} from 'primeng/primeng';
 
 @NgModule({
     bootstrap: [ AppComponent ],
@@ -47,8 +50,8 @@ import { ButtonModule, GrowlModule, DropdownModule, AutoCompleteModule, InputTex
         ButtonModule,
         GrowlModule,
         DropdownModule,
-        AutoCompleteModule,
-        InputTextModule
+        AutoCompleteModule, InputTextareaModule,
+        InputTextModule, DataTableModule, SharedModule
     ]
 })
 export class AppModule {

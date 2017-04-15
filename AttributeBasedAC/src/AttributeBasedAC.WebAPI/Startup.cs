@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using AttributeBasedAC.Core.JsonAC.Repository;
+using AttributeBasedAC.Core.JsonAC.Service;
+using MongoDB.Driver;
 
 namespace AttributeBasedAC.WebAPI
 {
@@ -29,6 +32,24 @@ namespace AttributeBasedAC.WebAPI
         {
             // Add framework services.
             services.AddMvc();
+            services.AddScoped<IMongoClient, MongoClient>();
+
+            services.AddScoped<ISubjectRepository, SubjectRepository>();
+            services.AddScoped<IAccessControlPolicyRepository, AccessControlPolicyRepository>();
+            services.AddScoped<IResourceRepository, ResourceRepository>();
+            services.AddScoped<IPrivacyFunctionRepository, PrivacyFunctionRepository>();
+
+            services.AddScoped<IExpressionService, ExpressionService>();
+            services.AddScoped<IAccessControlPrivacyService, AccessControlPrivacyService>();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials());
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -36,7 +57,7 @@ namespace AttributeBasedAC.WebAPI
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
-
+            app.UseCors("CorsPolicy");
             app.UseMvc();
         }
     }

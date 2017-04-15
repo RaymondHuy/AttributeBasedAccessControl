@@ -17,17 +17,7 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
         {
             _mongoClient = mongoClient;
         }
-
-        ICollection<TargetSubject> IAccessControlPolicyRepository.GetAllTargetSubjects()
-        {
-            var data = _mongoClient.GetDatabase(JsonAccessControlSetting.AccessControlDatabaseName)
-                                   .GetCollection<TargetSubject>("PolicyTargetSubject")
-                                   .Find(_ => true)
-                                   .ToList();
-
-            return data;
-        }
-
+        
         ICollection<PolicyAccessControl> IAccessControlPolicyRepository.GetPolicies(string collectionName, string action)
         {
             var builder = Builders<PolicyAccessControl>.Filter;

@@ -11,8 +11,6 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
 {
     public interface IAccessControlPolicyRepository
     {
-        ICollection<TargetSubject> GetAllTargetSubjects();
-
         ICollection<PolicyAccessControl> GetPolicies(string collectionName, string action);
         
     }

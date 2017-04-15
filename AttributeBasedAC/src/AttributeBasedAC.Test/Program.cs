@@ -55,7 +55,7 @@ namespace AttributeBasedAC.Test
         static CollectionRequestInfo resourceInfo = new CollectionRequestInfo()
         {
             Name = "Department",
-            FilterCondition = Builders<BsonDocument>.Filter.Gt("dept_id", 5)
+            FilterCondition = Builders<BsonDocument>.Filter.Gt("dept_id", 25)
         };
 
         static JObject environment = new JObject(new JProperty("purpose", "analysis"));
@@ -71,6 +71,7 @@ namespace AttributeBasedAC.Test
             builder.RegisterType<SubjectRepository>().As<ISubjectRepository>();
             builder.RegisterType<ResourceRepository>().As<IResourceRepository>();
             builder.RegisterType<AccessControlPolicyRepository>().As<IAccessControlPolicyRepository>();
+            builder.RegisterType<PrivacyFunctionRepository>().As<IPrivacyFunctionRepository>();
 
             builder.RegisterType<ExpressionService>().As<IExpressionService>();
             builder.RegisterType<AccessControlPrivacyService>().As<IAccessControlPrivacyService>();

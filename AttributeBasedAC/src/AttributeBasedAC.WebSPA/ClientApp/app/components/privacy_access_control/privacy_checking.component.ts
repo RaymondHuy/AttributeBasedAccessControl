@@ -1,9 +1,9 @@
-﻿import { Component } from '@angular/core';
-import { SelectItem } from 'primeng/primeng';
+﻿/// <reference path="../../models/app_setting.ts" />
+import { Component, OnInit } from '@angular/core';
+import { Http, Headers, RequestOptions } from '@angular/http';
+import { SelectItem, Message } from 'primeng/primeng';
 
-import {
-    Message
-} from 'primeng/primeng';
+import { AppSetting } from '../../models/app_setting';
 @Component({
     selector: 'privacy_checking',
     template: require('./privacy_checking.component.html')
@@ -11,8 +11,9 @@ import {
 export class PrivacyComponent {
 
     //#region Subject
-    private user_attributes: SelectItem[] = [];
-    private user_selected_attribute: string;
+    private users: any[];
+    private user_property_names: any[] = [];
+    private selected_user: any;
     //#endregion
 
     //#region Resource
@@ -24,57 +25,132 @@ export class PrivacyComponent {
     private resource_values: string;
     private resource_operators: SelectItem[] = [];
     private resource_selected_operator: string;
+
+    private condition_result: string = "";
     //#endregion
 
+    //#region environment
     private environment_field: string;
     private environment_value: string;
+    private environment_object: string;
+    private environment_result: string;
+    //#endregion
+    private json_helper: any;
 
-    cities: SelectItem[];
+    private headers = new Headers({ 'Content-Type': 'application/json' });
+    private options = new RequestOptions({ headers: this.headers });
 
-    selectedCity: string;
+    constructor(private http: Http) {
+        this.json_helper = JSON;
 
-    filteredCountriesSingle: any[];
-
-    city: string;
-
-    
-    constructor() {
-        this.user_attributes.push({ label: '_id', value: '_id' });
-        this.user_attributes.push({ label: 'access_token', value: 'access_token' });
-        this.user_attributes.push({ label: 'role', value: 'role' });
-
-        this.collection_names.push({ label: 'Department', value: 'Department' });
-        this.collection_names.push({ label: 'Employee', value: 'Employee' });
-
-        this.resource_fields.push({ label: 'dept_id', value: 'dept_id' });
-        this.resource_fields.push({ label: 'dept_no', value: 'dept_no' });
-
-        this.cities = [];
-        this.cities.push({ label: '', value: null });
-        this.cities.push({ label: 'New York', value: { id: 1, name: 'New York', code: 'NY' } });
-        this.cities.push({ label: 'Rome', value: { id: 2, name: 'Rome', code: 'RM' } });
-        this.cities.push({ label: 'London', value: { id: 3, name: 'London', code: 'LDN' } });
-        this.cities.push({ label: 'Istanbul', value: { id: 4, name: 'Istanbul', code: 'IST' } });
-        this.cities.push({ label: 'Paris', value: { id: 5, name: 'Paris', code: 'PRS' } });
+        this.users = [
+            { _id: 'a1235', name: 'Alice' },
+            { _id: 'b465', name: 'Bob' },
+            { _id: 'ad84', name: 'John' },
+            { _id: 'awd4', name: 'James' }
+        ];
 
         this.resource_operators.push({ label: 'Equals', value: 'Equals' });
         this.resource_operators.push({ label: 'GreaterThan', value: 'GreaterThan' });
         this.resource_operators.push({ label: 'LessThan', value: 'LessThan' });
+
     }
 
-    filterCountrySingle(event) {
-        let query = event.query;
-        this.filteredCountriesSingle = this.filterCountry(query, this.cities);
-    }
-
-    filterCountry(query, countries: SelectItem[]): any[] {
-        let filtered: any[] = [];
-        for (let i = 0; i < countries.length; i++) {
-            let country = countries[i];
-            if (country.label.toLowerCase().indexOf(query.toLowerCase()) == 0) {
-                filtered.push(country);
+    ngOnInit() {
+        var that = this;
+        this.http.get(AppSetting.API_ENDPOINT +'accounts/').subscribe(data => {
+            let jsonObject: any = data.json()[0];
+            for (var property in jsonObject) {
+                that.user_property_names.push(property);
             }
-        }
-        return filtered;
+            that.users = data.json();
+        })
+        this.http.get(AppSetting.API_ENDPOINT + 'collections/').subscribe(data => {
+            let collections: any[] = data.json();
+            for (var name of collections) {
+                that.collection_names.push({ label: name, value: name });
+            }
+        })
+    }
+
+    private onSelectCollectionName(collectionSelected: string) {
+        var that = this;
+        this.resource_fields = [];
+        console.log(collectionSelected);
+        this.http.get(AppSetting.API_ENDPOINT + 'structure/?collectionName=' + collectionSelected).subscribe(data => {
+            let jsonObject: any = data.json();
+            for (var property in jsonObject) {
+                that.resource_fields.push({ label: property, value: property });
+            }
+        })
+    }
+
+    and_click() {
+        this.condition_result += " AND ";
+    }
+
+    or_click() {
+        this.condition_result += " OR ";
+    }
+
+    not_click() {
+        this.condition_result += "NOT( ";
+    }
+
+    open_bracket_click() {
+        this.condition_result += "(";
+    }
+
+    private close_bracket_click() {
+        this.condition_result += " )";
+    }
+
+    private add_condition() {
+        if (!this.resource_selected_field)
+            this.resource_selected_field = this.resource_fields[0].value;
+
+        if (!this.resource_selected_operator)
+            this.resource_selected_operator = this.resource_operators[0].value;
+
+        let expression: string = this.resource_selected_operator + '('
+            + this.resource_selected_field + ', ' + this.resource_values + ')';
+
+        if (this.condition_result)
+            this.condition_result += expression;
+        else this.condition_result = expression;
+    }
+
+    private clear_condition() {
+        this.condition_result = null;
+    }
+
+    private add_environment_field() {
+        if (!this.environment_result)
+            this.environment_result = "\"" + this.environment_field + "\" : \"" + this.environment_value + "\"";
+        else
+            this.environment_result += ", \"" + this.environment_field + "\" : \"" + this.environment_value + "\"";
+
+        this.environment_object = "{ " + this.environment_result + " }";
+
+        this.environment_field = this.environment_value = null;
+    }
+
+    private clear_environment() {
+        this.environment_object = "";
+        this.environment_result = "";
+    }
+
+    private submit() {
+        let environment = "{ " + this.environment_result + " }";
+        let command = {
+            "UserID": this.selected_user._id,
+            "ResourceName": this.collection_selected_name,
+            "ResourceCondition": this.condition_result,
+            "Environment": environment
+        };
+
+        this.http.post(AppSetting.API_ENDPOINT + 'privacy/check/', JSON.stringify(command), this.options).subscribe(data => {
+            console.log(data);
+        });
     }
 }
