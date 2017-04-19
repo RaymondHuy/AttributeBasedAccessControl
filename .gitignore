@@ -4,3 +4,7 @@
 /AttributeBasedAC/src/AttributeBasedAC.Core/obj/Debug/**/*.*
 /AttributeBasedAC/src/AttributeBasedAC.WebAPI/bin/Debug/**/*.*
 /AttributeBasedAC/src/AttributeBasedAC.WebAPI/obj/Debug/**/*.*
+
+/AttributeBasedAC/src/AttributeBasedAC.Test/project.lock.json
+/AttributeBasedAC/src/AttributeBasedAC.WebAPI/project.lock.json
+/AttributeBasedAC/src/AttributeBasedAC.Core/project.lock.json
