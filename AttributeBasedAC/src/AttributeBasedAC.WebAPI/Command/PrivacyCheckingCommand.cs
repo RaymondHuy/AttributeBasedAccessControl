@@ -14,5 +14,7 @@ namespace AttributeBasedAC.WebAPI.Command
         public string ResourceCondition { get; set; }
 
         public string Environment { get; set; }
+
+        public string Action { get; set; }
     }
 }

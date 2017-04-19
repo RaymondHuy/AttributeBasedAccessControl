@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace AttributeBasedAC.Core.JsonAC.Model
 {
     [BsonIgnoreExtraElements]
-    public class PolicyAccessControl
+    public class PrivacyPolicy
     {
         public ObjectId Id { get; set; }
 
@@ -21,10 +21,11 @@ namespace AttributeBasedAC.Core.JsonAC.Model
         [BsonElement("action")]
         public string ActionSubject { get; set; }
 
-        [BsonElement("collection_field_rules")]
-        public ICollection<FieldCondition> CollectionFieldRules { get; set; }
+        [BsonElement("is_attribute_resource_required")]
+        public bool IsAttributeResourceRequired { get; set; }
 
-        [BsonElement("record_rules")]
-        public ICollection<FieldCondition> RecordFieldRules { get; set; }
+        [BsonElement("rules")]
+        public ICollection<FieldRule> Rules { get; set; }
+        
     }
 }

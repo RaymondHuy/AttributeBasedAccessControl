@@ -12,7 +12,9 @@
       "type": "platform",
       "version": "1.0.1"
     },
-    "AttributeBasedAC.Core": "1.0.0-*"
+    "AttributeBasedAC.Core": "1.0.0-*",
+    "AttributeBasedAC.WebAPI": "1.0.0-*",
+    "xunit": "2.2.0"
   },
 
   "frameworks": {

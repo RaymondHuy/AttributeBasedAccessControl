@@ -1,4 +1,8 @@
-﻿<div class="row">
+﻿<div class="col-lg-12">
+    <p-messages [value]="msgs"></p-messages>
+</div>
+
+<div class="row">
     <div class="col-lg-12"><h3 style="color: blue">Subject Selection</h3></div>
 
     <div class="col-lg-12">
@@ -60,17 +64,35 @@
             <input id="in" type="text" size="25" pInputText [(ngModel)]="environment_value" />
         </div>
     </div>
+
     <div class="col-lg-12" style="padding-bottom: 10px" >
         <button class="ui-button-success" pButton type="button" 
                 label="Add" (click)="add_environment_field()"></button>
         <button class="ui-button-success" pButton type="button"
                  label="Clear" (click)="clear_environment()"></button>
     </div>
+
     <div class="col-lg-12">
         <textarea style="border-color: black" rows="2" cols="140" pInputTextarea class="ui-inputtextarea"
                   [(ngModel)]="environment_object" [disabled]="true"></textarea>
     </div>
+
     <div class="col-lg-12 text-center">
         <button class="btn btn-primary btn-lg" type="button" style="height:90%" (click)="submit()">Submit</button>
+    </div>
+
+    <div class="col-lg-12" *ngIf="result.length > 0" style="margin-top:20px">
+        <table class="table table-bordered table-responsive table-striped">
+            <thead>
+                <tr>
+                    <th *ngFor="let col of result_property_names">{{col}}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let row of result">
+                    <td *ngFor="let idx of result_property_names">{{json_helper.stringify(row[idx])}}</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>

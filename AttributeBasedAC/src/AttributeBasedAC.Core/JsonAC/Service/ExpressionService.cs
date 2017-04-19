@@ -11,17 +11,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
 {
     public class ExpressionService : IExpressionService
     {
-        private readonly ISubjectRepository _subjectRepository;
-        private readonly IResourceRepository _resourceRepository;
-        
-        public ExpressionService(
-            ISubjectRepository subjectRepository,
-            IResourceRepository resourceRepository)
-        {
-            _subjectRepository = subjectRepository;
-            _resourceRepository = resourceRepository;
-        }
-        
+
         bool IExpressionService.Evaluate(Function function, JObject user, JObject resource, JObject environment)
         {
             var parameters = new List<string>();
@@ -62,16 +52,24 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                     }
                 }
             }
+
             Type type = Type.GetType("AttributeBasedAC.Core.JsonAC.UserDefinedFunctionFactory");
             MethodInfo method = type.GetMethod(function.FunctionName);
+            string result = String.Empty;
+            if (method.GetParameters().Length > 0)
+            {
+                result = method.GetParameters()[0].ParameterType.IsArray
+                       ? method.Invoke(null, new object[] { parameters.ToArray() }).ToString()
+                       : method.Invoke(null, parameters.ToArray()).ToString();
+            }
+            else result = method.Invoke(null, null).ToString();
 
-            return (bool)method.Invoke(null, new object[] { parameters.ToArray() });
+            return bool.Parse(result);
         }
 
         private string InvokeFunction(Function function, JObject user, JObject resource, JObject environment)
         {
-            List<object> parameters = new List<object>();
-            string result;
+            var parameters = new List<object>();
 
             foreach (var param in function.Parameters)
             {
@@ -79,7 +77,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                 if (param.Value == null)
                 {
                     string resultFunctionInvoke = InvokeFunction(param, user, resource, environment);
-                    if (resultFunctionInvoke == null) return null;
+                    if (resultFunctionInvoke == null) return "";
                     else
                     {
                         bool isOrOperatorEscape = (function.FunctionName == "Or" && resultFunctionInvoke == "true");
@@ -113,16 +111,35 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                                 break;
                         }
                         if (value == null)
-                            return null;
+                            return "";
 
                         parameters.Add(value.ToString());
                     }
                 }
             }
+
+            string result = String.Empty;
             Type type = Type.GetType("AttributeBasedAC.Core.JsonAC.UserDefinedFunctionFactory");
             MethodInfo method = type.GetMethod(function.FunctionName);
-            result = method.Invoke(null, parameters.ToArray()).ToString();
+            if (method.GetParameters().Length > 0)
+            {
+                result = method.GetParameters()[0].ParameterType.IsArray
+                       ? method.Invoke(null, new object[] { parameters.ToArray() }).ToString()
+                       : method.Invoke(null, parameters.ToArray()).ToString();
+            }
+            else result = method.Invoke(null, null).ToString();
             return result;
+        }
+        /// <summary>
+        /// Or (Equal (Resource._id, 1232), Equal (Subject.role, leader))
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <returns></returns>
+        Function IExpressionService.Parse(string condition)
+        {
+            return null;
+            //condition.Remove()
+            throw new NotImplementedException();
         }
     }
 }

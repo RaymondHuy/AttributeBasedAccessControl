@@ -12,5 +12,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
         /// <summary>Evaluate a conditional expression. 
         /// </summary>
         bool Evaluate(Function function, JObject user, JObject resource, JObject environment);
+
+        Function Parse(string condition);
     }
 }

@@ -1,12 +1,13 @@
 ﻿/// <reference path="../../models/app_setting.ts" />
 import { Component, OnInit } from '@angular/core';
 import { Http, Headers, RequestOptions } from '@angular/http';
-import { SelectItem, Message } from 'primeng/primeng';
+import { SelectItem, Message, ConfirmationService } from 'primeng/primeng';
 
 import { AppSetting } from '../../models/app_setting';
 @Component({
     selector: 'privacy_checking',
-    template: require('./privacy_checking.component.html')
+    template: require('./privacy_checking.component.html'),
+    providers: [ConfirmationService]
 })
 export class PrivacyComponent {
 
@@ -35,21 +36,19 @@ export class PrivacyComponent {
     private environment_object: string;
     private environment_result: string;
     //#endregion
+
+    //#region result
+    private result: any[] = [];
+    private result_property_names: any[] = [];
+    //#endregion
     private json_helper: any;
+    private msgs: Message[] = [];
 
     private headers = new Headers({ 'Content-Type': 'application/json' });
     private options = new RequestOptions({ headers: this.headers });
 
     constructor(private http: Http) {
         this.json_helper = JSON;
-
-        this.users = [
-            { _id: 'a1235', name: 'Alice' },
-            { _id: 'b465', name: 'Bob' },
-            { _id: 'ad84', name: 'John' },
-            { _id: 'awd4', name: 'James' }
-        ];
-
         this.resource_operators.push({ label: 'Equals', value: 'Equals' });
         this.resource_operators.push({ label: 'GreaterThan', value: 'GreaterThan' });
         this.resource_operators.push({ label: 'LessThan', value: 'LessThan' });
@@ -58,7 +57,7 @@ export class PrivacyComponent {
 
     ngOnInit() {
         var that = this;
-        this.http.get(AppSetting.API_ENDPOINT +'accounts/').subscribe(data => {
+        this.http.get(AppSetting.API_ENDPOINT + 'accounts/').subscribe(data => {
             let jsonObject: any = data.json()[0];
             for (var property in jsonObject) {
                 that.user_property_names.push(property);
@@ -70,13 +69,14 @@ export class PrivacyComponent {
             for (var name of collections) {
                 that.collection_names.push({ label: name, value: name });
             }
+            that.collection_selected_name = collections[0];
+            that.onSelectCollectionName(collections[0]);
         })
     }
 
     private onSelectCollectionName(collectionSelected: string) {
         var that = this;
         this.resource_fields = [];
-        console.log(collectionSelected);
         this.http.get(AppSetting.API_ENDPOINT + 'structure/?collectionName=' + collectionSelected).subscribe(data => {
             let jsonObject: any = data.json();
             for (var property in jsonObject) {
@@ -141,16 +141,34 @@ export class PrivacyComponent {
     }
 
     private submit() {
+        if (!this.selected_user) {
+            this.msgs = [];
+            this.msgs.push({ severity: 'error', summary: 'Error Message', detail: 'You have not selected user' });
+            return;
+        }
         let environment = "{ " + this.environment_result + " }";
         let command = {
             "UserID": this.selected_user._id,
             "ResourceName": this.collection_selected_name,
             "ResourceCondition": this.condition_result,
-            "Environment": environment
+            "Environment": environment,
+            "Action": "read"
         };
-
-        this.http.post(AppSetting.API_ENDPOINT + 'privacy/check/', JSON.stringify(command), this.options).subscribe(data => {
-            console.log(data);
-        });
+        this.result = [];
+        this.result_property_names = [];
+        let that = this;
+        this.http.post(AppSetting.API_ENDPOINT + 'privacy/check/', JSON.stringify(command), this.options).subscribe(
+            data => {
+                that.result = data.json();
+                let jsonObject: any = data.json()[0];
+                for (var property in jsonObject) {
+                    that.result_property_names.push(property);
+                }
+            },
+            error => {
+                this.msgs = [];
+                this.msgs.push({ severity: 'error', summary: 'Error Message', detail: error });
+            }
+        );
     }
 }

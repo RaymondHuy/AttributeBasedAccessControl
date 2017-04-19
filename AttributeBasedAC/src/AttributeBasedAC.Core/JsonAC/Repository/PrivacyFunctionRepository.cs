@@ -14,7 +14,7 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
         public PrivacyFunctionRepository(IMongoClient mongoClient)
         {
             _mongoClient = mongoClient;
-            _mongoCollection = _mongoClient.GetDatabase(JsonAccessControlSetting.AccessControlDatabaseName)
+            _mongoCollection = _mongoClient.GetDatabase(JsonAccessControlSetting.PrivacyAccessControlDbName)
                                         .GetCollection<PrivacyDomain>("PrivacyFunction");
         }
 

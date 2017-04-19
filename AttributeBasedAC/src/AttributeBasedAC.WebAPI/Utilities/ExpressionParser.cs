@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AttributeBasedAC.WebAPI.Utilities
 {
-    public class ExpressionParser
+    public class ExpressionMongoDbParser
     {
         public FilterDefinition<BsonDocument> ParseCondition(string condition)
         {
@@ -110,6 +110,7 @@ namespace AttributeBasedAC.WebAPI.Utilities
                 return true;
             return false;
         }
+
         private int Priority(string op)
         {
             if (op.Equals("NOT(", StringComparison.OrdinalIgnoreCase))
@@ -118,6 +119,7 @@ namespace AttributeBasedAC.WebAPI.Utilities
                 return 2;
             else return 1;
         }
+
         private FilterDefinition<BsonDocument> ConvertToFilterDefinition(string condition)
         {
             var filter = Builders<BsonDocument>.Filter;

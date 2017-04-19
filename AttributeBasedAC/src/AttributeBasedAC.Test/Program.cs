@@ -14,6 +14,7 @@ using AttributeBasedAC.Core.JsonAC;
 using AttributeBasedAC.Core.NewtonsoftExtension;
 using System.Reflection;
 using System.Diagnostics;
+using AttributeBasedAC.Test.WebApiTesting;
 
 namespace AttributeBasedAC.Test
 {
@@ -72,6 +73,7 @@ namespace AttributeBasedAC.Test
             builder.RegisterType<ResourceRepository>().As<IResourceRepository>();
             builder.RegisterType<AccessControlPolicyRepository>().As<IAccessControlPolicyRepository>();
             builder.RegisterType<PrivacyFunctionRepository>().As<IPrivacyFunctionRepository>();
+            builder.RegisterType<PrivacyPolicyRepository>().As<IPrivacyPolicyRepository>();
 
             builder.RegisterType<ExpressionService>().As<IExpressionService>();
             builder.RegisterType<AccessControlPrivacyService>().As<IAccessControlPrivacyService>();
@@ -80,21 +82,28 @@ namespace AttributeBasedAC.Test
 
             using (var scope = container.BeginLifetimeScope())
             {
-                var service = scope.Resolve<IAccessControlPrivacyService>();
-                var subjectRepository = scope.Resolve<ISubjectRepository>();
-                var resourceRepository = scope.Resolve<IResourceRepository>();
-                var user = subjectRepository.GetUniqueUser(subjest.Name, subjest.FilterCondition);
-                var resource = resourceRepository.GetCollectionDataWithCustomFilter(resourceInfo.Name, resourceInfo.FilterCondition);
-                var s = new Stopwatch();
-                s.Start();
-                ICollection<JObject> result = service.ExecuteSecurityProcess(user, resource, action, resourceInfo.Name, environment);
-                s.Stop();
-                Console.WriteLine(s.Elapsed);
-                foreach (var item in result)
-                {
-                    Console.WriteLine(item);
-                }
+                Test(scope);
+                //var service = scope.Resolve<IAccessControlPrivacyService>();
+                //var subjectRepository = scope.Resolve<ISubjectRepository>();
+                //var resourceRepository = scope.Resolve<IResourceRepository>();
+                //var user = subjectRepository.GetUniqueUser(subjest.Name, subjest.FilterCondition);
+                //var resource = resourceRepository.GetCollectionDataWithCustomFilter(resourceInfo.Name, null);
+                //var s = new Stopwatch();
+                //s.Start();
+                //ICollection<JObject> result = service.ExecuteSecurityProcess(user, resource, action, resourceInfo.Name, environment);
+                //s.Stop();
+                //Console.WriteLine(s.Elapsed);
+                //foreach (var item in result)
+                //{
+                //    Console.WriteLine(item);
+                //}
             }
+        }
+
+        public static void Test(ILifetimeScope scope)
+        {
+            var test = new PrivacyControllerTest();
+            test.CheckTesting(scope);
         }
     }
 }

@@ -15,7 +15,7 @@ import { PolicyReviewComponent } from './components/privacy_access_control/polic
 import { PrivacyRuleComponent } from './components/privacy_access_control/privacy_rule.component';
 import {
     ButtonModule, GrowlModule, DropdownModule, AutoCompleteModule, InputTextModule, DataTableModule,
-    SharedModule, InputTextareaModule
+    SharedModule, InputTextareaModule, MessagesModule
 } from 'primeng/primeng';
 
 @NgModule({
@@ -50,7 +50,7 @@ import {
         ButtonModule,
         GrowlModule,
         DropdownModule,
-        AutoCompleteModule, InputTextareaModule,
+        AutoCompleteModule, InputTextareaModule, MessagesModule,
         InputTextModule, DataTableModule, SharedModule
     ]
 })

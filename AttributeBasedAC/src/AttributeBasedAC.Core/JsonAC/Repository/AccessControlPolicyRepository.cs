@@ -18,17 +18,31 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
             _mongoClient = mongoClient;
         }
         
-        ICollection<PolicyAccessControl> IAccessControlPolicyRepository.GetPolicies(string collectionName, string action)
+        ICollection<AccessControlPolicy> IAccessControlPolicyRepository.GetPolicies(string collectionName, string action, bool isAttributeResourceRequired)
         {
-            var builder = Builders<PolicyAccessControl>.Filter;
+            var builder = Builders<AccessControlPolicy>.Filter;
             var filter = builder.Eq("collection_name", collectionName)
-                       & builder.Eq("action_subject", action);
+                       & builder.Eq("action", action)
+                       & builder.Eq("is_attribute_resource_required", isAttributeResourceRequired);
 
-            var data = _mongoClient.GetDatabase(JsonAccessControlSetting.AccessControlDatabaseName)
-                                   .GetCollection<PolicyAccessControl>("PolicyExpression")
+            var data = _mongoClient.GetDatabase(JsonAccessControlSetting.PrivacyAccessControlDbName)
+                                   .GetCollection<AccessControlPolicy>(JsonAccessControlSetting.AccessControlCollectionName)
                                    .Find(filter)
                                    .ToList();
             return data;
+        }
+
+        string IAccessControlPolicyRepository.GetPolicyCombining(string collectionName, string action)
+        {
+            var builder = Builders<AccessControlPolicyCombiningConfiguration>.Filter;
+            var filter = builder.Eq("collection_name", collectionName)
+                       & builder.Eq("action", action);
+
+            var data = _mongoClient.GetDatabase(JsonAccessControlSetting.PrivacyAccessControlDbName)
+                                   .GetCollection<AccessControlPolicyCombiningConfiguration>(JsonAccessControlSetting.AccessControlPolicyCombiningConfigurtaion)
+                                   .Find(filter)
+                                   .First();
+            return data.Algorithm;
         }
     }
 }

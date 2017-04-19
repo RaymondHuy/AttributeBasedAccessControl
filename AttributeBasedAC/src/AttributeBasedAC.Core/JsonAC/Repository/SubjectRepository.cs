@@ -27,11 +27,12 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
             return JArray.Parse(user.ToJson());
         }
 
-        JObject ISubjectRepository.GetUniqueUser(string collectionName, FilterDefinition<BsonDocument> filterByKey)
+        JObject ISubjectRepository.GetUniqueUser(string collectionName, dynamic filterExpressionByKey)
         {
+            var filter = (FilterDefinition<BsonDocument>)filterExpressionByKey;
             var user = _mongoClient.GetDatabase(JsonAccessControlSetting.UserDefaultDatabaseName)
                                     .GetCollection<BsonDocument>(collectionName)
-                                    .Find(filterByKey)
+                                    .Find(filter)
                                     .FirstOrDefault();
 
             return JObject.Parse(user.ToJson());

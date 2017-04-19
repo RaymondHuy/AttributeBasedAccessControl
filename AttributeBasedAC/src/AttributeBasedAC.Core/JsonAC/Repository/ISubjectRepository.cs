@@ -10,7 +10,7 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
 {
     public interface ISubjectRepository
     {
-        JObject GetUniqueUser(string collectionName, FilterDefinition<BsonDocument> filterByKey);
+        JObject GetUniqueUser(string collectionName, dynamic filterExpressionByKey);
 
         JArray GetAllUsers(string collectionName);
         
