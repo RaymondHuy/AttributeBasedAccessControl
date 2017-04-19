@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AttributeBasedAC.Core.JsonAC.Service
 {
-    public interface IExpressionService
+    public interface IConditionalExpressionService
     {
         /// <summary>Evaluate a conditional expression. 
         /// </summary>

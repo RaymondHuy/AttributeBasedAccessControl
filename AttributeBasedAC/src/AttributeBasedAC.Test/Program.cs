@@ -75,7 +75,7 @@ namespace AttributeBasedAC.Test
             builder.RegisterType<PrivacyFunctionRepository>().As<IPrivacyFunctionRepository>();
             builder.RegisterType<PrivacyPolicyRepository>().As<IPrivacyPolicyRepository>();
 
-            builder.RegisterType<ExpressionService>().As<IExpressionService>();
+            builder.RegisterType<ConditionalExpressionService>().As<IConditionalExpressionService>();
             builder.RegisterType<AccessControlPrivacyService>().As<IAccessControlPrivacyService>();
 
             var container = builder.Build();

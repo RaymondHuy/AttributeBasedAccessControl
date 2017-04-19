@@ -31,5 +31,11 @@ namespace AttributeBasedAC.Test.WebApiTesting
             var result = privacyController.Check(command);
             Console.WriteLine(result.ElementAt(0)); 
         }
+
+        [Fact]
+        public void FilterMongoDbParserTesting()
+        {
+
+        }
     }
 }

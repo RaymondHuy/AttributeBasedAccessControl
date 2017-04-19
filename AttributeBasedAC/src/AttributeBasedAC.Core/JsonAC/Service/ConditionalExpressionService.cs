@@ -9,10 +9,10 @@ using Newtonsoft.Json.Linq;
 
 namespace AttributeBasedAC.Core.JsonAC.Service
 {
-    public class ExpressionService : IExpressionService
+    public class ConditionalExpressionService : IConditionalExpressionService
     {
 
-        bool IExpressionService.Evaluate(Function function, JObject user, JObject resource, JObject environment)
+        bool IConditionalExpressionService.Evaluate(Function function, JObject user, JObject resource, JObject environment)
         {
             var parameters = new List<string>();
 
@@ -131,15 +131,136 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             return result;
         }
         /// <summary>
-        /// Or (Equal (Resource._id, 1232), Equal (Subject.role, leader))
+        /// Or (Equal (Resource._id,1232), Equal (Subject.role,leader))
+        /// Equal(Resource._id,function(a,b)) Or Equal(Subject.role,leader)
         /// </summary>
         /// <param name="condition"></param>
         /// <returns></returns>
-        Function IExpressionService.Parse(string condition)
+        Function IConditionalExpressionService.Parse(string condition)
         {
+            var stack = new Stack<string>();
+            var queue = new Queue<string>();
+
+            var resultFunction = new Function();
+            string[] keywords = condition.Split(' ');
+            #region Poland Notation
+            foreach (var keyword in keywords)
+            {
+                if (IsLogicOperator(keyword))
+                {
+                    if (!stack.Any())
+                    {
+                        stack.Push(keyword);
+                        continue;
+                    }
+                    string op = stack.Peek();
+                    if (op.Equals("("))
+                    {
+                        stack.Push(keyword);
+                        continue;
+                    }
+                    if (Priority(keyword) <= Priority(op))
+                    {
+                        while (stack.Count() != 0)
+                        {
+                            string s = stack.Peek();
+                            if (s.Equals("("))
+                                break;
+                            else
+                            {
+                                string temp = stack.Pop();
+                                queue.Enqueue(temp);
+                            }
+                        }
+                        stack.Push(keyword);
+                        continue;
+                    }
+                    stack.Push(keyword);
+                }
+                else if (keyword.Equals("(", StringComparison.OrdinalIgnoreCase))
+                {
+                    stack.Push(keyword);
+                }
+                else if (keyword.Equals(")", StringComparison.OrdinalIgnoreCase))
+                {
+                    while (stack.Count() != 0)
+                    {
+                        string s = stack.Pop();
+                        if (s.Equals("(", StringComparison.OrdinalIgnoreCase))
+                            break;
+                        queue.Enqueue(s);
+                    }
+                }
+                else queue.Enqueue(keyword);
+            }
+            while (stack.Count() != 0)
+            {
+                queue.Enqueue(stack.Pop());
+            }
+            #endregion
+            var stackBuilder = new Stack<Function>();
+            while (queue.Any())
+            {
+                string keyword = queue.Dequeue();
+                if (keyword.Equals("AND"))
+                {
+                    var op1 = stackBuilder.Pop();
+                    var op2 = stackBuilder.Pop();
+                    //var result = (op1 & op2);
+                    //stackBuilder.Push(result);
+                }
+                else if (keyword.Equals("OR"))
+                {
+                    var op1 = stackBuilder.Pop();
+                    var op2 = stackBuilder.Pop();
+                    //var result = (op1 | op2);
+                    //stackBuilder.Push(result);
+                }
+                else if (keyword.Equals("NOT"))
+                {
+                    var op1 = stackBuilder.Pop();
+                    //var result = !op1;
+                    //stackBuilder.Push(result);
+                }
+                else
+                {
+                    //stackBuilder.Push(ConvertToFilterDefinition(keyword));
+                }
+            }
+            return stackBuilder.Pop();
+        }
+
+        private bool IsLogicOperator(string keyword)
+        {
+            if (keyword.Equals("AND", StringComparison.OrdinalIgnoreCase)
+             || keyword.Equals("OR", StringComparison.OrdinalIgnoreCase)
+             || keyword.Equals("NOT", StringComparison.OrdinalIgnoreCase))
+                return true;
+            return false;
+        }
+
+        private int Priority(string op)
+        {
+            if (op.Equals("NOT", StringComparison.OrdinalIgnoreCase))
+                return 3;
+            else if (op.Equals("AND", StringComparison.OrdinalIgnoreCase))
+                return 2;
+            else return 1;
+        }
+
+        private FilterDefinition<BsonDocument> ConvertToFilterDefinition(string condition)
+        {
+            var filter = Builders<BsonDocument>.Filter;
+            string op = condition.Split('(')[0];
+            string field = condition.Split('(')[1].Split(',')[0];
+            string value = condition.Split('(')[1].Split(',')[0];
+            if (op.Equals("Equals"))
+                return filter.Eq(field, value);
+            else if (op.Equals("GreaterThan"))
+                return filter.Gt(field, int.Parse(value));
+            else if (op.Equals("LessThan"))
+                return filter.Lt(field, int.Parse(value));
             return null;
-            //condition.Remove()
-            throw new NotImplementedException();
         }
     }
 }

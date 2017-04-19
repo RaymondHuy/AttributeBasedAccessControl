@@ -7,16 +7,15 @@ using System.Threading.Tasks;
 
 namespace AttributeBasedAC.WebAPI.Utilities
 {
-    public class ExpressionMongoDbParser
+    public class MongoDbFilterParser
     {
-        public FilterDefinition<BsonDocument> ParseCondition(string condition)
+        public FilterDefinition<BsonDocument> Parse(string filter)
         {
             var stack = new Stack<string>();
             var queue = new Queue<string>();
 
             var builder = Builders<BsonDocument>.Filter;
-            var filter = builder.Eq("x", 10) & !builder.Lt("y", 20);
-            string[] keywords = condition.Split(' ');
+            string[] keywords = filter.Split(' ');
             #region Poland Notation
             foreach (var keyword in keywords)
             {

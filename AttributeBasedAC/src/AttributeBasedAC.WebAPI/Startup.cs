@@ -41,7 +41,7 @@ namespace AttributeBasedAC.WebAPI
             services.AddScoped<IAccessControlPolicyRepository, AccessControlPolicyRepository>();
             services.AddScoped<IPrivacyPolicyRepository, PrivacyPolicyRepository>();
 
-            services.AddScoped<IExpressionService, ExpressionService>();
+            services.AddScoped<IConditionalExpressionService, ConditionalExpressionService>();
             services.AddScoped<IAccessControlPrivacyService, AccessControlPrivacyService>();
 
             services.AddCors(options =>
