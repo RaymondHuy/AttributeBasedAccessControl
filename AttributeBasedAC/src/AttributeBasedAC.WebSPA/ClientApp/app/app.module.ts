@@ -12,7 +12,8 @@ import { studentsComponent } from './components/students/students.component';
 import { PrimeComponent } from './components/prime/prime.component';
 import { PrivacyComponent } from './components/privacy_access_control/privacy_checking.component';
 import { PolicyReviewComponent } from './components/privacy_access_control/policy_review.component';
-import { PrivacyRuleComponent } from './components/privacy_access_control/privacy_rule.component';
+import { AccessControlPolicyFormCreateComponent } from './components/privacy_access_control/privacy_rule.component';
+import { PrivacyPolicyFormCreateComponent } from './components/privacy_access_control/privacy_policy_form_create.component';
 import {
     ButtonModule, GrowlModule, DropdownModule, AutoCompleteModule, InputTextModule, DataTableModule,
     SharedModule, InputTextareaModule, MessagesModule
@@ -30,7 +31,8 @@ import {
         PrimeComponent,
         PrivacyComponent,
         PolicyReviewComponent,
-        PrivacyRuleComponent
+        AccessControlPolicyFormCreateComponent,
+        PrivacyPolicyFormCreateComponent
     ],
     imports: [
         UniversalModule, // Must be first import. This automatically imports BrowserModule, HttpModule, and JsonpModule too.
@@ -43,7 +45,8 @@ import {
             { path: 'prime', component: PrimeComponent },
             { path: 'privacy_checking', component: PrivacyComponent },
             { path: 'policy_review', component: PolicyReviewComponent },
-            { path: 'privacy_rule', component: PrivacyRuleComponent },
+            { path: 'privacy_rule', component: AccessControlPolicyFormCreateComponent },
+            { path: 'privacy_policy', component: PrivacyPolicyFormCreateComponent },
             { path: '**', redirectTo: 'home' },
         ]),
         FormsModule,

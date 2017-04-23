@@ -3,12 +3,13 @@ import { Http, Headers, RequestOptions } from '@angular/http';
 import { SelectItem, Message, ConfirmationService } from 'primeng/primeng';
 
 import { AppSetting } from '../../models/app_setting';
+import { FieldEffect } from '../../models/field_effect.model';
 
 @Component({
-    selector: 'privacy_rule',
-    template: require('./privacy_rule.component.html')
+    selector: 'privacy_policy',
+    template: require('./privacy_policy_form_create.component.html')
 })
-export class AccessControlPolicyFormCreateComponent {
+export class PrivacyPolicyFormCreateComponent {
     //#region Resource
     private collection_names: SelectItem[] = [];
     private collection_selected_name: string;
@@ -28,12 +29,6 @@ export class AccessControlPolicyFormCreateComponent {
     private actions: SelectItem[] = [];
     private selected_action: string;
 
-    private policy_effects: SelectItem[] = [];
-    private rule_effects: SelectItem[] = [];
-    private selected_policy_effect: string;
-    private selected_rule_effect: string;
-    private final_rule_effects: string[] = [];
-
     private function_names: SelectItem[] = [];
     private selected_function_name: string;
 
@@ -42,8 +37,6 @@ export class AccessControlPolicyFormCreateComponent {
 
     private current_rule_result: string = "";
     private final_rule_result: string[] = [];
-    private rules_combining: SelectItem[] = [];
-    private selected_rule_combining: string;
 
     private target_result: string = "";
 
@@ -52,6 +45,11 @@ export class AccessControlPolicyFormCreateComponent {
 
     private rule_id: string;
     private rule_ids: string[] = [];
+
+    private privacy_field_selected: string;
+    private privacy_functions: SelectItem[] = [];
+    private field_effects: FieldEffect[] = [];
+    private final_field_effects: FieldEffect[][] = [];
 
     private json_helper: any;
     private msgs: Message[] = [];
@@ -65,6 +63,7 @@ export class AccessControlPolicyFormCreateComponent {
 
     ngOnInit() {
         var that = this;
+        //#region call web api for option data
         this.http.get(AppSetting.API_ENDPOINT + 'collections/').subscribe(data => {
             let collections: any[] = data.json();
             for (var name of collections) {
@@ -88,22 +87,19 @@ export class AccessControlPolicyFormCreateComponent {
                 that.initialize_fields(property, jsonObject, "", that.subject_fields);
             }
         });
-
+        this.http.get(AppSetting.API_ENDPOINT + 'PrivacyFunctions/').subscribe(data => {
+            let methods: any = data.json();
+            for (var method of methods) {
+                that.privacy_functions.push({ label: method, value: method});
+            }
+            that.privacy_functions.push({ label: 'Optional', value: 'Optional' });
+        });
+        //#endregion
+        //#region hard code for options
         this.actions.push({ label: 'read', value: 'read' });
         this.actions.push({ label: 'write', value: 'write' });
         this.selected_action = this.actions[0].value;
-
-        this.policy_effects.push({ label: 'Permit', value: 'Permit' });
-        this.policy_effects.push({ label: 'Deny', value: 'Deny' });
-        this.selected_policy_effect = this.policy_effects[0].value;
-
-        this.rule_effects.push({ label: 'Permit', value: 'Permit' });
-        this.rule_effects.push({ label: 'Deny', value: 'Deny' });
-        this.selected_rule_effect = this.rule_effects[0].value;
-
-        this.rules_combining.push({ label: 'Permit overrides', value: 'Permit overrides' });
-        this.rules_combining.push({ label: 'Deny overrides', value: 'Deny overrides' });
-        this.selected_rule_combining = this.rules_combining[0].value;
+        //#endregion
     }
 
     private onSelectCollectionName(collectionSelected: string) {
@@ -115,6 +111,10 @@ export class AccessControlPolicyFormCreateComponent {
                 if (that.resource_selected_field === undefined)
                     that.resource_selected_field = property;
                 that.initialize_fields(property, jsonObject, "", that.resource_fields);
+                that.field_effects = [];
+                for (var item of that.resource_fields) {
+                    that.field_effects.push(new FieldEffect(item.label, "Optional"));
+                }
             }
         })
     }
@@ -124,6 +124,13 @@ export class AccessControlPolicyFormCreateComponent {
         let object = jsonObject[property];
         if (typeof object === 'object' && !Array.isArray(object)) {
             for (var sub_property in object) {
+                if (prefix == '')
+                    this.initialize_fields(sub_property, object, prefix + property, container);
+                else this.initialize_fields(sub_property, object, prefix + '.' + property, container);
+            }
+        }
+        else if (Array.isArray(object)) {
+            for (var sub_property in object[0]) {
                 if (prefix == '')
                     this.initialize_fields(sub_property, object, prefix + property, container);
                 else this.initialize_fields(sub_property, object, prefix + '.' + property, container);
@@ -228,38 +235,41 @@ export class AccessControlPolicyFormCreateComponent {
             this.current_rule_result += ", "
         }
     }
-    //#endregion 
+    //#endregion
 
     private add_current_rule() {
         this.final_rule_result.push(this.current_rule_result);
         this.rule_ids.push(this.rule_id);
-        this.final_rule_effects.push(this.selected_rule_effect);
-        this.msgs.push({ severity: 'info', summary: 'Info Message', detail: 'One rule added' });
+        var cloned: FieldEffect[] = [];
+        for (var item of this.field_effects) {
+            cloned.push(new FieldEffect(item.Name, item.FunctionApply));
+        }
+        this.final_field_effects.push(cloned);
     }
 
     private submit() {
+        console.log(32);
+        console.log(this.final_field_effects);
         let command = {
             "PolicyID": this.policy_id,
             "CollectionName": this.collection_selected_name,
             "Description": this.description,
             "Action": this.selected_action,
-            "Effect": this.selected_policy_effect,
-            "RuleCombining": this.selected_rule_combining,
             "Target": this.target_result,
             "Conditions": this.final_rule_result,
             "RuleIDs": this.rule_ids,
-            "RuleEffects": this.final_rule_effects
+            "FieldEffects": this.final_field_effects
         }
         console.log(command);
-        this.http.post(AppSetting.API_ENDPOINT + 'AccessControlPolicy', JSON.stringify(command), this.options).subscribe(
-            data => {
+        //this.http.post(AppSetting.API_ENDPOINT + 'AccessControlPolicy', JSON.stringify(command), this.options).subscribe(
+        //    data => {
 
-                console.log('OK');
-            },
-            error => {
-                this.msgs = [];
-                this.msgs.push({ severity: 'error', summary: 'Error Message', detail: error });
-            }
-        );
+        //        console.log('OK');
+        //    },
+        //    error => {
+        //        this.msgs = [];
+        //        this.msgs.push({ severity: 'error', summary: 'Error Message', detail: error });
+        //    }
+        //);
     }
 }

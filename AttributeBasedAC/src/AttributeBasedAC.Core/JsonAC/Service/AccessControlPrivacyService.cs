@@ -16,7 +16,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
     {
         private readonly IAccessControlPolicyRepository _accessControlPolicyRepository;
         private readonly IConditionalExpressionService             _expressionService;
-        private readonly IPrivacyFunctionRepository     _privacyFunctionRepository;
+        private readonly IPrivacyDomainRepository     _privacyFunctionRepository;
         private readonly IPrivacyPolicyRepository       _privacyPolicyRepository;
 
         private ICollection<JObject> _resource;
@@ -32,7 +32,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
         public AccessControlPrivacyService(
             IAccessControlPolicyRepository accessControlPolicyRepository,
             IConditionalExpressionService expressionService,
-            IPrivacyFunctionRepository privacyFunctionRepository,
+            IPrivacyDomainRepository privacyFunctionRepository,
             IPrivacyPolicyRepository privacyPolicyRepository)
         {
             _accessControlPolicyRepository = accessControlPolicyRepository;

@@ -72,7 +72,7 @@ namespace AttributeBasedAC.Test
             builder.RegisterType<SubjectRepository>().As<ISubjectRepository>();
             builder.RegisterType<ResourceRepository>().As<IResourceRepository>();
             builder.RegisterType<AccessControlPolicyRepository>().As<IAccessControlPolicyRepository>();
-            builder.RegisterType<PrivacyFunctionRepository>().As<IPrivacyFunctionRepository>();
+            builder.RegisterType<PrivacyDomainRepository>().As<IPrivacyDomainRepository>();
             builder.RegisterType<PrivacyPolicyRepository>().As<IPrivacyPolicyRepository>();
 
             builder.RegisterType<ConditionalExpressionService>().As<IConditionalExpressionService>();

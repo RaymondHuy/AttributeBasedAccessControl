@@ -18,9 +18,11 @@ namespace AttributeBasedAC.Core.JsonAC.Model
         public ICollection<Function> Parameters { get; set; }
 
         [BsonElement("value")]
+        [BsonIgnoreIfNull]
         public string Value { get; set; }
 
         [BsonElement("resource_id")]
+        [BsonIgnoreIfNull]
         public string ResourceID { get; set; }
     }
 }

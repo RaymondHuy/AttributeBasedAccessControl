@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace AttributeBasedAC.Core.JsonAC.Repository
 {
-    public interface IPrivacyFunctionRepository
+    public interface IPrivacyDomainRepository
     {
         string ComparePrivacyFunction(string firstPrivacyFunction, string secondPrivacyFunction);
+
+        IEnumerable<string> GetAllPrivacyFunctionName();
     }
 }

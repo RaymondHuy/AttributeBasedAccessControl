@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace AttributeBasedAC.WebAPI.Command
 {
-    public class PolicyAccessControlInsertCommand
+    public class AccessControlPolicyInsertCommand
     {
         public string PolicyID { get; set; }
 

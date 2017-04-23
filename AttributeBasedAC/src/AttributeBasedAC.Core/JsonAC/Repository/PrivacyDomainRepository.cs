@@ -7,18 +7,18 @@ using System.Threading.Tasks;
 
 namespace AttributeBasedAC.Core.JsonAC.Repository
 {
-    public class PrivacyFunctionRepository : IPrivacyFunctionRepository
+    public class PrivacyDomainRepository : IPrivacyDomainRepository
     {
         private readonly IMongoClient _mongoClient;
         private readonly IMongoCollection<PrivacyDomain> _mongoCollection;
-        public PrivacyFunctionRepository(IMongoClient mongoClient)
+        public PrivacyDomainRepository(IMongoClient mongoClient)
         {
             _mongoClient = mongoClient;
             _mongoCollection = _mongoClient.GetDatabase(JsonAccessControlSetting.PrivacyAccessControlDbName)
-                                        .GetCollection<PrivacyDomain>("PrivacyFunction");
+                                        .GetCollection<PrivacyDomain>("PrivacyDomain");
         }
 
-        string IPrivacyFunctionRepository.ComparePrivacyFunction(string firstPrivacyFunction, string secondPrivacyFunction)
+        string IPrivacyDomainRepository.ComparePrivacyFunction(string firstPrivacyFunction, string secondPrivacyFunction)
         {
             string domainName = firstPrivacyFunction.Split('.')[0];
             string firstPrivacyFunctionName = firstPrivacyFunction.Split('.')[1];
@@ -31,6 +31,20 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
             if (priority1 > priority2)
                 return firstPrivacyFunction;
             else return secondPrivacyFunction;
+        }
+
+        IEnumerable<string> IPrivacyDomainRepository.GetAllPrivacyFunctionName()
+        {
+            var result = new List<string>();
+            var domains = _mongoCollection.Find(_ => true).ToList();
+            foreach (var domain in domains)
+            {
+                foreach (var function in domain.Functions)
+                {
+                    result.Add(domain.DomainName + "." + function.Name);
+                }
+            }
+            return result;
         }
     }
 }

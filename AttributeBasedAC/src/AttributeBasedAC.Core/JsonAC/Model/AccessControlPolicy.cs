@@ -21,11 +21,17 @@ namespace AttributeBasedAC.Core.JsonAC.Model
         [BsonElement("rule_combining")]
         public string RuleCombining { get; set; }
 
+        [BsonElement("is_attribute_resource_required")]
+        public bool IsAttributeResourceRequired { get; set; }
+
         [BsonElement("effect")]
         public string Effect { get; set; }
 
         [BsonElement("action")]
         public string Action { get; set; }
+
+        [BsonElement("target")]
+        public Function Target { get; set; }
 
         [BsonElement("rules")]
         public ICollection<AccessControlRule> Rules { get; set; }

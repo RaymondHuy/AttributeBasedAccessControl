@@ -37,7 +37,7 @@ namespace AttributeBasedAC.WebAPI
             services.AddScoped<ISubjectRepository, SubjectRepository>();
             services.AddScoped<IAccessControlPolicyRepository, AccessControlPolicyRepository>();
             services.AddScoped<IResourceRepository, ResourceRepository>();
-            services.AddScoped<IPrivacyFunctionRepository, PrivacyFunctionRepository>();
+            services.AddScoped<IPrivacyDomainRepository, PrivacyDomainRepository>();
             services.AddScoped<IAccessControlPolicyRepository, AccessControlPolicyRepository>();
             services.AddScoped<IPrivacyPolicyRepository, PrivacyPolicyRepository>();
 

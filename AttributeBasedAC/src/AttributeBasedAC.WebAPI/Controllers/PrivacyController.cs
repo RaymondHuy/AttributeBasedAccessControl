@@ -19,15 +19,18 @@ namespace AttributeBasedAC.WebAPI.Controllers
         private readonly IAccessControlPrivacyService _accessControlPrivacyService;
         private readonly ISubjectRepository _subjectRepository;
         private readonly IResourceRepository _resourceRepository;
+        private readonly IPrivacyDomainRepository _privacyDomainRepository;
 
         public PrivacyController(
             IAccessControlPrivacyService accessControlPrivacyService,
             ISubjectRepository subjectRepository,
-            IResourceRepository resourceRepository)
+            IResourceRepository resourceRepository,
+            IPrivacyDomainRepository privacyDomainRepository)
         {
             _accessControlPrivacyService = accessControlPrivacyService;
             _subjectRepository = subjectRepository;
             _resourceRepository = resourceRepository;
+            _privacyDomainRepository = privacyDomainRepository;
         }
 
         [HttpPost]
@@ -49,6 +52,13 @@ namespace AttributeBasedAC.WebAPI.Controllers
             }
             builder.Append("]");
             return builder.ToString();
+        }
+
+        [HttpGet]
+        [Route("api/PrivacyFunctions")]
+        public IEnumerable<string> GetPrivacyFunctions()
+        {
+            return _privacyDomainRepository.GetAllPrivacyFunctionName();
         }
     }
 }

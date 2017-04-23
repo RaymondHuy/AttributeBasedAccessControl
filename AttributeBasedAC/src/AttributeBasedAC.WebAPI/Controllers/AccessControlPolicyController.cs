@@ -43,7 +43,7 @@ namespace AttributeBasedAC.WebAPI.Controllers
         // POST api/values
         [HttpPost]
         [Route("api/AccessControlPolicy")]
-        public void Post([FromBody]PolicyAccessControlInsertCommand command)
+        public void Post([FromBody]AccessControlPolicyInsertCommand command)
         {
             var accessControlRules = new List<AccessControlRule>();
             for (int i = 0; i < command.RuleIDs.Count; i++)
@@ -58,6 +58,7 @@ namespace AttributeBasedAC.WebAPI.Controllers
                 };
                 accessControlRules.Add(accessControlRule);
             }
+            var target = _conditionalExpressionService.Parse(command.Target);
             var accessControlModel = new AccessControlPolicy()
             {
                 Id = ObjectId.GenerateNewId(),
@@ -66,10 +67,11 @@ namespace AttributeBasedAC.WebAPI.Controllers
                 Description = command.Description,
                 Effect = command.Effect,
                 RuleCombining = command.RuleCombining,
-                Rules = accessControlRules
+                Target = target,
+                Rules = accessControlRules,
+                IsAttributeResourceRequired = true
             };
             _accessControlPolicyRepository.Add(accessControlModel);
-            Console.WriteLine(command);
         }
 
         // PUT api/values/5
