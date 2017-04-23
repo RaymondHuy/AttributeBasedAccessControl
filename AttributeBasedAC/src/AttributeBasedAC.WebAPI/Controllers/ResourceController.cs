@@ -41,5 +41,16 @@ namespace AttributeBasedAC.WebAPI.Controllers
             return database.GetCollectionNames();
         }
 
+        [HttpGet]
+        [Route("api/subject/fields")]
+        public string GetSubjectFields()
+        {
+            var exampleStructure = _mongoClient.GetDatabase(JsonAccessControlSetting.UserDefaultDatabaseName)
+                                   .GetCollection<BsonDocument>(JsonAccessControlSetting.UserDefaultCollectionName)
+                                   .Find(_ => true)
+                                   .First();
+
+            return exampleStructure.ToJson();
+        }
     }
 }

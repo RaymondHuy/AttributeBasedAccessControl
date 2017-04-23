@@ -11,7 +11,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
 {
     public class ConditionalExpressionService : IConditionalExpressionService
     {
-
+        private MethodInfo[] methods;
         bool IConditionalExpressionService.Evaluate(Function function, JObject user, JObject resource, JObject environment)
         {
             var parameters = new List<string>();
@@ -132,12 +132,82 @@ namespace AttributeBasedAC.Core.JsonAC.Service
         }
         /// <summary>
         /// Or (Equal (Resource._id,1232), Equal (Subject.role,leader))
-        /// Equal(Resource._id,function(a,b)) Or Equal(Subject.role,leader)
+        /// Equal ( Resource._id , Function1 ( Resource.name , b ) ) Or Equal ( Subject.role , leader )
         /// </summary>
         /// <param name="condition"></param>
         /// <returns></returns>
         Function IConditionalExpressionService.Parse(string condition)
         {
+            var queue = PolandNotationProcess(condition);
+            var stackBuilder = new Stack<Function>();
+            while (queue.Any())
+            {
+                string keyword = queue.Dequeue();
+                var method = GetUserFunction(keyword);
+                if (method != null)
+                {
+                    var function = new Function()
+                    {
+                        FunctionName = method.Name,
+                        Parameters = new List<Function>()
+                    };
+                    int count = method.GetParameters().Length;
+                    for (int i = 0; i < count; i++)
+                    {
+                        function.Parameters.Add(stackBuilder.Pop());
+                    }
+                    stackBuilder.Push(function);
+                }
+                else if (keyword.Equals("AND"))
+                {
+                    var function = new Function()
+                    {
+                        FunctionName = "And",
+                        Parameters = new List<Function>()
+                    };
+                    function.Parameters.Add(stackBuilder.Pop());
+                    function.Parameters.Add(stackBuilder.Pop());
+                    stackBuilder.Push(function);
+                }
+                else if (keyword.Equals("OR"))
+                {
+                    var function = new Function()
+                    {
+                        FunctionName = "Or",
+                        Parameters = new List<Function>()
+                    };
+                    function.Parameters.Add(stackBuilder.Pop());
+                    function.Parameters.Add(stackBuilder.Pop());
+                    stackBuilder.Push(function);
+                }
+                else if (keyword.Equals("NOT"))
+                {
+                    var function = new Function()
+                    {
+                        FunctionName = "Not",
+                        Parameters = new List<Function>()
+                    };
+                    function.Parameters.Add(stackBuilder.Pop());
+                    stackBuilder.Push(function);
+                }
+                else if (keyword.Contains("."))
+                {
+                    int idxResourceName = keyword.IndexOf('.');
+                    var function = new Function()
+                    {
+                        ResourceID = keyword.Substring(0, idxResourceName),
+                        Value = keyword.Substring(idxResourceName + 1)
+                    };
+                    stackBuilder.Push(function);
+                }
+                else stackBuilder.Push(new Function() { Value = keyword });
+            }
+            return stackBuilder.Pop();
+        }
+
+        public Queue<string> PolandNotationProcess(string condition)
+        {
+
             var stack = new Stack<string>();
             var queue = new Queue<string>();
 
@@ -181,16 +251,27 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                 {
                     stack.Push(keyword);
                 }
+                else if (GetUserFunction(keyword) != null)
+                {
+                    stack.Push(keyword);
+                }
                 else if (keyword.Equals(")", StringComparison.OrdinalIgnoreCase))
                 {
                     while (stack.Count() != 0)
                     {
                         string s = stack.Pop();
                         if (s.Equals("(", StringComparison.OrdinalIgnoreCase))
+                        {
+                            string methodName = stack.Any() ? stack.Pop() : String.Empty;
+                            if (methodName != null)
+                                queue.Enqueue(methodName);
                             break;
+                        }
                         queue.Enqueue(s);
                     }
                 }
+                else if (keyword.Equals(",") || keyword.Equals(""))
+                    continue;
                 else queue.Enqueue(keyword);
             }
             while (stack.Count() != 0)
@@ -198,36 +279,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                 queue.Enqueue(stack.Pop());
             }
             #endregion
-            var stackBuilder = new Stack<Function>();
-            while (queue.Any())
-            {
-                string keyword = queue.Dequeue();
-                if (keyword.Equals("AND"))
-                {
-                    var op1 = stackBuilder.Pop();
-                    var op2 = stackBuilder.Pop();
-                    //var result = (op1 & op2);
-                    //stackBuilder.Push(result);
-                }
-                else if (keyword.Equals("OR"))
-                {
-                    var op1 = stackBuilder.Pop();
-                    var op2 = stackBuilder.Pop();
-                    //var result = (op1 | op2);
-                    //stackBuilder.Push(result);
-                }
-                else if (keyword.Equals("NOT"))
-                {
-                    var op1 = stackBuilder.Pop();
-                    //var result = !op1;
-                    //stackBuilder.Push(result);
-                }
-                else
-                {
-                    //stackBuilder.Push(ConvertToFilterDefinition(keyword));
-                }
-            }
-            return stackBuilder.Pop();
+            return queue;
         }
 
         private bool IsLogicOperator(string keyword)
@@ -239,6 +291,13 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             return false;
         }
 
+        private MethodInfo GetUserFunction(string keyword)
+        {
+            methods = methods ?? typeof(UserDefinedFunctionFactory).GetMethods();
+            var method = methods.Where(m => m.Name.Equals(keyword)).FirstOrDefault();
+            return method;
+        }
+
         private int Priority(string op)
         {
             if (op.Equals("NOT", StringComparison.OrdinalIgnoreCase))
@@ -246,21 +305,6 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             else if (op.Equals("AND", StringComparison.OrdinalIgnoreCase))
                 return 2;
             else return 1;
-        }
-
-        private FilterDefinition<BsonDocument> ConvertToFilterDefinition(string condition)
-        {
-            var filter = Builders<BsonDocument>.Filter;
-            string op = condition.Split('(')[0];
-            string field = condition.Split('(')[1].Split(',')[0];
-            string value = condition.Split('(')[1].Split(',')[0];
-            if (op.Equals("Equals"))
-                return filter.Eq(field, value);
-            else if (op.Equals("GreaterThan"))
-                return filter.Gt(field, int.Parse(value));
-            else if (op.Equals("LessThan"))
-                return filter.Lt(field, int.Parse(value));
-            return null;
         }
     }
 }

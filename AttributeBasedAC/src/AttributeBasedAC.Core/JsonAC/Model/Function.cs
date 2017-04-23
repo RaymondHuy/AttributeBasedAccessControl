@@ -10,9 +10,11 @@ namespace AttributeBasedAC.Core.JsonAC.Model
     public class Function
     {
         [BsonElement("function_name")]
+        [BsonIgnoreIfNull]
         public string FunctionName { get; set; }
 
         [BsonElement("parameters")]
+        [BsonIgnoreIfNull]
         public ICollection<Function> Parameters { get; set; }
 
         [BsonElement("value")]

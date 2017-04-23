@@ -17,7 +17,15 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
         {
             _mongoClient = mongoClient;
         }
-        
+
+        void IAccessControlPolicyRepository.Add(AccessControlPolicy policy)
+        {
+            var MongoDB = _mongoClient.GetDatabase(JsonAccessControlSetting.PrivacyAccessControlDbName);
+            var Collec = MongoDB.GetCollection<AccessControlPolicy>(JsonAccessControlSetting.AccessControlCollectionName);
+            
+            Collec.InsertOneAsync(policy);
+        }
+
         ICollection<AccessControlPolicy> IAccessControlPolicyRepository.GetPolicies(string collectionName, string action, bool isAttributeResourceRequired)
         {
             var builder = Builders<AccessControlPolicy>.Filter;

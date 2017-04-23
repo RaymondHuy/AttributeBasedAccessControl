@@ -102,8 +102,11 @@ namespace AttributeBasedAC.Test
 
         public static void Test(ILifetimeScope scope)
         {
-            var test = new PrivacyControllerTest();
-            test.CheckTesting(scope);
+            var service = scope.Resolve<IConditionalExpressionService>();
+            string s = "Equal ( Resource._id , Function1 ( Resource.name , b ) ) OR Equal ( Subject.role , leader )";
+            var test = new ConditionalExpressionService();
+            //test.PolandNotationProcess(s);
+            Function f = service.Parse(s);
         }
     }
 }

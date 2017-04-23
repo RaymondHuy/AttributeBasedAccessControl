@@ -98,6 +98,12 @@ namespace AttributeBasedAC.Core.JsonAC
             }
             return result;
         }
-        
+
+        public void Function1(int a, int b)
+        { }
+
+        public void Function2(string s)
+        { }
+
     }
 }

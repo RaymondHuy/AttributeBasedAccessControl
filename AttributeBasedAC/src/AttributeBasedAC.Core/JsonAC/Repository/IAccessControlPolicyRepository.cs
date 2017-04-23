@@ -14,5 +14,7 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
         ICollection<AccessControlPolicy> GetPolicies(string collectionName, string action, bool isAttributeResourceRequired);
 
         string GetPolicyCombining(string collectionName, string action);
+
+        void Add(AccessControlPolicy policy);
     }
 }
