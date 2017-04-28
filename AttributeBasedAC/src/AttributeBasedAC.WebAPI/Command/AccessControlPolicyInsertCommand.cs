@@ -15,8 +15,6 @@ namespace AttributeBasedAC.WebAPI.Command
 
         public string Action { get; set; }
 
-        public string Effect { get; set; }
-
         public string RuleCombining { get; set; }
 
         public string Target { get; set; }

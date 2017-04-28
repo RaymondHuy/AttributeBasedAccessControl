@@ -41,17 +41,17 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             _privacyPolicyRepository = privacyPolicyRepository;
         }
 
-        ICollection<JObject> IAccessControlPrivacyService.ExecuteSecurityProcess(JObject user, JObject[] resource, string action, string collectionName, JObject environment)
+        ResponseContext IAccessControlPrivacyService.ExecuteSecurityProcess(JObject user, JObject[] resource, string action, string collectionName, JObject environment)
         {
             _user = user;
             _collectionName = collectionName;
             _action = action;
             _environment = environment;
             _policyCombining = _accessControlPolicyRepository.GetPolicyCombining(collectionName, action);
-            _collectionPrivacyRules = GetFieldCollectionRules();
-
+            
             environment.AddAnnotation(action);
-            resource = AccessControlCollectionPolicyProcessing(resource);
+            if (AccessControlCollectionPolicyProcessing() == EffectResult.Deny)
+                return new ResponseContext(EffectResult.Deny, null);
 
             var accessControlRecordPolicies = _accessControlPolicyRepository.GetPolicies(collectionName, action, true);
             _resource = new List<JObject>();
@@ -62,6 +62,13 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                     _resource.Add(record);
             }
 
+            if (_resource.Count == 0)
+                return new ResponseContext(EffectResult.Deny, null);
+
+            if (!action.Equals("read"))
+                return new ResponseContext(EffectResult.Permit, _resource);
+
+            _collectionPrivacyRules = GetFieldCollectionRules();
             var privacyRecords = new List<JObject>();
             
             //Parallel.ForEach(_resource, record =>
@@ -77,7 +84,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                 var privacyRecord = PrivacyProcessing(record, privacyFields);
                 privacyRecords.Add(privacyRecord);
             }
-            return privacyRecords;
+            return new ResponseContext(EffectResult.Permit, privacyRecords);
         }
 
         /// <summary>Get the privacy rule of collection fields
@@ -180,13 +187,21 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             }
         }
         
-        private JObject[] AccessControlCollectionPolicyProcessing(JObject[] resource)
+        private EffectResult AccessControlCollectionPolicyProcessing()
         {
+            EffectResult result = EffectResult.NotApplicable;
+
             string policyCombining = _accessControlPolicyRepository.GetPolicyCombining(_collectionName, _action);
             ICollection<AccessControlPolicy> collectionPolicies = _accessControlPolicyRepository.GetPolicies(_collectionName, _action, false);
-            JObject[] result = null;
-
+            var targetPolicies = new List<AccessControlPolicy>();
             foreach (var policy in collectionPolicies)
+            {
+                bool isTarget = _expressionService.Evaluate(policy.Target, _user, null, _environment);
+                if (isTarget)
+                    targetPolicies.Add(policy);
+            }
+
+            foreach (var policy in targetPolicies)
             {
                 string policyEffect = String.Empty;
 
@@ -206,12 +221,12 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                 }
                 if (policyEffect.Equals("Permit") && policyCombining.Equals("permit-overrides"))
                 {
-                    result = resource;
+                    result = EffectResult.Permit;
                     break;
                 }
                 else if (policyEffect.Equals("Deny") && policyCombining.Equals("deny-overrides"))
                 {
-                    result = null;
+                    result = EffectResult.Deny;
                     break;
                 }
             }
@@ -221,8 +236,14 @@ namespace AttributeBasedAC.Core.JsonAC.Service
         private JObject AccessControlRecordPolicyProcessing(JObject resource, string policyCombining, ICollection<AccessControlPolicy> policies)
         {
             JObject result = null;
-
+            var targetPolicy = new List<AccessControlPolicy>();
             foreach (var policy in policies)
+            {
+                bool isTarget = _expressionService.Evaluate(policy.Target, _user, resource, _environment);
+                if (isTarget)
+                    targetPolicy.Add(policy);
+            }
+            foreach (var policy in targetPolicy)
             {
                 string policyEffect = String.Empty;
 

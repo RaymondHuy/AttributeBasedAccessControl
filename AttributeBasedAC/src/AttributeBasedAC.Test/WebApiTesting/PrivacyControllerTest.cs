@@ -19,7 +19,8 @@ namespace AttributeBasedAC.Test.WebApiTesting
             var accessControlPrivacyService = scope.Resolve<IAccessControlPrivacyService>();
             var subjectRepository = scope.Resolve<ISubjectRepository>();
             var resourceRepository = scope.Resolve<IResourceRepository>();
-            var privacyController = new PrivacyController(accessControlPrivacyService, subjectRepository, resourceRepository);
+            var privacyDomain = scope.Resolve<IPrivacyDomainRepository>();
+            var privacyController = new PrivacyController(accessControlPrivacyService, subjectRepository, resourceRepository, privacyDomain);
             var command = new PrivacyCheckingCommand
             {
                 Environment = "{ 'purpose' : 'analysis' }",

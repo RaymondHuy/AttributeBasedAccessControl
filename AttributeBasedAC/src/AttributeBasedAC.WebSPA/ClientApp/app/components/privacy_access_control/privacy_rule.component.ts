@@ -27,10 +27,8 @@ export class AccessControlPolicyFormCreateComponent {
 
     private actions: SelectItem[] = [];
     private selected_action: string;
-
-    private policy_effects: SelectItem[] = [];
+    
     private rule_effects: SelectItem[] = [];
-    private selected_policy_effect: string;
     private selected_rule_effect: string;
     private final_rule_effects: string[] = [];
 
@@ -90,12 +88,10 @@ export class AccessControlPolicyFormCreateComponent {
         });
 
         this.actions.push({ label: 'read', value: 'read' });
-        this.actions.push({ label: 'write', value: 'write' });
+        this.actions.push({ label: 'create', value: 'create' });
+        this.actions.push({ label: 'update', value: 'update' });
+        this.actions.push({ label: 'delete', value: 'delete' });
         this.selected_action = this.actions[0].value;
-
-        this.policy_effects.push({ label: 'Permit', value: 'Permit' });
-        this.policy_effects.push({ label: 'Deny', value: 'Deny' });
-        this.selected_policy_effect = this.policy_effects[0].value;
 
         this.rule_effects.push({ label: 'Permit', value: 'Permit' });
         this.rule_effects.push({ label: 'Deny', value: 'Deny' });
@@ -243,7 +239,6 @@ export class AccessControlPolicyFormCreateComponent {
             "CollectionName": this.collection_selected_name,
             "Description": this.description,
             "Action": this.selected_action,
-            "Effect": this.selected_policy_effect,
             "RuleCombining": this.selected_rule_combining,
             "Target": this.target_result,
             "Conditions": this.final_rule_result,
@@ -253,8 +248,7 @@ export class AccessControlPolicyFormCreateComponent {
         console.log(command);
         this.http.post(AppSetting.API_ENDPOINT + 'AccessControlPolicy', JSON.stringify(command), this.options).subscribe(
             data => {
-
-                console.log('OK');
+                this.msgs.push({ severity: 'info', summary: 'Info Message', detail: 'Create Successfully' });
             },
             error => {
                 this.msgs = [];

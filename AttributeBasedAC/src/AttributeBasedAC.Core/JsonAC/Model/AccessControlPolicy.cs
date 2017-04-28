@@ -10,8 +10,6 @@ namespace AttributeBasedAC.Core.JsonAC.Model
     [BsonIgnoreExtraElements]
     public class AccessControlPolicy
     {
-        public ObjectId Id { get; set; }
-
         [BsonElement("collection_name")]
         public string CollectionName { get; set; }
 
@@ -23,9 +21,6 @@ namespace AttributeBasedAC.Core.JsonAC.Model
 
         [BsonElement("is_attribute_resource_required")]
         public bool IsAttributeResourceRequired { get; set; }
-
-        [BsonElement("effect")]
-        public string Effect { get; set; }
 
         [BsonElement("action")]
         public string Action { get; set; }

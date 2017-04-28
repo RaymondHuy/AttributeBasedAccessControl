@@ -52,8 +52,7 @@ namespace AttributeBasedAC.WebAPI.Controllers
                 var accessControlRule = new AccessControlRule()
                 {
                     Id = command.RuleIDs.ElementAt(i),
-                    //Effect = command.RuleEffects.ElementAt(i),
-                    Effect = "Permit",
+                    Effect = command.RuleEffects.ElementAt(i),
                     Condition = condition
                 };
                 accessControlRules.Add(accessControlRule);
@@ -61,11 +60,9 @@ namespace AttributeBasedAC.WebAPI.Controllers
             var target = _conditionalExpressionService.Parse(command.Target);
             var accessControlModel = new AccessControlPolicy()
             {
-                Id = ObjectId.GenerateNewId(),
                 CollectionName = command.CollectionName,
                 Action = command.Action,
                 Description = command.Description,
-                Effect = command.Effect,
                 RuleCombining = command.RuleCombining,
                 Target = target,
                 Rules = accessControlRules,

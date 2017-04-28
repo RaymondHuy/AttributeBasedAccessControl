@@ -14,6 +14,15 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
         {
             _mongoClient = mongoClient;
         }
+
+        void IPrivacyPolicyRepository.Add(PrivacyPolicy privacyPolicy)
+        {
+            var MongoDB = _mongoClient.GetDatabase(JsonAccessControlSetting.PrivacyAccessControlDbName);
+            var Collec = MongoDB.GetCollection<PrivacyPolicy>(JsonAccessControlSetting.PrivacyCollectionName);
+
+            Collec.InsertOneAsync(privacyPolicy);
+        }
+
         ICollection<PrivacyPolicy> IPrivacyPolicyRepository.GetPolicies(string collectionName, string action, bool isAttributeResourceRequired)
         {
             var builder = Builders<PrivacyPolicy>.Filter;

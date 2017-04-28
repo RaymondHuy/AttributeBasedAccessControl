@@ -1,10 +1,12 @@
-﻿using System;
+﻿using AttributeBasedAC.Core.JsonAC.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace AttributeBasedAC.WebAPI.Command
 {
+
     public class PrivacyPolicyInsertCommand
     {
         //"PolicyID": this.policy_id,
@@ -27,6 +29,6 @@ namespace AttributeBasedAC.WebAPI.Command
 
         public ICollection<string> RuleIDs { get; set; }
 
-        public ICollection<ICollection<string>> FieldEffectsArray { get; set; }
+        public ICollection<FieldEffect[]> FieldEffectsArray { get; set; }
     }
 }

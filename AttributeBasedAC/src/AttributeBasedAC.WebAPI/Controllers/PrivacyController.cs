@@ -1,4 +1,5 @@
 ﻿using AttributeBasedAC.Core.JsonAC;
+using AttributeBasedAC.Core.JsonAC.Model;
 using AttributeBasedAC.Core.JsonAC.Repository;
 using AttributeBasedAC.Core.JsonAC.Service;
 using AttributeBasedAC.WebAPI.Command;
@@ -44,9 +45,12 @@ namespace AttributeBasedAC.WebAPI.Controllers
             var action = command.Action;
             var result = _accessControlPrivacyService.ExecuteSecurityProcess(subject, resource, action, command.ResourceName, environment);
 
+            if (result.Effect == EffectResult.Deny)
+                return "Deny";
+
             var builder = new StringBuilder();
             builder.Append("[");
-            foreach (var json in result)
+            foreach (var json in result.Data)
             {
                 builder.Append(json.ToString());
             }
@@ -59,6 +63,14 @@ namespace AttributeBasedAC.WebAPI.Controllers
         public IEnumerable<string> GetPrivacyFunctions()
         {
             return _privacyDomainRepository.GetAllPrivacyFunctionName();
+        }
+
+        [HttpPost]
+        [Route("api/PrivacyPolicy")]
+        public IEnumerable<string> Create([FromBody]PrivacyPolicyInsertCommand command)
+        {
+            var policy = new PrivacyPolicy();
+            return null;
         }
     }
 }

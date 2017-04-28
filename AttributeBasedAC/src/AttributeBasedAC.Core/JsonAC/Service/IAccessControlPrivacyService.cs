@@ -8,6 +8,6 @@ namespace AttributeBasedAC.Core.JsonAC.Service
 {
     public interface IAccessControlPrivacyService
     {
-        ICollection<JObject> ExecuteSecurityProcess(JObject user, JObject[] resource, string action, string collectionName, JObject environment);
+        ResponseContext ExecuteSecurityProcess(JObject user, JObject[] resource, string action, string collectionName, JObject environment);
     }
 }

@@ -62,6 +62,7 @@ export class PrivacyPolicyFormCreateComponent {
     }
 
     ngOnInit() {
+        console.log('aaaa');
         var that = this;
         //#region call web api for option data
         this.http.get(AppSetting.API_ENDPOINT + 'collections/').subscribe(data => {
@@ -247,6 +248,10 @@ export class PrivacyPolicyFormCreateComponent {
         this.final_field_effects.push(cloned);
     }
 
+    private customFunction(): SelectItem[] {
+        return this.privacy_functions;
+    }
+
     private submit() {
         console.log(32);
         console.log(this.final_field_effects);
@@ -258,18 +263,17 @@ export class PrivacyPolicyFormCreateComponent {
             "Target": this.target_result,
             "Conditions": this.final_rule_result,
             "RuleIDs": this.rule_ids,
-            "FieldEffects": this.final_field_effects
+            "FieldEffectsArray": this.final_field_effects
         }
         console.log(command);
-        //this.http.post(AppSetting.API_ENDPOINT + 'AccessControlPolicy', JSON.stringify(command), this.options).subscribe(
-        //    data => {
-
-        //        console.log('OK');
-        //    },
-        //    error => {
-        //        this.msgs = [];
-        //        this.msgs.push({ severity: 'error', summary: 'Error Message', detail: error });
-        //    }
-        //);
+        this.http.post(AppSetting.API_ENDPOINT + 'PrivacyPolicy', JSON.stringify(command), this.options).subscribe(
+            data => {
+                console.log('OK');
+            },
+            error => {
+                this.msgs = [];
+                this.msgs.push({ severity: 'error', summary: 'Error Message', detail: error });
+            }
+        );
     }
 }
