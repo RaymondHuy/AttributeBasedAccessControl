@@ -16,6 +16,6 @@ namespace AttributeBasedAC.Core.JsonAC.Model
         public Function Condition { get; set; }
 
         [BsonElement("rule_id")]
-        public Function Id { get; set; }
+        public string Identifer { get; set; }
     }
 }

@@ -13,6 +13,9 @@ namespace AttributeBasedAC.Core.JsonAC.Model
         [BsonElement("collection_name")]
         public string CollectionName { get; set; }
 
+        [BsonElement("policy_id")]
+        public string PolicyId { get; set; }
+
         [BsonElement("description")]
         public string Description { get; set; }
 

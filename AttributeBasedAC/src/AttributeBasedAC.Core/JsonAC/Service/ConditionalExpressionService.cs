@@ -67,68 +67,17 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             return bool.Parse(result);
         }
 
-        private string InvokeFunction(Function function, JObject user, JObject resource, JObject environment)
+        bool IConditionalExpressionService.IsAccessControlPolicyRelateToContext(AccessControlPolicy policy, JObject user, JObject resource, JObject environment)
         {
-            var parameters = new List<object>();
+            if (CheckRelativeFunction(policy.Target, user, resource, environment) == true)
+                return true;
 
-            foreach (var param in function.Parameters)
+            foreach (var rule in policy.Rules)
             {
-                // if parameter is another function
-                if (param.Value == null)
-                {
-                    string resultFunctionInvoke = InvokeFunction(param, user, resource, environment);
-                    if (resultFunctionInvoke == null) return "";
-                    else
-                    {
-                        bool isOrOperatorEscape = (function.FunctionName == "Or" && resultFunctionInvoke == "true");
-                        bool isAndOperatorEscape = (function.FunctionName == "And" && resultFunctionInvoke == "false");
-
-                        if (isOrOperatorEscape || isAndOperatorEscape) return "true";
-                    }
-                    parameters.Add(resultFunctionInvoke);
-                }
-                else
-                {
-                    // if parameter is a constant value
-                    if (param.ResourceID == null)
-                    {
-                        parameters.Add(param.Value);
-                    }
-                    // if parameter is a value taken from repository
-                    else
-                    {
-                        JToken value = null;
-                        switch (param.ResourceID)
-                        {
-                            case "Subject":
-                                value = user.SelectToken(param.Value);
-                                break;
-                            case "Environment":
-                                value = environment.SelectToken(param.Value);
-                                break;
-                            default:
-                                value = resource.SelectToken(param.Value);
-                                break;
-                        }
-                        if (value == null)
-                            return "";
-
-                        parameters.Add(value.ToString());
-                    }
-                }
+                if (CheckRelativeFunction(rule.Condition, user, resource, environment) == true)
+                    return true;
             }
-
-            string result = String.Empty;
-            Type type = Type.GetType("AttributeBasedAC.Core.JsonAC.UserDefinedFunctionFactory");
-            MethodInfo method = type.GetMethod(function.FunctionName);
-            if (method.GetParameters().Length > 0)
-            {
-                result = method.GetParameters()[0].ParameterType.IsArray
-                       ? method.Invoke(null, new object[] { parameters.ToArray() }).ToString()
-                       : method.Invoke(null, parameters.ToArray()).ToString();
-            }
-            else result = method.Invoke(null, null).ToString();
-            return result;
+            return false;
         }
         /// <summary>
         /// Or (Equal (Resource._id,1232), Equal (Subject.role,leader))
@@ -203,6 +152,147 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                 else stackBuilder.Push(new Function() { Value = keyword });
             }
             return stackBuilder.Pop();
+        }
+
+        private bool? CheckRelativeFunction(Function function, JObject user, JObject resource, JObject environment)
+        {
+            var parameters = new List<string>();
+            bool missingValueField = false;
+            bool hasRelativeField = false;
+            foreach (var param in function.Parameters)
+            {
+                // if parameter is another function
+                if (param.Value == null)
+                {
+                    bool? isRelative = CheckRelativeFunction(param, user, resource, environment);
+                    if (isRelative == true)
+                        return true;
+                }
+                else
+                {
+                    // if parameter is a constant value
+                    if (param.ResourceID == null)
+                    {
+                        parameters.Add(param.Value);
+                    }
+                    // if parameter is a value taken from repository
+                    else
+                    {
+                        JToken value = null;
+                        switch (param.ResourceID)
+                        {
+                            case "Subject":
+                                value = user.SelectToken(param.Value);
+                                break;
+                            case "Environment":
+                                value = environment.SelectToken(param.Value);
+                                break;
+                            default:
+                                value = resource.SelectToken(param.Value);
+                                break;
+                        }
+                        if (value != null)
+                        {
+                            parameters.Add(value.ToString());
+                            hasRelativeField = true;
+                        }
+                        else
+                        {
+                            missingValueField = true;
+                            parameters.Add(null);
+                        }
+                    }
+                }
+            }
+            if (missingValueField && hasRelativeField)
+                return true;
+            else if (missingValueField && !hasRelativeField)
+                return false;
+            else if (!missingValueField && !hasRelativeField)
+                return false;
+            try
+            {
+                Type type = Type.GetType("AttributeBasedAC.Core.JsonAC.UserDefinedFunctionFactory");
+                MethodInfo method = type.GetMethod(function.FunctionName);
+                string result = String.Empty;
+                if (method.GetParameters().Length > 0)
+                {
+                    result = method.GetParameters()[0].ParameterType.IsArray
+                           ? method.Invoke(null, new object[] { parameters.ToArray() }).ToString()
+                           : method.Invoke(null, parameters.ToArray()).ToString();
+                }
+                else result = method.Invoke(null, null).ToString();
+                var isRelative = bool.Parse(result);
+                return isRelative;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        private string InvokeFunction(Function function, JObject user, JObject resource, JObject environment)
+        {
+            var parameters = new List<object>();
+
+            foreach (var param in function.Parameters)
+            {
+                // if parameter is another function
+                if (param.Value == null)
+                {
+                    string resultFunctionInvoke = InvokeFunction(param, user, resource, environment);
+                    if (resultFunctionInvoke == null) return "";
+                    else
+                    {
+                        bool isOrOperatorEscape = (function.FunctionName == "Or" && resultFunctionInvoke == "true");
+                        bool isAndOperatorEscape = (function.FunctionName == "And" && resultFunctionInvoke == "false");
+
+                        if (isOrOperatorEscape || isAndOperatorEscape) return "true";
+                    }
+                    parameters.Add(resultFunctionInvoke);
+                }
+                else
+                {
+                    // if parameter is a constant value
+                    if (param.ResourceID == null)
+                    {
+                        parameters.Add(param.Value);
+                    }
+                    // if parameter is a value taken from repository
+                    else
+                    {
+                        JToken value = null;
+                        switch (param.ResourceID)
+                        {
+                            case "Subject":
+                                value = user.SelectToken(param.Value);
+                                break;
+                            case "Environment":
+                                value = environment.SelectToken(param.Value);
+                                break;
+                            default:
+                                value = resource.SelectToken(param.Value);
+                                break;
+                        }
+                        if (value == null)
+                            return "";
+
+                        parameters.Add(value.ToString());
+                    }
+                }
+            }
+
+            string result = String.Empty;
+            Type type = Type.GetType("AttributeBasedAC.Core.JsonAC.UserDefinedFunctionFactory");
+            MethodInfo method = type.GetMethod(function.FunctionName);
+            if (method.GetParameters().Length > 0)
+            {
+                result = method.GetParameters()[0].ParameterType.IsArray
+                       ? method.Invoke(null, new object[] { parameters.ToArray() }).ToString()
+                       : method.Invoke(null, parameters.ToArray()).ToString();
+            }
+            else result = method.Invoke(null, null).ToString();
+            return result;
         }
 
         public Queue<string> PolandNotationProcess(string condition)
@@ -305,6 +395,16 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             else if (op.Equals("AND", StringComparison.OrdinalIgnoreCase))
                 return 2;
             else return 1;
+        }
+
+        bool IConditionalExpressionService.IsPrivacyPolicyRelateToContext(PrivacyPolicy policy, JObject user, JObject resource, JObject environment)
+        {
+            foreach (var rule in policy.Rules)
+            {
+                if (CheckRelativeFunction(rule.Condition, user, resource, environment) == true)
+                    return true;
+            }
+            return false;
         }
     }
 }

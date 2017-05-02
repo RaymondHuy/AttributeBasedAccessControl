@@ -21,17 +21,23 @@ namespace AttributeBasedAC.WebAPI.Controllers
         private readonly ISubjectRepository _subjectRepository;
         private readonly IResourceRepository _resourceRepository;
         private readonly IPrivacyDomainRepository _privacyDomainRepository;
+        private readonly IConditionalExpressionService _conditionalExpressionService;
+        private readonly IPrivacyPolicyRepository _privacyPolicyRepository;
 
         public PrivacyController(
             IAccessControlPrivacyService accessControlPrivacyService,
             ISubjectRepository subjectRepository,
             IResourceRepository resourceRepository,
-            IPrivacyDomainRepository privacyDomainRepository)
+            IPrivacyDomainRepository privacyDomainRepository,
+            IConditionalExpressionService conditionalExpressionService,
+            IPrivacyPolicyRepository privacyPolicyRepository)
         {
             _accessControlPrivacyService = accessControlPrivacyService;
             _subjectRepository = subjectRepository;
             _resourceRepository = resourceRepository;
             _privacyDomainRepository = privacyDomainRepository;
+            _conditionalExpressionService = conditionalExpressionService;
+            _privacyPolicyRepository = privacyPolicyRepository;
         }
 
         [HttpPost]
@@ -67,10 +73,46 @@ namespace AttributeBasedAC.WebAPI.Controllers
 
         [HttpPost]
         [Route("api/PrivacyPolicy")]
-        public IEnumerable<string> Create([FromBody]PrivacyPolicyInsertCommand command)
+        public void Create([FromBody]PrivacyPolicyInsertCommand command)
         {
-            var policy = new PrivacyPolicy();
-            return null;
+            var fieldRules = new List<FieldRule>();
+
+            for (int i = 0; i < command.RuleIDs.Count; i++)
+            {
+                var condition = _conditionalExpressionService.Parse(command.Conditions.ElementAt(i));
+                var fieldRule = new FieldRule()
+                {
+                    Identifer = command.RuleIDs.ElementAt(i),
+                    FieldEffects = command.FieldEffectsArray.ElementAt(i),
+                    Condition = condition
+                };
+                fieldRules.Add(fieldRule);
+            }
+
+            var policy = new PrivacyPolicy()
+            {
+                CollectionName = command.CollectionName,
+                Action = command.Action,
+                Description = command.Description,
+                PolicyId = command.PolicyID,
+                Rules = fieldRules,
+                IsAttributeResourceRequired = true
+            };
+            _privacyPolicyRepository.Add(policy);
+        }
+
+        [HttpPost]
+        [Route("api/Privacy/Review")]
+        public IEnumerable<string> Review([FromBody]PolicyReviewCommand command)
+        {
+            JObject user = string.IsNullOrEmpty(command.UserJsonData) ? new JObject() : JObject.Parse(command.UserJsonData);
+            JObject resource = string.IsNullOrEmpty(command.ResourceJsonData) ? new JObject() : JObject.Parse(command.ResourceJsonData);
+            JObject environment = string.IsNullOrEmpty(command.EnvironmentJsonData) ? new JObject() : JObject.Parse(command.EnvironmentJsonData);
+
+            var policies = _privacyPolicyRepository.GetPolicies(command.CollectionName, command.Action, null);
+            var relativePolicies = _accessControlPrivacyService.Review(policies, user, resource, environment);
+
+            return relativePolicies.Select(p => p.PolicyId).ToList();
         }
     }
 }

@@ -12,6 +12,8 @@ namespace AttributeBasedAC.Core.JsonAC
         #region Equality Predicate
         public static bool Equal(string a, string b)
         {
+            if (a == null && b == null)
+                return true;
             return a.Equals(b);
         }
         #endregion

@@ -98,7 +98,9 @@ export class PrivacyPolicyFormCreateComponent {
         //#endregion
         //#region hard code for options
         this.actions.push({ label: 'read', value: 'read' });
-        this.actions.push({ label: 'write', value: 'write' });
+        this.actions.push({ label: 'create', value: 'create' });
+        this.actions.push({ label: 'update', value: 'update' });
+        this.actions.push({ label: 'delete', value: 'delete' });
         this.selected_action = this.actions[0].value;
         //#endregion
     }

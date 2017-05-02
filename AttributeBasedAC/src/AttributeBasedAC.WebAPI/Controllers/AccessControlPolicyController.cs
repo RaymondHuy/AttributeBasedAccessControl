@@ -8,6 +8,7 @@ using AttributeBasedAC.Core.JsonAC.Service;
 using AttributeBasedAC.Core.JsonAC.Repository;
 using AttributeBasedAC.Core.JsonAC.Model;
 using MongoDB.Bson;
+using Newtonsoft.Json.Linq;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -17,13 +18,16 @@ namespace AttributeBasedAC.WebAPI.Controllers
     {
         private readonly IConditionalExpressionService _conditionalExpressionService;
         private readonly IAccessControlPolicyRepository _accessControlPolicyRepository;
+        private readonly IAccessControlPrivacyService _accessControlPrivacyService;
 
         public AccessControlPolicyController(
             IConditionalExpressionService conditionalExpressionService,
-            IAccessControlPolicyRepository accessControlPolicyRepository)
+            IAccessControlPolicyRepository accessControlPolicyRepository,
+            IAccessControlPrivacyService accessControlPrivacyService)
         {
             _conditionalExpressionService = conditionalExpressionService;
             _accessControlPolicyRepository = accessControlPolicyRepository;
+            _accessControlPrivacyService = accessControlPrivacyService;
         }
 
         // GET: api/values
@@ -71,10 +75,18 @@ namespace AttributeBasedAC.WebAPI.Controllers
             _accessControlPolicyRepository.Add(accessControlModel);
         }
 
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        [HttpPost]
+        [Route("api/AccessControl/Review")]
+        public IEnumerable<string> Review([FromBody]PolicyReviewCommand command)
         {
+            JObject user = string.IsNullOrEmpty(command.UserJsonData) ? new JObject() : JObject.Parse(command.UserJsonData);
+            JObject resource = string.IsNullOrEmpty(command.ResourceJsonData) ? new JObject() : JObject.Parse(command.ResourceJsonData);
+            JObject environment = string.IsNullOrEmpty(command.EnvironmentJsonData) ? new JObject() : JObject.Parse(command.EnvironmentJsonData);
+
+            var policies = _accessControlPolicyRepository.GetPolicies(command.CollectionName, command.Action, null);
+            var relativePolicies = _accessControlPrivacyService.Review(policies, user, resource, environment);
+
+            return relativePolicies.Select(p => p.PolicyId).ToList();
         }
 
         // DELETE api/values/5

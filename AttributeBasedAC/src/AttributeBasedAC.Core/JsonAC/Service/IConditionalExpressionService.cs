@@ -14,5 +14,10 @@ namespace AttributeBasedAC.Core.JsonAC.Service
         bool Evaluate(Function function, JObject user, JObject resource, JObject environment);
 
         Function Parse(string condition);
+
+        bool IsAccessControlPolicyRelateToContext(AccessControlPolicy policy, JObject user, JObject resource, JObject environment);
+
+        bool IsPrivacyPolicyRelateToContext(PrivacyPolicy policy, JObject user, JObject resource, JObject environment);
+
     }
 }

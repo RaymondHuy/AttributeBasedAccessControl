@@ -87,6 +87,17 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             return new ResponseContext(EffectResult.Permit, privacyRecords);
         }
 
+        ICollection<AccessControlPolicy> IAccessControlPrivacyService.Review(ICollection<AccessControlPolicy> policies, JObject user, JObject resource, JObject environment)
+        {
+            var result = new List<AccessControlPolicy>();
+            foreach (var policy in policies)
+            {
+                if (_expressionService.IsAccessControlPolicyRelateToContext(policy, user, resource, environment))
+                    result.Add(policy);
+            }
+            return result;
+        }
+
         /// <summary>Get the privacy rule of collection fields
         /// <para>List policy Access Control</para>
         /// </summary>
@@ -271,6 +282,17 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                     result = null;
                     break;
                 }
+            }
+            return result;
+        }
+
+        ICollection<PrivacyPolicy> IAccessControlPrivacyService.Review(ICollection<PrivacyPolicy> policies, JObject user, JObject resource, JObject environment)
+        {
+            var result = new List<PrivacyPolicy>();
+            foreach (var policy in policies)
+            {
+                if (_expressionService.IsPrivacyPolicyRelateToContext(policy, user, resource, environment))
+                    result.Add(policy);
             }
             return result;
         }
