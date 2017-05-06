@@ -46,5 +46,26 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
             }
             return result;
         }
+
+        IEnumerable<string> IPrivacyDomainRepository.GetPrivacyFunctionNames(string fieldName)
+        {
+            var result = new List<string>();
+            var builder = Builders<PrivacyDomain>.Filter;
+            Console.WriteLine(fieldName);
+            var filter = builder.In("fields", fieldName);
+            result.Add("Optional");
+            var domains = _mongoCollection.Find(_ => true).ToList();
+            foreach (var domain in domains)
+            {
+                if (domain.Fields.Contains(fieldName))
+                    foreach (var function in domain.Functions)
+                    {
+                        result.Add(domain.DomainName + "." + function.Name);
+                    }
+            }
+            result.Add("DefaultDomainPrivacy.Show");
+            result.Add("DefaultDomainPrivacy.Hide");
+            return result;
+        }
     }
 }

@@ -3,7 +3,7 @@ import { Http, Headers, RequestOptions } from '@angular/http';
 import { SelectItem, Message, ConfirmationService } from 'primeng/primeng';
 
 import { AppSetting } from '../../models/app_setting';
-import { FieldEffect } from '../../models/field_effect.model';
+import { FieldEffect, FieldEffectOption } from '../../models/field_effect.model';
 
 @Component({
     selector: 'privacy_policy',
@@ -51,6 +51,8 @@ export class PrivacyPolicyFormCreateComponent {
     private field_effects: FieldEffect[] = [];
     private final_field_effects: FieldEffect[][] = [];
 
+    private field_effect_options: FieldEffectOption[] = [];
+
     private json_helper: any;
     private msgs: Message[] = [];
 
@@ -62,8 +64,8 @@ export class PrivacyPolicyFormCreateComponent {
     }
 
     ngOnInit() {
-        console.log('aaaa');
         var that = this;
+
         //#region call web api for option data
         this.http.get(AppSetting.API_ENDPOINT + 'collections/').subscribe(data => {
             let collections: any[] = data.json();
@@ -72,6 +74,7 @@ export class PrivacyPolicyFormCreateComponent {
             }
             that.collection_selected_name = collections[0];
             that.onSelectCollectionName(collections[0]);
+            console.log(that.field_effect_options);
         });
         this.http.get(AppSetting.API_ENDPOINT + 'function/').subscribe(data => {
             let names: any[] = data.json();
@@ -91,7 +94,7 @@ export class PrivacyPolicyFormCreateComponent {
         this.http.get(AppSetting.API_ENDPOINT + 'PrivacyFunctions/').subscribe(data => {
             let methods: any = data.json();
             for (var method of methods) {
-                that.privacy_functions.push({ label: method, value: method});
+                that.privacy_functions.push({ label: method, value: method });
             }
             that.privacy_functions.push({ label: 'Optional', value: 'Optional' });
         });
@@ -108,18 +111,57 @@ export class PrivacyPolicyFormCreateComponent {
     private onSelectCollectionName(collectionSelected: string) {
         var that = this;
         this.resource_fields = [];
+        this.field_effect_options = [];
         this.http.get(AppSetting.API_ENDPOINT + 'structure/?collectionName=' + collectionSelected).subscribe(data => {
             let jsonObject: any = data.json();
             for (var property in jsonObject) {
                 if (that.resource_selected_field === undefined)
                     that.resource_selected_field = property;
-                that.initialize_fields(property, jsonObject, "", that.resource_fields);
+                that.initialize_field_effects(property, jsonObject, "", that.resource_fields);
                 that.field_effects = [];
-                for (var item of that.resource_fields) {
+                for (let item of that.resource_fields) {
                     that.field_effects.push(new FieldEffect(item.label, "Optional"));
                 }
             }
         })
+    }
+
+    private initialize_field_effects(property: any, jsonObject: any, prefix: string, container: SelectItem[]) {
+        let that = this;
+        let object = jsonObject[property];
+        if (typeof object === 'object' && !Array.isArray(object)) {
+            for (var sub_property in object) {
+                if (prefix == '')
+                    this.initialize_field_effects(sub_property, object, prefix + property, container);
+                else this.initialize_field_effects(sub_property, object, prefix + '.' + property, container);
+            }
+        }
+        else {
+            let name: string = "";
+            if (prefix == '') {
+                container.push({ label: property, value: property });
+                name = property;
+            }
+            else {
+                container.push({ label: prefix + '.' + property, value: prefix + '.' + property });
+                name = prefix + '.' + property;
+            }
+            let parameter = this.collection_selected_name + '.' + name;
+            this.http.get(AppSetting.API_ENDPOINT + 'PrivacyFunction?name=' + parameter, this.options).subscribe(
+                data => {
+                    let effects = data.json();
+                    let select_items: SelectItem[] = [];
+                    for (let effect of effects) {
+                        select_items.push({ label: effect, value: effect })
+                    }
+                    that.field_effect_options.push(new FieldEffectOption(name, select_items));
+                },
+                error => {
+                    this.msgs = [];
+                    this.msgs.push({ severity: 'error', summary: 'Error Message', detail: error });
+                }
+            );
+        }
     }
 
     private initialize_fields(property: any, jsonObject: any, prefix: string, container: SelectItem[]) {
@@ -132,13 +174,13 @@ export class PrivacyPolicyFormCreateComponent {
                 else this.initialize_fields(sub_property, object, prefix + '.' + property, container);
             }
         }
-        else if (Array.isArray(object)) {
-            for (var sub_property in object[0]) {
-                if (prefix == '')
-                    this.initialize_fields(sub_property, object, prefix + property, container);
-                else this.initialize_fields(sub_property, object, prefix + '.' + property, container);
-            }
-        }
+        //else if (Array.isArray(object)) {
+        //    for (var sub_property in object[0]) {
+        //        if (prefix == '')
+        //            this.initialize_fields(sub_property, object, prefix + property, container);
+        //        else this.initialize_fields(sub_property, object, prefix + '.' + property, container);
+        //    }
+        //}
         else {
             if (prefix == '')
                 container.push({ label: property, value: property });
@@ -250,12 +292,18 @@ export class PrivacyPolicyFormCreateComponent {
         this.final_field_effects.push(cloned);
     }
 
-    private customFunction(): SelectItem[] {
+    private getPrivacyFunctions(fieldName: any): SelectItem[] {
+        let result: any;
+        if (this.field_effect_options.length == 0)
+            return this.privacy_functions;
+        else result = this.field_effect_options.find(x => x.Name == fieldName);
+        if (result != undefined)
+            return result.Functions;
         return this.privacy_functions;
+
     }
 
     private submit() {
-        console.log(32);
         console.log(this.final_field_effects);
         let command = {
             "PolicyID": this.policy_id,
@@ -268,14 +316,14 @@ export class PrivacyPolicyFormCreateComponent {
             "FieldEffectsArray": this.final_field_effects
         }
         console.log(command);
-        this.http.post(AppSetting.API_ENDPOINT + 'PrivacyPolicy', JSON.stringify(command), this.options).subscribe(
-            data => {
-                console.log('OK');
-            },
-            error => {
-                this.msgs = [];
-                this.msgs.push({ severity: 'error', summary: 'Error Message', detail: error });
-            }
-        );
+        //this.http.post(AppSetting.API_ENDPOINT + 'PrivacyPolicy', JSON.stringify(command), this.options).subscribe(
+        //    data => {
+        //        console.log('OK');
+        //    },
+        //    error => {
+        //        this.msgs = [];
+        //        this.msgs.push({ severity: 'error', summary: 'Error Message', detail: error });
+        //    }
+        //);
     }
 }

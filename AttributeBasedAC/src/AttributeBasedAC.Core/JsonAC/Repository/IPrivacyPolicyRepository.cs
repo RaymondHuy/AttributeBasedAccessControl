@@ -11,5 +11,7 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
         ICollection<PrivacyPolicy> GetPolicies(string collectionName, string action, bool? isAttributeResourceRequired);
 
         void Add(PrivacyPolicy privacyPolicy);
+
+        PrivacyPolicy GetPolicy(string policyID);
     }
 }

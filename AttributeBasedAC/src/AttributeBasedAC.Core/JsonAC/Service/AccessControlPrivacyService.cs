@@ -127,19 +127,21 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                 {
                     privacyRules.Add(field.Name, field.FunctionApply);
                 }
-                else if (field.FunctionApply == "DefaultPrivacyFunction.Hide")
+                else if (field.FunctionApply.Equals("Optional") || field.FunctionApply.Equals(privacyRules[field.Name]))
+                {
+                    continue;
+                }
+                else if (privacyRules[field.Name].Equals("Optional") || privacyRules[field.Name].Equals("DefaultPrivacyFunction.Show"))
                 {
                     privacyRules[field.Name] = field.FunctionApply;
                 }
-                else if (privacyRules[field.Name] != "DefaultDomainPrivacy.Hide")
+                else if (field.FunctionApply.Equals("DefaultPrivacyFunction.Hide"))
                 {
-                    //resolve conflict
-                    if (privacyRules[field.Name].Contains("DefaultDomainPrivacy")
-                        || privacyRules[field.Name].Equals("Optional"))
-                    {
-                        privacyRules[field.Name] = field.FunctionApply;
-                    }
-                    else privacyRules[field.Name] = _privacyFunctionRepository.ComparePrivacyFunction(privacyRules[field.Name], field.FunctionApply);
+                    privacyRules[field.Name] = field.FunctionApply;
+                }
+                else
+                {
+                    privacyRules[field.Name] = _privacyFunctionRepository.ComparePrivacyFunction(privacyRules[field.Name], field.FunctionApply);
                 }
             }
         }
@@ -166,34 +168,76 @@ namespace AttributeBasedAC.Core.JsonAC.Service
         private JObject PrivacyProcessing(JObject record, IDictionary<string, string> privacyField)
         {
             var privacyRecord = new JObject();
-            
+
             foreach (var fieldName in privacyField.Keys)
             {
-                if (privacyField[fieldName] != "Optional")
-                {
-                    privacyRecord.AddNewFieldFromPath(fieldName, record, privacyField[fieldName]);
+                if (privacyField[fieldName] != "Optional") {
+                    string json = record.SelectToken(fieldName).ToString();
+                    try
+                    {
+                        var token = JToken.Parse(json);
+                        if (token is JArray)
+                        {
+                            var arr = JArray.Parse(record.SelectToken(fieldName).ToString());
+                            privacyRecord[fieldName] = RecursivePrivacyProcess(privacyField[fieldName], arr);
+                        }
+                        else privacyRecord.AddNewFieldFromPath(fieldName, record, privacyField[fieldName]);
+                    }
+                    catch (Exception)
+                    {
+                        privacyRecord.AddNewFieldFromPath(fieldName, record, privacyField[fieldName]);
+                    }
                 }
             }
             return privacyRecord;
         }
 
+        private JArray RecursivePrivacyProcess(string policyName, JArray nestedArrayResource)
+        {
+            var policyID = policyName.Split('.')[1];
+            var policy = _privacyPolicyRepository.GetPolicy(policyID);
+            var result = new JArray();
+            foreach (var token in nestedArrayResource)
+            {
+                var record = (JObject)token;
+                var fieldCollectionRules = new Dictionary<string, string>();
+                foreach (var rule in policy.Rules)
+                {
+                    bool isRuleApplied = _expressionService.Evaluate(rule.Condition, _user, record, _environment);
+                    if (isRuleApplied)
+                    {
+                        foreach (var fieldEffect in rule.FieldEffects)
+                        {
+                            if (!fieldCollectionRules.ContainsKey(fieldEffect.Name))
+                                fieldCollectionRules.Add(fieldEffect.Name, fieldEffect.FunctionApply);
+                            else fieldCollectionRules[fieldEffect.Name] = fieldEffect.FunctionApply;
+                        }
+                    }
+                }
+                result.Add(PrivacyProcessing(record, fieldCollectionRules));
+            }
+            return result;
+        }
+
         private void CombinePrivacyFields(IDictionary<string, string> privacyRules, ICollection<FieldEffect> bonusFields)
         {
-            foreach (FieldEffect fieldEffect in bonusFields)
+            foreach (FieldEffect field in bonusFields)
             {
-                if (fieldEffect.FunctionApply == "DefaultDomainPrivacy.Hide")
+                if (field.FunctionApply.Equals("Optional") || field.FunctionApply.Equals(privacyRules[field.Name]))
                 {
-                    privacyRules[fieldEffect.Name] = "DefaultDomainPrivacy.Hide";
+                    continue;
                 }
-                else if (privacyRules[fieldEffect.Name] != "DefaultDomainPrivacy.Hide")
+                else if (privacyRules[field.Name].Equals("Optional") || privacyRules[field.Name].Equals("DefaultPrivacyFunction.Show"))
                 {
-                    //resolve conflict
-                    if (privacyRules[fieldEffect.Name].Contains("DefaultDomainPrivacy")
-                        || privacyRules[fieldEffect.Name].Equals("Optional"))
-                    {
-                        privacyRules[fieldEffect.Name] = fieldEffect.FunctionApply;
-                    }
-                    else privacyRules[fieldEffect.Name] = _privacyFunctionRepository.ComparePrivacyFunction(privacyRules[fieldEffect.Name], fieldEffect.FunctionApply);        
+                    privacyRules[field.Name] = field.FunctionApply;
+                }
+                else if (field.FunctionApply.Equals("DefaultPrivacyFunction.Hide"))
+                {
+                    privacyRules[field.Name] = field.FunctionApply;
+                }
+                else
+                {
+                    privacyRules[field.Name] = _privacyFunctionRepository.ComparePrivacyFunction(privacyRules[field.Name], field.FunctionApply);
                 }
             }
         }
@@ -297,4 +341,5 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             return result;
         }
     }
+    
 }

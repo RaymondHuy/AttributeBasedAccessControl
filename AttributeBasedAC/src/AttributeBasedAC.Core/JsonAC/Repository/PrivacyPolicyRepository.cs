@@ -39,5 +39,16 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
                                    .ToList();
             return data;
         }
+
+        PrivacyPolicy IPrivacyPolicyRepository.GetPolicy(string policyID)
+        {
+            var builder = Builders<PrivacyPolicy>.Filter;
+            var filter = builder.Eq("policy_id", policyID);
+
+            return _mongoClient.GetDatabase(JsonAccessControlSetting.PrivacyAccessControlDbName)
+                                   .GetCollection<PrivacyPolicy>(JsonAccessControlSetting.PrivacyCollectionName)
+                                   .Find(filter)
+                                   .First();
+        }
     }
 }

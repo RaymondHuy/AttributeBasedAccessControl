@@ -72,7 +72,7 @@
                 <p-column field="FunctionApply" header="Privacy Function"
                           [editable]="true" [style]="{'overflow':'visible'}">
                     <template let-col let-car="rowData" pTemplate="editor">
-                        <p-dropdown [(ngModel)]="car[col.field]" [options]="customFunction()"
+                        <p-dropdown [(ngModel)]="car[col.field]" [options]="getPrivacyFunctions(car.Name)"
                                     [autoWidth]="false" [style]="{'width':'100%'}" required="true"></p-dropdown>
                     </template>
                 </p-column>

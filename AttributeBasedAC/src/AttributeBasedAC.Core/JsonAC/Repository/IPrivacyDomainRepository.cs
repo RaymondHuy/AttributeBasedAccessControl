@@ -11,5 +11,7 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
         string ComparePrivacyFunction(string firstPrivacyFunction, string secondPrivacyFunction);
 
         IEnumerable<string> GetAllPrivacyFunctionName();
+
+        IEnumerable<string> GetPrivacyFunctionNames(string fieldName);
     }
 }
