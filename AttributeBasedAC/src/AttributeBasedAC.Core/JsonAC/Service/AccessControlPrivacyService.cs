@@ -50,7 +50,8 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             _policyCombining = _accessControlPolicyRepository.GetPolicyCombining(collectionName, action);
             
             environment.AddAnnotation(action);
-            if (AccessControlCollectionPolicyProcessing() == EffectResult.Deny)
+            EffectResult effect = AccessControlCollectionPolicyProcessing();
+            if (effect == EffectResult.Deny)
                 return new ResponseContext(EffectResult.Deny, null);
 
             var accessControlRecordPolicies = _accessControlPolicyRepository.GetPolicies(collectionName, action, true);

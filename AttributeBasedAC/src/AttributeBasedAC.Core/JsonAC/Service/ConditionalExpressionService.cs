@@ -6,6 +6,7 @@ using AttributeBasedAC.Core.JsonAC.Model;
 using AttributeBasedAC.Core.JsonAC.Repository;
 using System.Reflection;
 using Newtonsoft.Json.Linq;
+using AttributeBasedAC.Core.Exceptions;
 
 namespace AttributeBasedAC.Core.JsonAC.Service
 {
@@ -47,7 +48,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                                 break;
                         }
                         if (value == null)
-                            return false;
+                            throw new ConditionalExpressionException("Can not access value of field: " + param.ResourceID);
                         else parameters.Add(value.ToString());
                     }
                 }
@@ -55,6 +56,8 @@ namespace AttributeBasedAC.Core.JsonAC.Service
 
             Type type = Type.GetType("AttributeBasedAC.Core.JsonAC.UserDefinedFunctionFactory");
             MethodInfo method = type.GetMethod(function.FunctionName);
+            if(method == null)
+                throw new ConditionalExpressionException("Can not find the method: " + function.FunctionName + " Please implement it in UserDefinedFunctionFactory");
             string result = String.Empty;
             if (method.GetParameters().Length > 0)
             {
@@ -63,8 +66,11 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                        : method.Invoke(null, parameters.ToArray()).ToString();
             }
             else result = method.Invoke(null, null).ToString();
-
-            return bool.Parse(result);
+            bool isConvertSuccessfully = false;
+            bool expressionResult = bool.TryParse(result, out isConvertSuccessfully);
+            if (!isConvertSuccessfully)
+                throw new ConditionalExpressionException("Method " + function.FunctionName + " didn't return boolean value");
+            return expressionResult;
         }
 
         bool IConditionalExpressionService.IsAccessControlPolicyRelateToContext(AccessControlPolicy policy, JObject user, JObject resource, JObject environment)
@@ -285,6 +291,8 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             string result = String.Empty;
             Type type = Type.GetType("AttributeBasedAC.Core.JsonAC.UserDefinedFunctionFactory");
             MethodInfo method = type.GetMethod(function.FunctionName);
+            if (method == null)
+                throw new ConditionalExpressionException("Can not find the method: " + function.FunctionName + " Please implement it in UserDefinedFunctionFactory");
             if (method.GetParameters().Length > 0)
             {
                 result = method.GetParameters()[0].ParameterType.IsArray
