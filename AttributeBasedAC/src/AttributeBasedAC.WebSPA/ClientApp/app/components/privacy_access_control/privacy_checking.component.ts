@@ -80,9 +80,28 @@ export class PrivacyComponent {
         this.http.get(AppSetting.API_ENDPOINT + 'structure/?collectionName=' + collectionSelected).subscribe(data => {
             let jsonObject: any = data.json();
             for (var property in jsonObject) {
-                that.resource_fields.push({ label: property, value: property });
+                if (that.resource_selected_field === undefined)
+                    that.resource_selected_field = property;
+                that.initialize_fields(property, jsonObject, "", that.resource_fields);
             }
         })
+    }
+
+    private initialize_fields(property: any, jsonObject: any, prefix: string, container: SelectItem[]) {
+
+        let object = jsonObject[property];
+        if (typeof object === 'object' && !Array.isArray(object)) {
+            for (var sub_property in object) {
+                if (prefix == '')
+                    this.initialize_fields(sub_property, object, prefix + property, container);
+                else this.initialize_fields(sub_property, object, prefix + '.' + property, container);
+            }
+        }
+        else {
+            if (prefix == '')
+                container.push({ label: property, value: property });
+            else container.push({ label: prefix + '.' + property, value: prefix + '.' + property });
+        }
     }
 
     and_click() {

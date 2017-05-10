@@ -8,11 +8,11 @@ using Newtonsoft.Json.Linq;
 
 namespace AttributeBasedAC.Core.JsonAC.Repository
 {
-    public class SubjectRepository : ISubjectRepository
+    public class SubjectMongoDbRepository : ISubjectRepository
     {
         private readonly IMongoClient _mongoClient;
 
-        public SubjectRepository(IMongoClient mongoClient)
+        public SubjectMongoDbRepository(IMongoClient mongoClient)
         {
             _mongoClient = mongoClient;
         }

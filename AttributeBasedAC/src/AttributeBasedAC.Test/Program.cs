@@ -65,15 +65,16 @@ namespace AttributeBasedAC.Test
 
         public static void Main(string[] args)
         {
+            TestMongoDbFilter();
             var builder = new ContainerBuilder();
-
+            return;
             builder.RegisterType<MongoClient>().As<IMongoClient>();
             
-            builder.RegisterType<SubjectRepository>().As<ISubjectRepository>();
-            builder.RegisterType<ResourceRepository>().As<IResourceRepository>();
-            builder.RegisterType<AccessControlPolicyRepository>().As<IAccessControlPolicyRepository>();
-            builder.RegisterType<PrivacyDomainRepository>().As<IPrivacyDomainRepository>();
-            builder.RegisterType<PrivacyPolicyRepository>().As<IPrivacyPolicyRepository>();
+            builder.RegisterType<SubjectMongoDbRepository>().As<ISubjectRepository>();
+            builder.RegisterType<ResourceMongoDbRepository>().As<IResourceRepository>();
+            builder.RegisterType<AccessControlPolicyMongoDbRepository>().As<IAccessControlPolicyRepository>();
+            builder.RegisterType<PrivacyDomainMongoDbRepository>().As<IPrivacyDomainRepository>();
+            builder.RegisterType<PrivacyPolicyMongoDbRepository>().As<IPrivacyPolicyRepository>();
 
             builder.RegisterType<ConditionalExpressionService>().As<IConditionalExpressionService>();
             builder.RegisterType<AccessControlPrivacyService>().As<IAccessControlPrivacyService>();
@@ -99,7 +100,18 @@ namespace AttributeBasedAC.Test
                 //}
             }
         }
+        public static void TestMongoDbFilter()
+        {
+            var _mongoClient = new MongoClient();
 
+            var builder = Builders<BsonDocument>.Filter;
+            var filter = builder.AnyIn("algorithm", "permit");
+
+            var _mongoCollection = _mongoClient.GetDatabase(JsonAccessControlSetting.PrivacyAccessControlDbName)
+                                        .GetCollection<BsonDocument>("AccessControlPolicyCombiningConfiguration2")
+                                        .Find(filter)
+                                        .ToList();
+        }
         public static void Test(ILifetimeScope scope)
         {
             //test.PolandNotationProcess(s);

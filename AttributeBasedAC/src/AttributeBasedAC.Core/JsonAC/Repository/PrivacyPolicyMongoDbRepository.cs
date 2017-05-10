@@ -7,10 +7,10 @@ using MongoDB.Driver;
 
 namespace AttributeBasedAC.Core.JsonAC.Repository
 {
-    public class PrivacyPolicyRepository : IPrivacyPolicyRepository
+    public class PrivacyPolicyMongoDbRepository : IPrivacyPolicyRepository
     {
         private IMongoClient _mongoClient;
-        public PrivacyPolicyRepository(IMongoClient mongoClient)
+        public PrivacyPolicyMongoDbRepository(IMongoClient mongoClient)
         {
             _mongoClient = mongoClient;
         }

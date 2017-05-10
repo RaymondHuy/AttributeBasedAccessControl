@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace AttributeBasedAC.Core.JsonAC.Repository
 {
-    public class PrivacyDomainRepository : IPrivacyDomainRepository
+    public class PrivacyDomainMongoDbRepository : IPrivacyDomainRepository
     {
         private readonly IMongoClient _mongoClient;
         private readonly IMongoCollection<PrivacyDomain> _mongoCollection;
-        public PrivacyDomainRepository(IMongoClient mongoClient)
+        public PrivacyDomainMongoDbRepository(IMongoClient mongoClient)
         {
             _mongoClient = mongoClient;
             _mongoCollection = _mongoClient.GetDatabase(JsonAccessControlSetting.PrivacyAccessControlDbName)
@@ -51,7 +51,6 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
         {
             var result = new List<string>();
             var builder = Builders<PrivacyDomain>.Filter;
-            Console.WriteLine(fieldName);
             var filter = builder.In("fields", fieldName);
             result.Add("Optional");
             var domains = _mongoCollection.Find(_ => true).ToList();

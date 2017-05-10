@@ -34,12 +34,12 @@ namespace AttributeBasedAC.WebAPI
             services.AddMvc();
             services.AddScoped<IMongoClient, MongoClient>();
 
-            services.AddScoped<ISubjectRepository, SubjectRepository>();
-            services.AddScoped<IAccessControlPolicyRepository, AccessControlPolicyRepository>();
-            services.AddScoped<IResourceRepository, ResourceRepository>();
-            services.AddScoped<IPrivacyDomainRepository, PrivacyDomainRepository>();
-            services.AddScoped<IAccessControlPolicyRepository, AccessControlPolicyRepository>();
-            services.AddScoped<IPrivacyPolicyRepository, PrivacyPolicyRepository>();
+            services.AddScoped<ISubjectRepository, SubjectMongoDbRepository>();
+            services.AddScoped<IAccessControlPolicyRepository, AccessControlPolicyMongoDbRepository>();
+            services.AddScoped<IResourceRepository, ResourceMongoDbRepository>();
+            services.AddScoped<IPrivacyDomainRepository, PrivacyDomainMongoDbRepository>();
+            services.AddScoped<IAccessControlPolicyRepository, AccessControlPolicyMongoDbRepository>();
+            services.AddScoped<IPrivacyPolicyRepository, PrivacyPolicyMongoDbRepository>();
 
             services.AddScoped<IConditionalExpressionService, ConditionalExpressionService>();
             services.AddScoped<IAccessControlPrivacyService, AccessControlPrivacyService>();

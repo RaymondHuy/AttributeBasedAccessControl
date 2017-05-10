@@ -9,11 +9,11 @@ using MongoDB.Bson;
 
 namespace AttributeBasedAC.Core.JsonAC.Repository
 {
-    public class AccessControlPolicyRepository : IAccessControlPolicyRepository
+    public class AccessControlPolicyMongoDbRepository : IAccessControlPolicyRepository
     {
         private readonly IMongoClient _mongoClient;
 
-        public AccessControlPolicyRepository(IMongoClient mongoClient)
+        public AccessControlPolicyMongoDbRepository(IMongoClient mongoClient)
         {
             _mongoClient = mongoClient;
         }

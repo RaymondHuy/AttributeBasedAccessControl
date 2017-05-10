@@ -66,8 +66,8 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                        : method.Invoke(null, parameters.ToArray()).ToString();
             }
             else result = method.Invoke(null, null).ToString();
-            bool isConvertSuccessfully = false;
-            bool expressionResult = bool.TryParse(result, out isConvertSuccessfully);
+            bool expressionResult;
+            bool isConvertSuccessfully = Boolean.TryParse(result, out expressionResult);
             if (!isConvertSuccessfully)
                 throw new ConditionalExpressionException("Method " + function.FunctionName + " didn't return boolean value");
             return expressionResult;

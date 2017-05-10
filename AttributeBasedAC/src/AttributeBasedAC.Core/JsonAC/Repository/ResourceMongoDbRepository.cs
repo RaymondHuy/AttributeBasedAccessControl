@@ -9,11 +9,11 @@ using Newtonsoft.Json;
 
 namespace AttributeBasedAC.Core.JsonAC.Repository
 {
-    public class ResourceRepository : IResourceRepository
+    public class ResourceMongoDbRepository : IResourceRepository
     {
         private readonly IMongoClient _mongoClient;
 
-        public ResourceRepository(IMongoClient mongoClient)
+        public ResourceMongoDbRepository(IMongoClient mongoClient)
         {
             _mongoClient = mongoClient;
         }
