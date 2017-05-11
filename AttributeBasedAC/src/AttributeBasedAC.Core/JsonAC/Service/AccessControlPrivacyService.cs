@@ -105,8 +105,15 @@ namespace AttributeBasedAC.Core.JsonAC.Service
         private IDictionary<string, string> GetFieldCollectionRules()
         {
             var policies = _privacyPolicyRepository.GetPolicies(_collectionName, _action, false);
-            var fieldCollectionRules = new Dictionary<string, string>();
+            var targetPolicies = new List<PrivacyPolicy>();
             foreach (var policy in policies)
+            {
+                bool isTarget = _expressionService.Evaluate(policy.Target, _user, null, _environment);
+                if (isTarget)
+                    targetPolicies.Add(policy);
+            }
+            var fieldCollectionRules = new Dictionary<string, string>();
+            foreach (var policy in targetPolicies)
             {
                 foreach (var collectionField in policy.Rules)
                 {
@@ -150,9 +157,16 @@ namespace AttributeBasedAC.Core.JsonAC.Service
         private IDictionary<string, string> GetPrivacyRecordField(JObject record)
         {
             var policies = _privacyPolicyRepository.GetPolicies(_collectionName, _action, true);
+            var targetPolicies = new List<PrivacyPolicy>();
+            foreach (var policy in policies)
+            {
+                bool isTarget = _expressionService.Evaluate(policy.Target, _user, record, _environment);
+                if (isTarget)
+                    targetPolicies.Add(policy);
+            }
             IDictionary<string, string> recordPrivacyRules = _collectionPrivacyRules.ToDictionary(entry => entry.Key, entry => entry.Value);
             //Privacy checking
-            foreach (var policy in policies)
+            foreach (var policy in targetPolicies)
             {
                 foreach (var rule in policy.Rules)
                 {

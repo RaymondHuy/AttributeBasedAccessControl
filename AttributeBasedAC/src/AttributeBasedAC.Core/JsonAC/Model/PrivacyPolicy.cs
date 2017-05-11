@@ -19,6 +19,9 @@ namespace AttributeBasedAC.Core.JsonAC.Model
         [BsonElement("description")]
         public string Description { get; set; }
 
+        [BsonElement("target")]
+        public Function Target { get; set; }
+
         [BsonElement("action")]
         public string Action { get; set; }
 
