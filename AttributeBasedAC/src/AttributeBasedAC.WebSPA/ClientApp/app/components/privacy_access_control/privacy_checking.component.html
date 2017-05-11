@@ -57,7 +57,10 @@
     <div class="col-xs-12">
         <div class="col-xs-4 form-group">
             <label>Field :</label>
-            <input id="in" type="text" size="25" pInputText [(ngModel)]="environment_field" />
+            <p-autoComplete [(ngModel)]="environment_field" [suggestions]="environment_filtered_field" (completeMethod)="filter_environment_field($event)"
+                            [minLength]="1" >
+            </p-autoComplete>
+            <!--<input id="in" type="text" size="25" pInputText [(ngModel)]="environment_field" />-->
         </div>
         <div class="col-xs-4 form-group">
             <label>Value :</label>

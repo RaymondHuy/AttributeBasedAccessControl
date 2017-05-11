@@ -35,7 +35,8 @@ export class PrivacyComponent {
     private environment_value: string;
     private environment_object: string;
     private environment_result: string;
-    //#endregion
+    private environment_field_options: string[] = ['purpose', 'start_time', 'end_time'];
+    private environment_filtered_field: string[];
 
     //#region result
     private result: any[] = [];
@@ -104,6 +105,17 @@ export class PrivacyComponent {
         }
     }
 
+    filter_environment_field(event) {
+        let query = event.query;
+        let filtered: any[] = [];
+        for (let i = 0; i < this.environment_field_options.length; i++) {
+            let field = this.environment_field_options[i];
+            if (field.toLowerCase().indexOf(query.toLowerCase()) == 0) {
+                filtered.push(field);
+            }
+        }
+        this.environment_filtered_field = filtered;
+    }
     and_click() {
         this.condition_result += " AND ";
     }

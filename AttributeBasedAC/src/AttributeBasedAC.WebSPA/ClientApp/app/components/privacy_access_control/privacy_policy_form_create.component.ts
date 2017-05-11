@@ -42,6 +42,8 @@ export class PrivacyPolicyFormCreateComponent {
 
     private environment_value: string;
     private constant_value: string;
+    private environment_field_options: string[] = ['purpose', 'start_time', 'end_time'];
+    private environment_filtered_field: string[];
 
     private rule_id: string;
     private rule_ids: string[] = [];
@@ -301,6 +303,18 @@ export class PrivacyPolicyFormCreateComponent {
             return result.Functions;
         return this.privacy_functions;
 
+    }
+
+    filter_environment_field(event) {
+        let query = event.query;
+        let filtered: any[] = [];
+        for (let i = 0; i < this.environment_field_options.length; i++) {
+            let field = this.environment_field_options[i];
+            if (field.toLowerCase().indexOf(query.toLowerCase()) == 0) {
+                filtered.push(field);
+            }
+        }
+        this.environment_filtered_field = filtered;
     }
 
     private submit() {

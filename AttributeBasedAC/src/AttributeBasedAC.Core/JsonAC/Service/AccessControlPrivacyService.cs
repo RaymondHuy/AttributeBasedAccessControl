@@ -81,8 +81,10 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             //});
             foreach (var record in _resource)
             {
+                Console.WriteLine(DateTime.Now.Millisecond) ;
                 var privacyFields = GetPrivacyRecordField(record);
                 var privacyRecord = PrivacyProcessing(record, privacyFields);
+                Console.WriteLine(DateTime.Now.Millisecond);
                 privacyRecords.Add(privacyRecord);
             }
             return new ResponseContext(EffectResult.Permit, privacyRecords);
