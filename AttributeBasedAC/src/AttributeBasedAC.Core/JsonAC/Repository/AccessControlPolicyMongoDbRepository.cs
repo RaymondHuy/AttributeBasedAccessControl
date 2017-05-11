@@ -60,11 +60,11 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
                                    .ToList();
         }
 
-        string IAccessControlPolicyRepository.GetPolicyCombining(string collectionName, string action)
+        string IAccessControlPolicyRepository.GetPolicyCombining(ICollection<AccessControlPolicy> policies)
         {
             var builder = Builders<AccessControlPolicyCombiningConfiguration>.Filter;
-            var filter = builder.Eq("collection_name", collectionName)
-                       & builder.Eq("action", action);
+            var id = policies.ElementAt(0).PolicyId;
+            var filter = builder.AnyEq("policies_id", id);
 
             var data = _mongoClient.GetDatabase(JsonAccessControlSetting.PrivacyAccessControlDbName)
                                    .GetCollection<AccessControlPolicyCombiningConfiguration>(JsonAccessControlSetting.AccessControlPolicyCombiningConfigurtaion)

@@ -47,7 +47,6 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             _collectionName = collectionName;
             _action = action;
             _environment = environment;
-            _policyCombining = _accessControlPolicyRepository.GetPolicyCombining(collectionName, action);
             
             environment.AddAnnotation(action);
             EffectResult effect = AccessControlCollectionPolicyProcessing();
@@ -55,6 +54,8 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                 return new ResponseContext(EffectResult.Deny, null);
 
             var accessControlRecordPolicies = _accessControlPolicyRepository.GetPolicies(collectionName, action, true);
+            _policyCombining = _accessControlPolicyRepository.GetPolicyCombining(accessControlRecordPolicies);
+
             _resource = new List<JObject>();
 
             foreach (var record in resource)
@@ -263,8 +264,8 @@ namespace AttributeBasedAC.Core.JsonAC.Service
         {
             EffectResult result = EffectResult.NotApplicable;
 
-            string policyCombining = _accessControlPolicyRepository.GetPolicyCombining(_collectionName, _action);
             ICollection<AccessControlPolicy> collectionPolicies = _accessControlPolicyRepository.GetPolicies(_collectionName, _action, false);
+            string policyCombining = _accessControlPolicyRepository.GetPolicyCombining(collectionPolicies);
             var targetPolicies = new List<AccessControlPolicy>();
             foreach (var policy in collectionPolicies)
             {

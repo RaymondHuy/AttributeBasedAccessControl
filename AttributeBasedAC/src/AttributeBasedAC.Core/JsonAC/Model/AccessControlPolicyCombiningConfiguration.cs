@@ -10,12 +10,9 @@ namespace AttributeBasedAC.Core.JsonAC.Model
     public class AccessControlPolicyCombiningConfiguration
     {
         public ObjectId Id { get; set; }
-
-        [BsonElement("collection_name")]
-        public string CollectionName { get; set; }
-
-        [BsonElement("action")]
-        public string Action { get; set; }
+        
+        [BsonElement("policies_id")]
+        public ICollection<string> PolicyIds { get; set; }
 
         [BsonElement("algorithm")]
         public string Algorithm { get; set; }
