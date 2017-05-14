@@ -62,12 +62,12 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
 
         string IAccessControlPolicyRepository.GetPolicyCombining(ICollection<AccessControlPolicy> policies)
         {
-            var builder = Builders<AccessControlPolicyCombiningConfiguration>.Filter;
+            var builder = Builders<AccessControlPolicyCombining>.Filter;
             var id = policies.ElementAt(0).PolicyId;
             var filter = builder.AnyEq("policies_id", id);
 
             var data = _mongoClient.GetDatabase(JsonAccessControlSetting.PrivacyAccessControlDbName)
-                                   .GetCollection<AccessControlPolicyCombiningConfiguration>(JsonAccessControlSetting.AccessControlPolicyCombiningConfigurtaion)
+                                   .GetCollection<AccessControlPolicyCombining>(JsonAccessControlSetting.AccessControlPolicyCombiningConfigurtaion)
                                    .Find(filter)
                                    .First();
             return data.Algorithm;

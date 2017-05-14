@@ -15,17 +15,5 @@ namespace AttributeBasedAC.Core.JsonAC.Model
         [BsonElement("effect_function")]
         public string FunctionApply { get; set; }
     }
-
-    public class FieldEffectEqualityComparer : IEqualityComparer<FieldEffect>
-    {
-        public bool Equals(FieldEffect x, FieldEffect y)
-        {
-            return x.Name.Equals(y.Name);
-        }
-
-        public int GetHashCode(FieldEffect obj)
-        {
-            return obj.GetHashCode();
-        }
-    }
+    
 }
