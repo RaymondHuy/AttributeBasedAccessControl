@@ -5,8 +5,16 @@ using System.Threading.Tasks;
 
 namespace AttributeBasedAC.Core.JsonAC.PrivacyDomainFunction
 {
-    public static class SSNDomainPrivacy
+    public class SSNDomainPrivacy : IPluginDomain
     {
+        public string Name
+        {
+            get
+            {
+                return "SSNDomainPrivacy";
+            }
+        }
+
         public static string AreaNumber(string ssn)
         {
             return ssn.Split('-')[0];

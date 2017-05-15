@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using AttributeBasedAC.Core.JsonAC.Repository;
 using AttributeBasedAC.Core.JsonAC.Service;
 using MongoDB.Driver;
+using AttributeBasedAC.Core.JsonAC.PrivacyDomainFunction;
 
 namespace AttributeBasedAC.WebAPI
 {
@@ -43,6 +44,9 @@ namespace AttributeBasedAC.WebAPI
 
             services.AddScoped<IConditionalExpressionService, ConditionalExpressionService>();
             services.AddScoped<IAccessControlPrivacyService, AccessControlPrivacyService>();
+
+            var privacyDomainFactory = PrivacyDomainPluginFactory.GetInstance();
+            privacyDomainFactory.RegisterDefaultPlugin();
 
             services.AddCors(options =>
             {

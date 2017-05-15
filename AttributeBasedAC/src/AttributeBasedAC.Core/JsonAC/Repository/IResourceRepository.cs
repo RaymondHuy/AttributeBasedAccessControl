@@ -10,6 +10,6 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
 {
     public interface IResourceRepository
     {
-        JObject[] GetCollectionDataWithCustomFilter(string collectionName, FilterDefinition<BsonDocument> filter);
+        JObject[] GetCollectionDataWithCustomFilter(string collectionName, dynamic filter);
     }
 }

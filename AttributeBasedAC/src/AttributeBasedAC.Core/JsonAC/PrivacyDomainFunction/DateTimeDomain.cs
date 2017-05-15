@@ -5,23 +5,19 @@ using System.Threading.Tasks;
 
 namespace AttributeBasedAC.Core.JsonAC.PrivacyDomainFunction
 {
-    public class DefaultDomainPrivacy : IPluginDomain
+    public class DateTimeDomain : IPluginDomain
     {
         public string Name
         {
             get
             {
-                return "DefaultDomainPrivacy";
+                return "DateTimeDomain";
             }
         }
 
-        public static string Show(string s)
+        public static string Day(string dateTime)
         {
-            return s;
-        }
-        public static string Hide(string s)
-        {
-            return "";
+            return DateTime.Parse(dateTime).Day.ToString();
         }
     }
 }

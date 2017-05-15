@@ -1,7 +1,6 @@
-#:F:\Project\AttributeBasedAccessControl\AttributeBasedAC\src\AttributeBasedAC.Core\AttributeBasedAC.Core.xproj
+#:F:\Project\AttributeBasedAccessControl\AttributeBasedAC\src\AttributeBasedAC.WebAPI\AttributeBasedAC.WebAPI.xproj
+F:\Project\AttributeBasedAccessControl\AttributeBasedAC\src\AttributeBasedAC.WebAPI\AttributeBasedAC.WebAPI.xproj|F:\Project\AttributeBasedAccessControl\AttributeBasedAC\src\AttributeBasedAC.Core\AttributeBasedAC.Core.xproj
 #:F:\Project\AttributeBasedAccessControl\AttributeBasedAC\src\AttributeBasedAC.Test\AttributeBasedAC.Test.xproj
 F:\Project\AttributeBasedAccessControl\AttributeBasedAC\src\AttributeBasedAC.Test\AttributeBasedAC.Test.xproj|F:\Project\AttributeBasedAccessControl\AttributeBasedAC\src\AttributeBasedAC.Core\AttributeBasedAC.Core.xproj
 F:\Project\AttributeBasedAccessControl\AttributeBasedAC\src\AttributeBasedAC.Test\AttributeBasedAC.Test.xproj|F:\Project\AttributeBasedAccessControl\AttributeBasedAC\src\AttributeBasedAC.WebAPI\AttributeBasedAC.WebAPI.xproj
-F:\Project\AttributeBasedAccessControl\AttributeBasedAC\src\AttributeBasedAC.WebAPI\AttributeBasedAC.WebAPI.xproj|F:\Project\AttributeBasedAccessControl\AttributeBasedAC\src\AttributeBasedAC.Core\AttributeBasedAC.Core.xproj
-#:F:\Project\AttributeBasedAccessControl\AttributeBasedAC\src\AttributeBasedAC.WebAPI\AttributeBasedAC.WebAPI.xproj
 F:\Project\AttributeBasedAccessControl\AttributeBasedAC\src\AttributeBasedAC.WebAPI\AttributeBasedAC.WebAPI.xproj|F:\Project\AttributeBasedAccessControl\AttributeBasedAC\src\AttributeBasedAC.Core\AttributeBasedAC.Core.xproj

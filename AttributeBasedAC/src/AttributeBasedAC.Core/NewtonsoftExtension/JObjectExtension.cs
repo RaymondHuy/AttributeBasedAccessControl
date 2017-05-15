@@ -1,4 +1,5 @@
 ﻿using AttributeBasedAC.Core.JsonAC;
+using AttributeBasedAC.Core.JsonAC.PrivacyDomainFunction;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -56,7 +57,9 @@ namespace AttributeBasedAC.Core.NewtonsoftExtension
             {
                 string className = privacyFunction.Split('.')[0];
                 string functionName = privacyFunction.Split('.')[1];
-                MethodInfo method = Type.GetType(_defaultNamespace + "." + className).GetMethod(functionName);
+                var privacyDomainFactory = PrivacyDomainPluginFactory.GetInstance();
+                Type type = privacyDomainFactory.GetDomainType(className);
+                MethodInfo method = type.GetMethod(functionName);
                 string param = rawObject[field].ToString();
                 string result = (string)method.Invoke(null, new object[] { param });
                 privacyObject[field] = result;

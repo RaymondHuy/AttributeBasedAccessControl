@@ -18,7 +18,7 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
             _mongoClient = mongoClient;
         }
 
-        JObject[] IResourceRepository.GetCollectionDataWithCustomFilter(string collectionName, FilterDefinition<BsonDocument> filter)
+        JObject[] IResourceRepository.GetCollectionDataWithCustomFilter(string collectionName, dynamic filter)
         {
             var data = filter == null ?
                 _mongoClient.GetDatabase(JsonAccessControlSetting.UserDefaultDatabaseName)
@@ -28,7 +28,7 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
 
                : _mongoClient.GetDatabase(JsonAccessControlSetting.UserDefaultDatabaseName)
                                    .GetCollection<BsonDocument>(collectionName)
-                                   .Find(filter)
+                                   .Find((FilterDefinition<BsonDocument>)filter)
                                    .ToList();
 
             return JsonConvert.DeserializeObject<JObject[]>(data.ToJson());

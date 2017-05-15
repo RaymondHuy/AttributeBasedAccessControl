@@ -23,6 +23,14 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
             Collec.InsertOneAsync(privacyPolicy);
         }
 
+        ICollection<PrivacyPolicy> IPrivacyPolicyRepository.GetAll()
+        {
+            return _mongoClient.GetDatabase(JsonAccessControlSetting.PrivacyAccessControlDbName)
+                                   .GetCollection<PrivacyPolicy>(JsonAccessControlSetting.PrivacyCollectionName)
+                                   .Find(_ => true)
+                                   .ToList();
+        }
+
         ICollection<PrivacyPolicy> IPrivacyPolicyRepository.GetPolicies(string collectionName, string action, bool? isAttributeResourceRequired)
         {
             var builder = Builders<PrivacyPolicy>.Filter;
