@@ -17,7 +17,6 @@ namespace AttributeBasedAC.Core.JsonAC.Service
         private JObject _environment;
         private string _collectionName;
         private string _action;
-        private string _policyCombining;
 
         public AccessControlService(
             IAccessControlPolicyRepository accessControlPolicyRepository,
@@ -36,18 +35,18 @@ namespace AttributeBasedAC.Core.JsonAC.Service
 
             environment.AddAnnotation(action);
 
-            EffectResult effect = AccessControlCollectionPolicyProcessing();
+            EffectResult effect = CollectionAccessControlProcess();
             if (effect == EffectResult.Deny)
                 return new ResponseContext(EffectResult.Deny, null);
 
             var accessControlRecordPolicies = _accessControlPolicyRepository.GetPolicies(collectionName, action, true);
-            _policyCombining = _accessControlPolicyRepository.GetPolicyCombining(accessControlRecordPolicies);
+            string policyCombining = _accessControlPolicyRepository.GetPolicyCombining(accessControlRecordPolicies);
 
             ICollection<JObject> _resource = new List<JObject>();
 
             foreach (var record in resource)
             {
-                if (AccessControlRecordPolicyProcessing(record, _policyCombining, accessControlRecordPolicies) != null)
+                if (RowAccessControlProcess(record, policyCombining, accessControlRecordPolicies) != null)
                     _resource.Add(record);
             }
 
@@ -70,7 +69,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             return result;
         }
 
-        private EffectResult AccessControlCollectionPolicyProcessing()
+        private EffectResult CollectionAccessControlProcess()
         {
             EffectResult result = EffectResult.NotApplicable;
 
@@ -117,7 +116,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
         }
 
 
-        private JObject AccessControlRecordPolicyProcessing(JObject resource, string policyCombining, ICollection<AccessControlPolicy> policies)
+        private JObject RowAccessControlProcess(JObject resource, string policyCombining, ICollection<AccessControlPolicy> policies)
         {
             JObject result = null;
             var targetPolicy = new List<AccessControlPolicy>();

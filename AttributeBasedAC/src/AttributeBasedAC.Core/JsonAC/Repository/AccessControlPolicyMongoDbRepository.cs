@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using AttributeBasedAC.Core.JsonAC.Model;
-using Newtonsoft.Json.Linq;
 using MongoDB.Driver;
-using MongoDB.Bson;
+using AttributeBasedAC.Core.JsonAC.Infrastructure;
 
 namespace AttributeBasedAC.Core.JsonAC.Repository
 {

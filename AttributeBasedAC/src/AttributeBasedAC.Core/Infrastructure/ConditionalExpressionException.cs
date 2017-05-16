@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AttributeBasedAC.Core.Exceptions
+namespace AttributeBasedAC.Core.Infrastructure
 {
     public class ConditionalExpressionException : Exception
     {

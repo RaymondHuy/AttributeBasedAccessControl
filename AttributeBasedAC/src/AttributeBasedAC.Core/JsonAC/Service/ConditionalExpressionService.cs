@@ -6,7 +6,7 @@ using AttributeBasedAC.Core.JsonAC.Model;
 using AttributeBasedAC.Core.JsonAC.Repository;
 using System.Reflection;
 using Newtonsoft.Json.Linq;
-using AttributeBasedAC.Core.Exceptions;
+using AttributeBasedAC.Core.Infrastructure;
 
 namespace AttributeBasedAC.Core.JsonAC.Service
 {

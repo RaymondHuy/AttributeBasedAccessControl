@@ -1,4 +1,5 @@
-﻿using AttributeBasedAC.Core.JsonAC.Model;
+﻿using AttributeBasedAC.Core.JsonAC.Infrastructure;
+using AttributeBasedAC.Core.JsonAC.Model;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;

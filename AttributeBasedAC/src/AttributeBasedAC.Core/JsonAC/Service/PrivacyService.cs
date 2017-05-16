@@ -12,7 +12,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
     public class PrivacyService : IPrivacyService
     {
         private readonly IConditionalExpressionService _expressionService;
-        private readonly IPrivacyDomainRepository _privacyFunctionRepository;
+        private readonly IPrivacyDomainRepository _privacyDomainRepository;
         private readonly IPrivacyPolicyRepository _privacyPolicyRepository;
         
         private JObject _user;
@@ -24,11 +24,11 @@ namespace AttributeBasedAC.Core.JsonAC.Service
 
         public PrivacyService(
             IConditionalExpressionService expressionService,
-            IPrivacyDomainRepository privacyFunctionRepository,
+            IPrivacyDomainRepository privacyDomainRepository,
             IPrivacyPolicyRepository privacyPolicyRepository)
         {
             _expressionService = expressionService;
-            _privacyFunctionRepository = privacyFunctionRepository;
+            _privacyDomainRepository = privacyDomainRepository;
             _privacyPolicyRepository = privacyPolicyRepository;
         }
 
@@ -126,7 +126,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                 }
                 else
                 {
-                    privacyRules[field.Name] = _privacyFunctionRepository.ComparePrivacyFunction(privacyRules[field.Name], field.FunctionApply);
+                    privacyRules[field.Name] = _privacyDomainRepository.ComparePrivacyFunction(privacyRules[field.Name], field.FunctionApply);
                 }
             }
         }
@@ -234,7 +234,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                 }
                 else
                 {
-                    privacyRules[field.Name] = _privacyFunctionRepository.ComparePrivacyFunction(privacyRules[field.Name], field.FunctionApply);
+                    privacyRules[field.Name] = _privacyDomainRepository.ComparePrivacyFunction(privacyRules[field.Name], field.FunctionApply);
                 }
             }
         }

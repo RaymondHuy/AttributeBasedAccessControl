@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json.Linq;
+using AttributeBasedAC.Core.JsonAC.Infrastructure;
 
 namespace AttributeBasedAC.Core.JsonAC.Repository
 {

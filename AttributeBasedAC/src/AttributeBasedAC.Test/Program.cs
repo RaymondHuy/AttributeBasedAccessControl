@@ -15,6 +15,7 @@ using AttributeBasedAC.Core.NewtonsoftExtension;
 using System.Reflection;
 using System.Diagnostics;
 using AttributeBasedAC.Test.WebApiTesting;
+using AttributeBasedAC.Core.JsonAC.Infrastructure;
 
 namespace AttributeBasedAC.Test
 {

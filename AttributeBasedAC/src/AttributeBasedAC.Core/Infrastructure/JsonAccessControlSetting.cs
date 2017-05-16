@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AttributeBasedAC.Core.JsonAC
+namespace AttributeBasedAC.Core.JsonAC.Infrastructure
 {
     public class JsonAccessControlSetting
     {
