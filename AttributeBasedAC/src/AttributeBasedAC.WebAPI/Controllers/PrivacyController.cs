@@ -1,6 +1,7 @@
 ﻿using AttributeBasedAC.Core.JsonAC;
 using AttributeBasedAC.Core.JsonAC.Infrastructure;
 using AttributeBasedAC.Core.JsonAC.Model;
+using AttributeBasedAC.Core.JsonAC.PrivacyDomainFunction;
 using AttributeBasedAC.Core.JsonAC.Repository;
 using AttributeBasedAC.Core.JsonAC.Service;
 using AttributeBasedAC.WebAPI.Command;
@@ -45,7 +46,7 @@ namespace AttributeBasedAC.WebAPI.Controllers
         [Route("api/Privacy/Check")]
         public string Check([FromBody]PrivacyCheckingCommand command)
         {
-            var userFilter = Builders<BsonDocument>.Filter.Eq("_id", command.UserID);
+            var userFilter = Builders<BsonDocument>.Filter.Eq("_id", ObjectId.Parse(command.UserID));
             var subject = _subjectRepository.GetUniqueUser(JsonAccessControlSetting.UserDefaultCollectionName, userFilter);
             var environment = string.IsNullOrEmpty(command.Environment) ? null : JObject.Parse(command.Environment);
             var resource = _resourceRepository.GetCollectionDataWithCustomFilter(command.ResourceName, null);
@@ -78,13 +79,13 @@ namespace AttributeBasedAC.WebAPI.Controllers
         {
             var fieldRules = new List<FieldRule>();
 
-            for (int i = 0; i < command.RuleIDs.Count; i++)
+            foreach (var rule in command.Rules)
             {
-                var condition = _conditionalExpressionService.Parse(command.Conditions.ElementAt(i));
+                var condition = _conditionalExpressionService.Parse(rule.Condition);
                 var fieldRule = new FieldRule()
                 {
-                    Identifer = command.RuleIDs.ElementAt(i),
-                    FieldEffects = command.FieldEffectsArray.ElementAt(i),
+                    Identifer = rule.RuleID,
+                    FieldEffects = rule.FieldEffects,
                     Condition = condition
                 };
                 fieldRules.Add(fieldRule);
@@ -122,5 +123,15 @@ namespace AttributeBasedAC.WebAPI.Controllers
         {
             return _privacyDomainRepository.GetPrivacyFunctionNames(name);
         }
+
+        [HttpGet]
+        [Route("api/PrivacyDomain")]
+        public IEnumerable<string> GetAllPrivacyDomain()
+        {
+            var container = PrivacyDomainPluginFactory.GetInstance();
+
+            return container.GetAllDomainType();
+        }
+
     }
 }

@@ -1,0 +1,18 @@
+﻿<div class="col-lg-12">
+    <p-messages [value]="msgs"></p-messages>
+</div>
+<h1 style="text-align:center">Privacy Domain</h1>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="col-lg-4 form-group">
+            <label>Domains :</label>
+            <p-dropdown [options]="domain_names" [(ngModel)]="domain_selected_name"
+                        [style]="{'width':'200px'}" (onChange)="onSelectDomainName($event.value)"></p-dropdown>
+        </div>
+        <div class="col-lg-4 form-group">
+            <label>Collection :</label>
+            <p-dropdown [options]="domain_names" [(ngModel)]="domain_selected_name"
+                        [style]="{'width':'200px'}" (onChange)="onSelectDomainName($event.value)"></p-dropdown>
+        </div>
+    </div>
+</div>

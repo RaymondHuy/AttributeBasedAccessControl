@@ -38,5 +38,10 @@ namespace AttributeBasedAC.Core.JsonAC.PrivacyDomainFunction
         {
             return _container[name];
         }
+
+        public ICollection<string> GetAllDomainType()
+        {
+            return _container.Select(n => n.Key).ToList();
+        }
     }
 }

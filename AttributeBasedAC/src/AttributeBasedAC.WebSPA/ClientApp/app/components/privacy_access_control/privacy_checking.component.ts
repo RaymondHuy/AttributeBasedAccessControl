@@ -1,5 +1,4 @@
-﻿/// <reference path="../../models/app_setting.ts" />
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { Http, Headers, RequestOptions } from '@angular/http';
 import { SelectItem, Message, ConfirmationService } from 'primeng/primeng';
 
@@ -60,8 +59,13 @@ export class PrivacyComponent {
         var that = this;
         this.http.get(AppSetting.API_ENDPOINT + 'accounts/').subscribe(data => {
             let jsonObject: any = data.json()[0];
+            console.log(jsonObject);
             for (var property in jsonObject) {
-                that.user_property_names.push(property);
+                if (property == '_id') continue;
+                let object = jsonObject[property];
+                if (!Array.isArray(object) && typeof object !== 'object') {
+                    that.user_property_names.push(property);   
+                }
             }
             that.users = data.json();
         })
@@ -89,7 +93,7 @@ export class PrivacyComponent {
     }
 
     private initialize_fields(property: any, jsonObject: any, prefix: string, container: SelectItem[]) {
-
+        if (property == "_id") return;
         let object = jsonObject[property];
         if (typeof object === 'object' && !Array.isArray(object)) {
             for (var sub_property in object) {
@@ -178,13 +182,15 @@ export class PrivacyComponent {
             return;
         }
         let environment = "{ " + this.environment_result + " }";
+        console.log(typeof this.selected_user._id === 'object');
         let command = {
-            "UserID": this.selected_user._id,
+            "UserID": typeof this.selected_user._id === 'object' ? this.selected_user._id.$oid : this.selected_user._id,
             "ResourceName": this.collection_selected_name,
             "ResourceCondition": this.condition_result,
             "Environment": environment,
             "Action": "read"
         };
+        console.log(command);
         this.result = [];
         this.result_property_names = [];
         let that = this;

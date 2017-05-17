@@ -3,6 +3,7 @@ import { Http, Headers, RequestOptions } from '@angular/http';
 import { SelectItem, Message, ConfirmationService } from 'primeng/primeng';
 
 import { AppSetting } from '../../models/app_setting';
+import { AccessControlRule } from '../../models/access_control_rule.model';
 
 @Component({
     selector: 'privacy_rule',
@@ -22,8 +23,8 @@ export class AccessControlPolicyFormCreateComponent {
     private condition_result: string = "";
     //#endregion
 
-    private policy_id: string;
-    private description: string;
+    private policy_id: string = '';
+    private description: string = '';
 
     private actions: SelectItem[] = [];
     private selected_action: string;
@@ -45,17 +46,19 @@ export class AccessControlPolicyFormCreateComponent {
 
     private target_result: string = "";
 
-    private environment_value: string;
-    private constant_value: string;
+    private environment_value: string = '';
+    private constant_value: string = '';
 
     private environment_field_options: string[] = ['purpose', 'start_time', 'end_time'];
     private environment_filtered_field: string[];
 
-    private rule_id: string;
+    private rule_id: string = '';
     private rule_ids: string[] = [];
 
     private json_helper: any;
     private msgs: Message[] = [];
+
+    private rules: AccessControlRule[] = [];
 
     private headers = new Headers({ 'Content-Type': 'application/json' });
     private options = new RequestOptions({ headers: this.headers });
@@ -82,6 +85,7 @@ export class AccessControlPolicyFormCreateComponent {
             that.selected_function_name = names[0];
         });
         this.http.get(AppSetting.API_ENDPOINT + 'subject/fields/').subscribe(data => {
+            
             let jsonObject: any = data.json();
             for (var property in jsonObject) {
                 if (that.selected_subject_field === undefined)
@@ -116,10 +120,17 @@ export class AccessControlPolicyFormCreateComponent {
                 that.initialize_fields(property, jsonObject, "", that.resource_fields);
             }
         })
+        this.reset();
+    }
+    private reset() {
+        this.rule_ids = [];
+        this.target_result = '';
+        this.current_rule_result = '';
+        this.rules = [];
     }
 
     private initialize_fields(property: any, jsonObject: any, prefix: string, container: SelectItem[]) {
-
+        if (property == "_id") return;
         let object = jsonObject[property];
         if (typeof object === 'object' && !Array.isArray(object)) {
             for (var sub_property in object) {
@@ -162,10 +173,18 @@ export class AccessControlPolicyFormCreateComponent {
     }
 
     add_constant_value_to_rule() {
+        if (this.constant_value == '') {
+            this.msgs.push({ severity: 'error', summary: 'Error Message', detail: 'Constant value can not be null' });
+            return;
+        }
         this.current_rule_result += this.constant_value + " ";
     }
 
     add_constant_value_to_target() {
+        if (this.constant_value == '') {
+            this.msgs.push({ severity: 'error', summary: 'Error Message', detail: 'Constant value can not be null' });
+            return;
+        }
         this.target_result += this.constant_value + " ";
     }
 
@@ -216,7 +235,7 @@ export class AccessControlPolicyFormCreateComponent {
         if (isTarget) {
             this.target_result += ") ";
         } else {
-            this.current_rule_result += ") "
+            this.current_rule_result += ") ";
         }
     }
 
@@ -224,15 +243,36 @@ export class AccessControlPolicyFormCreateComponent {
         if (isTarget) {
             this.target_result += ", ";
         } else {
-            this.current_rule_result += ", "
+            this.current_rule_result += ", ";
+        }
+    }
+    clear_condition(isTarget: boolean) {
+        if (isTarget) {
+            this.target_result = "";
+        } else {
+            this.current_rule_result = "";
         }
     }
     //#endregion 
 
     private add_current_rule() {
+        if (this.current_rule_result == '') {
+            this.msgs.push({ severity: 'error', summary: 'Error Message', detail: 'Rule can not be null' });
+            return;
+        } else if (this.rule_id == '') {
+            this.msgs.push({ severity: 'error', summary: 'Error Message', detail: 'Rule ID can not be null' });
+            return;
+        }
+        for (let r of this.rule_ids) {
+            if (r == this.rule_id) {
+                this.msgs.push({ severity: 'error', summary: 'Error Message', detail: 'Rule ID must be unique' });
+                return;
+            }
+        }
         this.final_rule_result.push(this.current_rule_result);
         this.rule_ids.push(this.rule_id);
         this.final_rule_effects.push(this.selected_rule_effect);
+        this.rules.push(new AccessControlRule(this.rule_id, this.current_rule_result, this.selected_rule_effect));
         this.msgs.push({ severity: 'info', summary: 'Info Message', detail: 'One rule added' });
     }
 
@@ -249,6 +289,13 @@ export class AccessControlPolicyFormCreateComponent {
     }
 
     private submit() {
+        if (this.policy_id == '') {
+            this.msgs.push({ severity: 'error', summary: 'Error Message', detail: 'Policy ID can not be null' });
+            return;
+        } else if (this.rules.length == 0) {
+            this.msgs.push({ severity: 'error', summary: 'Error Message', detail: 'Rule can not be null' });
+            return;
+        }
         let command = {
             "PolicyID": this.policy_id,
             "CollectionName": this.collection_selected_name,
@@ -256,14 +303,13 @@ export class AccessControlPolicyFormCreateComponent {
             "Action": this.selected_action,
             "RuleCombining": this.selected_rule_combining,
             "Target": this.target_result,
-            "Conditions": this.final_rule_result,
-            "RuleIDs": this.rule_ids,
-            "RuleEffects": this.final_rule_effects
-        }
-        console.log(command);
+            "Rules": this.rules
+        };
+        let that = this;
         this.http.post(AppSetting.API_ENDPOINT + 'AccessControlPolicy', JSON.stringify(command), this.options).subscribe(
             data => {
                 this.msgs.push({ severity: 'info', summary: 'Info Message', detail: 'Create Successfully' });
+                that.reset();
             },
             error => {
                 this.msgs = [];

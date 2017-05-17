@@ -3,7 +3,7 @@ import { Http, Headers, RequestOptions } from '@angular/http';
 import { SelectItem, Message, ConfirmationService } from 'primeng/primeng';
 
 import { AppSetting } from '../../models/app_setting';
-import { FieldEffect, FieldEffectOption } from '../../models/field_effect.model';
+import { FieldEffect, FieldEffectOption, PrivacyRule } from '../../models/privacy_rule.model';
 
 @Component({
     selector: 'privacy_policy',
@@ -23,8 +23,8 @@ export class PrivacyPolicyFormCreateComponent {
     private condition_result: string = "";
     //#endregion
 
-    private policy_id: string;
-    private description: string;
+    private policy_id: string = '';
+    private description: string = '';
 
     private actions: SelectItem[] = [];
     private selected_action: string;
@@ -40,12 +40,14 @@ export class PrivacyPolicyFormCreateComponent {
 
     private target_result: string = "";
 
+    //#region environment
     private environment_value: string;
-    private constant_value: string;
+    private constant_value: string = '';
     private environment_field_options: string[] = ['purpose', 'start_time', 'end_time'];
     private environment_filtered_field: string[];
+    //#endregion environment
 
-    private rule_id: string;
+    private rule_id: string = '';
     private rule_ids: string[] = [];
 
     private privacy_field_selected: string;
@@ -54,6 +56,7 @@ export class PrivacyPolicyFormCreateComponent {
     private final_field_effects: FieldEffect[][] = [];
 
     private field_effect_options: FieldEffectOption[] = [];
+    private privacy_rules: PrivacyRule[] = [];
 
     private json_helper: any;
     private msgs: Message[] = [];
@@ -76,7 +79,6 @@ export class PrivacyPolicyFormCreateComponent {
             }
             that.collection_selected_name = collections[0];
             that.onSelectCollectionName(collections[0]);
-            console.log(that.field_effect_options);
         });
         this.http.get(AppSetting.API_ENDPOINT + 'function/').subscribe(data => {
             let names: any[] = data.json();
@@ -125,10 +127,12 @@ export class PrivacyPolicyFormCreateComponent {
                     that.field_effects.push(new FieldEffect(item.label, "Optional"));
                 }
             }
-        })
+        });
+        this.reset();
     }
 
     private initialize_field_effects(property: any, jsonObject: any, prefix: string, container: SelectItem[]) {
+        if (property == "_id") return;
         let that = this;
         let object = jsonObject[property];
         if (typeof object === 'object' && !Array.isArray(object)) {
@@ -167,7 +171,7 @@ export class PrivacyPolicyFormCreateComponent {
     }
 
     private initialize_fields(property: any, jsonObject: any, prefix: string, container: SelectItem[]) {
-
+        if (property == "_id") return;
         let object = jsonObject[property];
         if (typeof object === 'object' && !Array.isArray(object)) {
             for (var sub_property in object) {
@@ -217,10 +221,18 @@ export class PrivacyPolicyFormCreateComponent {
     }
 
     add_constant_value_to_rule() {
+        if (this.constant_value == '') {
+            this.msgs.push({ severity: 'error', summary: 'Error Message', detail: 'Constant value can not be null' });
+            return;
+        }
         this.current_rule_result += this.constant_value + " ";
     }
 
     add_constant_value_to_target() {
+        if (this.constant_value == '') {
+            this.msgs.push({ severity: 'error', summary: 'Error Message', detail: 'Constant value can not be null' });
+            return;
+        }
         this.target_result += this.constant_value + " ";
     }
 
@@ -284,7 +296,28 @@ export class PrivacyPolicyFormCreateComponent {
     }
     //#endregion
 
+    private reset() {
+        this.rule_ids = [];
+        this.target_result = '';
+        this.current_rule_result = '';
+        this.privacy_rules = [];
+    }
+
     private add_current_rule() {
+        if (this.rule_id == '') {
+            this.msgs.push({ severity: 'error', summary: 'Error Message', detail: 'Rule Id can not be null' });
+            return;
+        }
+        if (this.current_rule_result == '') {
+            this.msgs.push({ severity: 'error', summary: 'Error Message', detail: 'Rule can not be null' });
+            return;
+        }
+        for (let r of this.rule_ids) {
+            if (r == this.rule_id) {
+                this.msgs.push({ severity: 'error', summary: 'Error Message', detail: 'Rule ID must be unique' });
+                return;
+            }
+        }
         this.final_rule_result.push(this.current_rule_result);
         this.rule_ids.push(this.rule_id);
         var cloned: FieldEffect[] = [];
@@ -292,6 +325,8 @@ export class PrivacyPolicyFormCreateComponent {
             cloned.push(new FieldEffect(item.Name, item.FunctionApply));
         }
         this.final_field_effects.push(cloned);
+        this.privacy_rules.push(new PrivacyRule(this.rule_id, this.current_rule_result, cloned));
+        this.msgs.push({ severity: 'info', summary: 'Info Message', detail: 'One Rule added' });
     }
 
     private getPrivacyFunctions(fieldName: any): SelectItem[] {
@@ -319,25 +354,32 @@ export class PrivacyPolicyFormCreateComponent {
 
     private submit() {
         console.log(this.final_field_effects);
+        if (this.policy_id == '') {
+            this.msgs.push({ severity: 'error', summary: 'Error Message', detail: 'Policy Id can not be null' });
+            return;
+        }
+        if (this.privacy_rules.length == 0) {
+            this.msgs.push({ severity: 'error', summary: 'Error Message', detail: 'Rules can not be null' });
+            return;
+        }
         let command = {
             "PolicyID": this.policy_id,
             "CollectionName": this.collection_selected_name,
             "Description": this.description,
             "Action": this.selected_action,
             "Target": this.target_result,
-            "Conditions": this.final_rule_result,
-            "RuleIDs": this.rule_ids,
-            "FieldEffectsArray": this.final_field_effects
+            "Rules": this.privacy_rules
         }
-        console.log(command);
-        //this.http.post(AppSetting.API_ENDPOINT + 'PrivacyPolicy', JSON.stringify(command), this.options).subscribe(
-        //    data => {
-        //        console.log('OK');
-        //    },
-        //    error => {
-        //        this.msgs = [];
-        //        this.msgs.push({ severity: 'error', summary: 'Error Message', detail: error });
-        //    }
-        //);
+        let that = this;
+        this.http.post(AppSetting.API_ENDPOINT + 'PrivacyPolicy', JSON.stringify(command), this.options).subscribe(
+            data => {
+                that.reset();
+                this.msgs.push({ severity: 'info', summary: 'Info Message', detail: "Privacy Policy added successfully" });
+            },
+            error => {
+                this.msgs = [];
+                this.msgs.push({ severity: 'error', summary: 'Error Message', detail: error });
+            }
+        );
     }
 }

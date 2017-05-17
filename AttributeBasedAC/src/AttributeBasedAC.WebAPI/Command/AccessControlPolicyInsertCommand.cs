@@ -19,10 +19,17 @@ namespace AttributeBasedAC.WebAPI.Command
 
         public string Target { get; set; }
 
-        public ICollection<string> Conditions { get; set; }
+        public bool IsAttributeResourceRequired { get; set; }
 
-        public ICollection<string> RuleIDs { get; set; }
+        public ICollection<AccessControlRuleViewModel> Rules { get; set; }
+    }
 
-        public ICollection<string> RuleEffects { get; set; }
+    public class AccessControlRuleViewModel
+    {
+        public string RuleID { get; set; }
+
+        public string Condition { get; set; }
+
+        public string Effect { get; set; }
     }
 }

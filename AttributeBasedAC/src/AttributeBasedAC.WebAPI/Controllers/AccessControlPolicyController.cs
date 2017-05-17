@@ -29,34 +29,19 @@ namespace AttributeBasedAC.WebAPI.Controllers
             _accessControlPolicyRepository = accessControlPolicyRepository;
             _accessControlPrivacyService = accessControlPrivacyService;
         }
-
-        // GET: api/values
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
         // POST api/values
         [HttpPost]
         [Route("api/AccessControlPolicy")]
         public void Post([FromBody]AccessControlPolicyInsertCommand command)
         {
             var accessControlRules = new List<AccessControlRule>();
-            for (int i = 0; i < command.RuleIDs.Count; i++)
+            foreach (var rule in command.Rules)
             {
-                var condition = _conditionalExpressionService.Parse(command.Conditions.ElementAt(i));
+                var condition = _conditionalExpressionService.Parse(rule.Condition);
                 var accessControlRule = new AccessControlRule()
                 {
-                    Id = command.RuleIDs.ElementAt(i),
-                    Effect = command.RuleEffects.ElementAt(i),
+                    Id = rule.RuleID,
+                    Effect = rule.Effect,
                     Condition = condition
                 };
                 accessControlRules.Add(accessControlRule);
@@ -70,7 +55,7 @@ namespace AttributeBasedAC.WebAPI.Controllers
                 RuleCombining = command.RuleCombining,
                 Target = target,
                 Rules = accessControlRules,
-                IsAttributeResourceRequired = true
+                IsAttributeResourceRequired = command.IsAttributeResourceRequired
             };
             _accessControlPolicyRepository.Add(accessControlModel);
         }

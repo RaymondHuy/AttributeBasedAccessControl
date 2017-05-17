@@ -9,14 +9,6 @@ namespace AttributeBasedAC.WebAPI.Command
 
     public class PrivacyPolicyInsertCommand
     {
-        //"PolicyID": this.policy_id,
-        //    "CollectionName": this.collection_selected_name,
-        //    "Description": this.description,
-        //    "Action": this.selected_action,
-        //    "Target": this.target_result,
-        //    "Conditions": this.final_rule_result,
-        //    "RuleIDs": this.rule_ids,
-        //    "FieldEffects": this.final_field_effects
         public string PolicyID { get; set; }
 
         public string CollectionName { get; set; }
@@ -27,10 +19,15 @@ namespace AttributeBasedAC.WebAPI.Command
 
         public string Target { get; set; }
 
-        public ICollection<string> Conditions { get; set; }
+        public ICollection<PrivacyRuleViewModel> Rules { get; set; }
+    }
 
-        public ICollection<string> RuleIDs { get; set; }
+    public class PrivacyRuleViewModel
+    {
+        public string Condition { get; set; }
 
-        public ICollection<FieldEffect[]> FieldEffectsArray { get; set; }
+        public string RuleID { get; set; }
+
+        public ICollection<FieldEffect> FieldEffects { get; set; }
     }
 }

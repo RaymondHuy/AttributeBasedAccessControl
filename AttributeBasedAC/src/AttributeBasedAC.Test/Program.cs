@@ -68,7 +68,6 @@ namespace AttributeBasedAC.Test
         {
             TestMongoDbFilter();
             var builder = new ContainerBuilder();
-            return;
             builder.RegisterType<MongoClient>().As<IMongoClient>();
             
             builder.RegisterType<SubjectMongoDbRepository>().As<ISubjectRepository>();

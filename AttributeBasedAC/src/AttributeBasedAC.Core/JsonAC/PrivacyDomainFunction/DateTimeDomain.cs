@@ -15,9 +15,17 @@ namespace AttributeBasedAC.Core.JsonAC.PrivacyDomainFunction
             }
         }
 
-        public static string Day(string dateTime)
+        public static string ShowDay(string dateTime)
         {
             return DateTime.Parse(dateTime).Day.ToString();
+        }
+        public static string ShowMonth(string dateTime)
+        {
+            return DateTime.Parse(dateTime).Month.ToString();
+        }
+        public static string ShowYear(string dateTime)
+        {
+            return DateTime.Parse(dateTime).Year.ToString();
         }
     }
 }

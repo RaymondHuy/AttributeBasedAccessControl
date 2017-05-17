@@ -3,6 +3,7 @@ using AttributeBasedAC.Core.JsonAC.Infrastructure;
 using AttributeBasedAC.Core.JsonAC.Repository;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
+using MongoDB.Bson.IO;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -28,8 +29,8 @@ namespace AttributeBasedAC.WebAPI.Controllers
                                    .GetCollection<BsonDocument>(collectionName)
                                    .Find(_ => true)
                                    .First();
-
-            return exampleStructure.ToJson();
+            var jsonSetting = new JsonWriterSettings { OutputMode = JsonOutputMode.Strict };
+            return exampleStructure.ToJson(jsonSetting);
         }
 
         [HttpGet]
@@ -50,8 +51,8 @@ namespace AttributeBasedAC.WebAPI.Controllers
                                    .GetCollection<BsonDocument>(JsonAccessControlSetting.UserDefaultCollectionName)
                                    .Find(_ => true)
                                    .First();
-
-            return exampleStructure.ToJson();
+            var jsonSetting = new JsonWriterSettings { OutputMode = JsonOutputMode.Strict };
+            return exampleStructure.ToJson(jsonSetting);
         }
     }
 }

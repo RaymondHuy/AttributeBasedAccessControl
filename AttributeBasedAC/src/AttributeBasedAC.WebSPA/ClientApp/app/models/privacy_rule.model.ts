@@ -19,3 +19,15 @@ export class FieldEffectOption {
         this.Name = propertyName;
     }
 }
+
+export class PrivacyRule {
+    public RuleID: string;
+    public Condition: string;
+    public FieldEffects: FieldEffect[];
+
+    constructor(ruleID: string, condition: string, fieldEffects: FieldEffect[]) {
+        this.RuleID = ruleID;
+        this.Condition = condition;
+        this.FieldEffects = fieldEffects;
+    }
+}

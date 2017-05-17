@@ -7,6 +7,7 @@ using MongoDB.Driver;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using AttributeBasedAC.Core.JsonAC.Infrastructure;
+using MongoDB.Bson.IO;
 
 namespace AttributeBasedAC.Core.JsonAC.Repository
 {
@@ -31,8 +32,8 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
                                    .GetCollection<BsonDocument>(collectionName)
                                    .Find((FilterDefinition<BsonDocument>)filter)
                                    .ToList();
-
-            return JsonConvert.DeserializeObject<JObject[]>(data.ToJson());
+            var jsonSetting = new JsonWriterSettings { OutputMode = JsonOutputMode.Strict };
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<JObject[]>(data.ToJson(jsonSetting));
         }
     }
 }

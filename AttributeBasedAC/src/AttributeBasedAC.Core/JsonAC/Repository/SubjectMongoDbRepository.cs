@@ -6,6 +6,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json.Linq;
 using AttributeBasedAC.Core.JsonAC.Infrastructure;
+using MongoDB.Bson.IO;
 
 namespace AttributeBasedAC.Core.JsonAC.Repository
 {
@@ -24,8 +25,8 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
                                     .GetCollection<BsonDocument>(collectionName)
                                     .Find(_ => true)
                                     .ToList();
-
-            return JArray.Parse(user.ToJson());
+            var jsonSetting = new JsonWriterSettings { OutputMode = JsonOutputMode.Strict };
+            return JArray.Parse(user.ToJson(jsonSetting));
         }
 
         JObject ISubjectRepository.GetUniqueUser(string collectionName, dynamic filterExpressionByKey)
@@ -35,8 +36,8 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
                                     .GetCollection<BsonDocument>(collectionName)
                                     .Find(filter)
                                     .FirstOrDefault();
-
-            return JObject.Parse(user.ToJson());
+            var jsonSetting = new JsonWriterSettings { OutputMode = JsonOutputMode.Strict };
+            return JObject.Parse(user.ToJson(jsonSetting));
         }
     }
 }
