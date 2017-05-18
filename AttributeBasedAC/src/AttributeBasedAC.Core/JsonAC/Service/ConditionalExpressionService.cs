@@ -7,6 +7,7 @@ using AttributeBasedAC.Core.JsonAC.Repository;
 using System.Reflection;
 using Newtonsoft.Json.Linq;
 using AttributeBasedAC.Core.Infrastructure;
+using AttributeBasedAC.Core.JsonAC.UserDefinedFunction;
 
 namespace AttributeBasedAC.Core.JsonAC.Service
 {
@@ -48,16 +49,15 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                                 break;
                         }
                         if (value == null)
-                            throw new ConditionalExpressionException("Can not access value of field: " + param.ResourceID);
+                            throw new ConditionalExpressionException("Missing field " + param.Value + " of field: " + param.ResourceID);
                         else parameters.Add(value.ToString());
                     }
                 }
             }
-
-            Type type = Type.GetType("AttributeBasedAC.Core.JsonAC.UserDefinedFunctionFactory");
-            MethodInfo method = type.GetMethod(function.FunctionName);
-            if(method == null)
-                throw new ConditionalExpressionException("Can not find the method: " + function.FunctionName + " Please implement it in UserDefinedFunctionFactory");
+            var factory = UserDefinedFunctionPluginFactory.GetInstance();
+            MethodInfo method = factory.GetFunction(function.FunctionName);
+            if (method == null)
+                throw new ConditionalExpressionException("Can not find the method: " + function.FunctionName + " Please registers it in UserDefinedFunctionPluginFactory");
             string result = String.Empty;
             if (method.GetParameters().Length > 0)
             {
@@ -94,7 +94,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
         Function IConditionalExpressionService.Parse(string condition)
         {
             var queue = PolandNotationProcess(condition);
-            var stackBuilder = new Stack<Function>();
+            var queueBuilder = new Queue<Function>();
             while (queue.Any())
             {
                 string keyword = queue.Dequeue();
@@ -103,15 +103,15 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                 {
                     var function = new Function()
                     {
-                        FunctionName = method.Name,
+                        FunctionName = keyword,
                         Parameters = new List<Function>()
                     };
                     int count = method.GetParameters().Length;
                     for (int i = 0; i < count; i++)
                     {
-                        function.Parameters.Add(stackBuilder.Pop());
+                        function.Parameters.Add(queueBuilder.Dequeue());
                     }
-                    stackBuilder.Push(function);
+                    queueBuilder.Enqueue(function);
                 }
                 else if (keyword.Equals("AND"))
                 {
@@ -120,9 +120,9 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                         FunctionName = "And",
                         Parameters = new List<Function>()
                     };
-                    function.Parameters.Add(stackBuilder.Pop());
-                    function.Parameters.Add(stackBuilder.Pop());
-                    stackBuilder.Push(function);
+                    function.Parameters.Add(queueBuilder.Dequeue());
+                    function.Parameters.Add(queueBuilder.Dequeue());
+                    queueBuilder.Enqueue(function);
                 }
                 else if (keyword.Equals("OR"))
                 {
@@ -131,9 +131,9 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                         FunctionName = "Or",
                         Parameters = new List<Function>()
                     };
-                    function.Parameters.Add(stackBuilder.Pop());
-                    function.Parameters.Add(stackBuilder.Pop());
-                    stackBuilder.Push(function);
+                    function.Parameters.Add(queueBuilder.Dequeue());
+                    function.Parameters.Add(queueBuilder.Dequeue());
+                    queueBuilder.Enqueue(function);
                 }
                 else if (keyword.Equals("NOT"))
                 {
@@ -142,8 +142,8 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                         FunctionName = "Not",
                         Parameters = new List<Function>()
                     };
-                    function.Parameters.Add(stackBuilder.Pop());
-                    stackBuilder.Push(function);
+                    function.Parameters.Add(queueBuilder.Dequeue());
+                    queueBuilder.Enqueue(function);
                 }
                 else if (keyword.Contains("."))
                 {
@@ -153,17 +153,16 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                         ResourceID = keyword.Substring(0, idxResourceName),
                         Value = keyword.Substring(idxResourceName + 1)
                     };
-                    stackBuilder.Push(function);
+                    queueBuilder.Enqueue(function);
                 }
-                else stackBuilder.Push(new Function() { Value = keyword });
+                else queueBuilder.Enqueue(new Function() { Value = keyword });
             }
-            return stackBuilder.Pop();
+            return queueBuilder.Dequeue();
         }
 
         private bool? CheckRelativeFunction(Function function, JObject user, JObject resource, JObject environment)
         {
             var parameters = new List<string>();
-            bool missingValueField = false;
             bool hasRelativeField = false;
             foreach (var param in function.Parameters)
             {
@@ -204,22 +203,17 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                         }
                         else
                         {
-                            missingValueField = true;
                             parameters.Add(null);
                         }
                     }
                 }
             }
-            if (missingValueField && hasRelativeField)
-                return true;
-            else if (missingValueField && !hasRelativeField)
-                return false;
-            else if (!missingValueField && !hasRelativeField)
-                return false;
             try
             {
-                Type type = Type.GetType("AttributeBasedAC.Core.JsonAC.UserDefinedFunctionFactory");
-                MethodInfo method = type.GetMethod(function.FunctionName);
+                var factory = UserDefinedFunctionPluginFactory.GetInstance();
+                MethodInfo method = factory.GetFunction(function.FunctionName);
+                if (method == null)
+                    throw new ConditionalExpressionException("Can not find the method: " + function.FunctionName + " Please implement it in UserDefinedFunctionFactory");
                 string result = String.Empty;
                 if (method.GetParameters().Length > 0)
                 {
@@ -233,6 +227,8 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             }
             catch (Exception)
             {
+                if (hasRelativeField)
+                    return true;
                 return null;
             }
         }
@@ -289,8 +285,8 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             }
 
             string result = String.Empty;
-            Type type = Type.GetType("AttributeBasedAC.Core.JsonAC.UserDefinedFunctionFactory");
-            MethodInfo method = type.GetMethod(function.FunctionName);
+            var factory = UserDefinedFunctionPluginFactory.GetInstance();
+            MethodInfo method = factory.GetFunction(function.FunctionName);
             if (method == null)
                 throw new ConditionalExpressionException("Can not find the method: " + function.FunctionName + " Please implement it in UserDefinedFunctionFactory");
             if (method.GetParameters().Length > 0)
@@ -305,7 +301,6 @@ namespace AttributeBasedAC.Core.JsonAC.Service
 
         public Queue<string> PolandNotationProcess(string condition)
         {
-
             var stack = new Stack<string>();
             var queue = new Queue<string>();
 
@@ -391,9 +386,8 @@ namespace AttributeBasedAC.Core.JsonAC.Service
 
         private MethodInfo GetUserFunction(string keyword)
         {
-            methods = methods ?? typeof(UserDefinedFunctionFactory).GetMethods();
-            var method = methods.Where(m => m.Name.Equals(keyword)).FirstOrDefault();
-            return method;
+            var factory = UserDefinedFunctionPluginFactory.GetInstance();
+            return factory.GetFunction(keyword);
         }
 
         private int Priority(string op)
@@ -407,6 +401,12 @@ namespace AttributeBasedAC.Core.JsonAC.Service
 
         bool IConditionalExpressionService.IsPrivacyPolicyRelateToContext(PrivacyPolicy policy, JObject user, JObject resource, JObject environment)
         {
+            if (policy.Target != null)
+            {
+                if (CheckRelativeFunction(policy.Target, user, resource, environment) == true)
+                    return true;
+            }
+
             foreach (var rule in policy.Rules)
             {
                 if (CheckRelativeFunction(rule.Condition, user, resource, environment) == true)

@@ -317,7 +317,7 @@ export class AccessControlPolicyFormCreateComponent {
             },
             error => {
                 this.msgs = [];
-                this.msgs.push({ severity: 'error', summary: 'Error Message', detail: error });
+                this.msgs.push({ severity: 'error', summary: 'Error Message', detail: error.text() });
             }
         );
     }

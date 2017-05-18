@@ -66,8 +66,8 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
             var data = _mongoClient.GetDatabase(JsonAccessControlSetting.PrivacyAccessControlDbName)
                                    .GetCollection<AccessControlPolicyCombining>(JsonAccessControlSetting.AccessControlPolicyCombiningConfigurtaion)
                                    .Find(filter)
-                                   .First();
-            return data.Algorithm;
+                                   .FirstOrDefault();
+            return data == null ? "permit-overrides": data.Algorithm;
         }
     }
 }

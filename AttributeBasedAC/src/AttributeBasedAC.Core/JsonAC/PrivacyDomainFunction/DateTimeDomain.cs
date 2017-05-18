@@ -15,13 +15,15 @@ namespace AttributeBasedAC.Core.JsonAC.PrivacyDomainFunction
             }
         }
 
-        public static string ShowDay(string dateTime)
+        public static string ShowDayAndMonth(string dateTime)
         {
-            return DateTime.Parse(dateTime).Day.ToString();
+            DateTime dt = DateTime.Parse(dateTime);
+            return dt.Day.ToString() + "/" + dt.Month.ToString();
         }
-        public static string ShowMonth(string dateTime)
+        public static string ShowMonthAndYear(string dateTime)
         {
-            return DateTime.Parse(dateTime).Month.ToString();
+            DateTime dt = DateTime.Parse(dateTime);
+            return dt.Month.ToString() + "/" + dt.Year.ToString();
         }
         public static string ShowYear(string dateTime)
         {

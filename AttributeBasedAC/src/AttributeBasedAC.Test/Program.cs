@@ -16,6 +16,7 @@ using System.Reflection;
 using System.Diagnostics;
 using AttributeBasedAC.Test.WebApiTesting;
 using AttributeBasedAC.Core.JsonAC.Infrastructure;
+using AttributeBasedAC.Core.JsonAC.UserDefinedFunction;
 
 namespace AttributeBasedAC.Test
 {
@@ -66,7 +67,10 @@ namespace AttributeBasedAC.Test
 
         public static void Main(string[] args)
         {
-            TestMongoDbFilter();
+            UserDefinedFunctionPluginFactory.GetInstance().RegisterDefaultPlugin();
+            IConditionalExpressionService exp = new ConditionalExpressionService();
+            exp.Parse("IntegerGreaterThan ( 20 , 30 ) ");
+            return;
             var builder = new ContainerBuilder();
             builder.RegisterType<MongoClient>().As<IMongoClient>();
             

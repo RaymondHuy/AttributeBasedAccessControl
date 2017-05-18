@@ -32,11 +32,10 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
                                    .ToList();
         }
 
-        ICollection<PrivacyPolicy> IPrivacyPolicyRepository.GetPolicies(string collectionName, string action, bool? isAttributeResourceRequired)
+        ICollection<PrivacyPolicy> IPrivacyPolicyRepository.GetPolicies(string collectionName, bool? isAttributeResourceRequired)
         {
             var builder = Builders<PrivacyPolicy>.Filter;
-            var filter = builder.Eq("collection_name", collectionName)
-                       & builder.Eq("action", action);
+            var filter = builder.Eq("collection_name", collectionName);
 
             if (isAttributeResourceRequired != null)
                 filter = filter & builder.Eq("is_attribute_resource_required", isAttributeResourceRequired);

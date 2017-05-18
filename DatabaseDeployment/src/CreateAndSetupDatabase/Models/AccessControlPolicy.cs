@@ -43,7 +43,7 @@ namespace CreateAndSetupDatabase
             data.Add(new AccessControlPolicy
             {
                 CollectionName = "Department",
-                Action = "Read",
+                Action = "read",
                 Description = "",
                 IsAttributeResourceRequired = false,
                 PolicyId = "policy 01",

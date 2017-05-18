@@ -10,7 +10,7 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
     {
         ICollection<PrivacyPolicy> GetAll();
 
-        ICollection<PrivacyPolicy> GetPolicies(string collectionName, string action, bool? isAttributeResourceRequired);
+        ICollection<PrivacyPolicy> GetPolicies(string collectionName, bool? isAttributeResourceRequired);
 
         void Add(PrivacyPolicy privacyPolicy);
 

@@ -42,8 +42,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             environment.AddAnnotation(action);
 
             _collectionPrivacyRules = GetFieldCollectionRules();
-            var privacyRecords = new List<JObject>();
-
+            var privacyRecords = new JArray();
             //Parallel.ForEach(_resource, record =>
             //{
             //    var privacyField = GetPrivacyRecordField(record, policies);
@@ -53,12 +52,16 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             //});
             foreach (var record in resource)
             {
-                Console.WriteLine(DateTime.Now.Millisecond);
                 var privacyFields = GetPrivacyRecordField(record);
-                var privacyRecord = PrivacyProcessing(record, privacyFields);
-                Console.WriteLine(DateTime.Now.Millisecond);
-                privacyRecords.Add(privacyRecord);
+                if (privacyFields.Count > 0)
+                {
+                    var privacyRecord = PrivacyProcessing(record, privacyFields);
+                    privacyRecords.Add(privacyRecord);
+                }
             }
+            if(privacyRecords.Count == 0)
+                return new ResponseContext(EffectResult.Permit, privacyRecords, "No privacy rules is satisfied");
+
             return new ResponseContext(EffectResult.Permit, privacyRecords);
         }
 
@@ -76,7 +79,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
 
         private IDictionary<string, string> GetFieldCollectionRules()
         {
-            var policies = _privacyPolicyRepository.GetPolicies(_collectionName, _action, false);
+            var policies = _privacyPolicyRepository.GetPolicies(_collectionName, false);
             var targetPolicies = new List<PrivacyPolicy>();
             foreach (var policy in policies)
             {
@@ -133,7 +136,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
 
         private IDictionary<string, string> GetPrivacyRecordField(JObject record)
         {
-            var policies = _privacyPolicyRepository.GetPolicies(_collectionName, _action, true);
+            var policies = _privacyPolicyRepository.GetPolicies(_collectionName, true);
             var targetPolicies = new List<PrivacyPolicy>();
             foreach (var policy in policies)
             {
@@ -216,7 +219,11 @@ namespace AttributeBasedAC.Core.JsonAC.Service
         {
             foreach (FieldEffect field in bonusFields)
             {
-                if (field.FunctionApply.Equals("Optional") || field.FunctionApply.Equals(privacyRules[field.Name]))
+                if (!privacyRules.Keys.Contains(field.Name))
+                {
+                    privacyRules.Add(field.Name, field.FunctionApply);
+                }
+                else if (field.FunctionApply.Equals("Optional") || field.FunctionApply.Equals(privacyRules[field.Name]))
                 {
                     continue;
                 }

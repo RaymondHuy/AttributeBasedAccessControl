@@ -15,16 +15,16 @@ namespace AttributeBasedAC.Core.JsonAC.Service
     public class AccessControlPrivacyService : IAccessControlPrivacyService
     {
         private readonly IAccessControlPolicyRepository _accessControlPolicyRepository;
-        private readonly IConditionalExpressionService             _expressionService;
-        private readonly IPrivacyDomainRepository     _privacyFunctionRepository;
-        private readonly IPrivacyPolicyRepository       _privacyPolicyRepository;
+        private readonly IConditionalExpressionService _expressionService;
+        private readonly IPrivacyDomainRepository _privacyFunctionRepository;
+        private readonly IPrivacyPolicyRepository _privacyPolicyRepository;
 
         private ICollection<JObject> _resource;
-        private JObject   _user;
-        private JObject   _environment;
-        private string    _collectionName;
-        private string    _action;
-        private string    _policyCombining;
+        private JObject _user;
+        private JObject _environment;
+        private string _collectionName;
+        private string _action;
+        private string _policyCombining;
 
         private IDictionary<string, string> _collectionPrivacyRules;
 
@@ -47,14 +47,15 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             _collectionName = collectionName;
             _action = action;
             _environment = environment;
-            
+
             environment.AddAnnotation(action);
             EffectResult effect = AccessControlCollectionPolicyProcessing();
             if (effect == EffectResult.Deny)
                 return new ResponseContext(EffectResult.Deny, null);
 
             var accessControlRecordPolicies = _accessControlPolicyRepository.GetPolicies(collectionName, action, true);
-            _policyCombining = _accessControlPolicyRepository.GetPolicyCombining(accessControlRecordPolicies);
+            _policyCombining = accessControlRecordPolicies.Count > 0 ? _accessControlPolicyRepository.GetPolicyCombining(accessControlRecordPolicies)
+                                                                    : "permit-overrides";
 
             _resource = new List<JObject>();
 
@@ -71,8 +72,8 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                 return new ResponseContext(EffectResult.Permit, _resource);
 
             _collectionPrivacyRules = GetFieldCollectionRules();
-            var privacyRecords = new List<JObject>();
-            
+            var privacyRecords = new JArray();
+
             //Parallel.ForEach(_resource, record =>
             //{
             //    var privacyField = GetPrivacyRecordField(record, policies);
@@ -82,7 +83,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             //});
             foreach (var record in _resource)
             {
-                Console.WriteLine(DateTime.Now.Millisecond) ;
+                Console.WriteLine(DateTime.Now.Millisecond);
                 var privacyFields = GetPrivacyRecordField(record);
                 var privacyRecord = PrivacyProcessing(record, privacyFields);
                 Console.WriteLine(DateTime.Now.Millisecond);
@@ -107,7 +108,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
         /// </summary>
         private IDictionary<string, string> GetFieldCollectionRules()
         {
-            var policies = _privacyPolicyRepository.GetPolicies(_collectionName, _action, false);
+            var policies = _privacyPolicyRepository.GetPolicies(_collectionName, false);
             var targetPolicies = new List<PrivacyPolicy>();
             foreach (var policy in policies)
             {
@@ -163,7 +164,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
 
         private IDictionary<string, string> GetPrivacyRecordField(JObject record)
         {
-            var policies = _privacyPolicyRepository.GetPolicies(_collectionName, _action, true);
+            var policies = _privacyPolicyRepository.GetPolicies(_collectionName, true);
             var targetPolicies = new List<PrivacyPolicy>();
             foreach (var policy in policies)
             {
@@ -193,7 +194,8 @@ namespace AttributeBasedAC.Core.JsonAC.Service
 
             foreach (var fieldName in privacyField.Keys)
             {
-                if (privacyField[fieldName] != "Optional") {
+                if (privacyField[fieldName] != "Optional")
+                {
                     string json = record.SelectToken(fieldName).ToString();
                     try
                     {
@@ -267,13 +269,13 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                 }
             }
         }
-        
+
         private EffectResult AccessControlCollectionPolicyProcessing()
         {
             EffectResult result = EffectResult.NotApplicable;
 
             ICollection<AccessControlPolicy> collectionPolicies = _accessControlPolicyRepository.GetPolicies(_collectionName, _action, false);
-            string policyCombining = _accessControlPolicyRepository.GetPolicyCombining(collectionPolicies);
+            string policyCombining = collectionPolicies.Count > 0 ? _accessControlPolicyRepository.GetPolicyCombining(collectionPolicies) : "permit-overrides";
             var targetPolicies = new List<AccessControlPolicy>();
             foreach (var policy in collectionPolicies)
             {
@@ -367,5 +369,5 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             return result;
         }
     }
-    
+
 }

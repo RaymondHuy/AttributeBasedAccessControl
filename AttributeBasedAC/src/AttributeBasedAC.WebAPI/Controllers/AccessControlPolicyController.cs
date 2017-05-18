@@ -18,22 +18,27 @@ namespace AttributeBasedAC.WebAPI.Controllers
     {
         private readonly IConditionalExpressionService _conditionalExpressionService;
         private readonly IAccessControlPolicyRepository _accessControlPolicyRepository;
-        private readonly IAccessControlPrivacyService _accessControlPrivacyService;
+        private readonly IAccessControlService _accessControlService;
 
         public AccessControlPolicyController(
             IConditionalExpressionService conditionalExpressionService,
             IAccessControlPolicyRepository accessControlPolicyRepository,
-            IAccessControlPrivacyService accessControlPrivacyService)
+            IAccessControlService accessControlService)
         {
             _conditionalExpressionService = conditionalExpressionService;
             _accessControlPolicyRepository = accessControlPolicyRepository;
-            _accessControlPrivacyService = accessControlPrivacyService;
+            _accessControlService = accessControlService;
         }
         // POST api/values
         [HttpPost]
         [Route("api/AccessControlPolicy")]
         public void Post([FromBody]AccessControlPolicyInsertCommand command)
         {
+            bool IsResourceRequired = false;
+
+            if (command.Target.Contains("\"Resource."))
+                IsResourceRequired = true;
+
             var accessControlRules = new List<AccessControlRule>();
             foreach (var rule in command.Rules)
             {
@@ -45,17 +50,21 @@ namespace AttributeBasedAC.WebAPI.Controllers
                     Condition = condition
                 };
                 accessControlRules.Add(accessControlRule);
+
+                if (!IsResourceRequired)
+                    IsResourceRequired = rule.Condition.Contains("\"Resource.");
             }
             var target = _conditionalExpressionService.Parse(command.Target);
             var accessControlModel = new AccessControlPolicy()
             {
+                PolicyId = command.PolicyID,
                 CollectionName = command.CollectionName,
                 Action = command.Action,
                 Description = command.Description,
                 RuleCombining = command.RuleCombining,
                 Target = target,
                 Rules = accessControlRules,
-                IsAttributeResourceRequired = command.IsAttributeResourceRequired
+                IsAttributeResourceRequired = IsResourceRequired
             };
             _accessControlPolicyRepository.Add(accessControlModel);
         }
@@ -68,16 +77,10 @@ namespace AttributeBasedAC.WebAPI.Controllers
             JObject resource = string.IsNullOrEmpty(command.ResourceJsonData) ? new JObject() : JObject.Parse(command.ResourceJsonData);
             JObject environment = string.IsNullOrEmpty(command.EnvironmentJsonData) ? new JObject() : JObject.Parse(command.EnvironmentJsonData);
 
-            var policies = _accessControlPolicyRepository.GetPolicies(command.CollectionName, command.Action, null);
-            var relativePolicies = _accessControlPrivacyService.Review(policies, user, resource, environment);
+            var relativePolicies = _accessControlService.Review(user, resource, environment);
 
             return relativePolicies.Select(p => p.PolicyId).ToList();
         }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+        
     }
 }

@@ -71,6 +71,7 @@ export class PolicyReviewComponent {
         this.http.get(AppSetting.API_ENDPOINT + 'subject/fields/').subscribe(data => {
             let jsonObject: any = data.json();
             for (var property in jsonObject) {
+                if (property == '_id') continue;
                 if (that.selected_subject_field === undefined)
                     that.selected_subject_field = property;
                 that.initialize_fields(property, jsonObject, "", that.subject_fields);
@@ -93,7 +94,9 @@ export class PolicyReviewComponent {
         this.resource_fields = [];
         this.http.get(AppSetting.API_ENDPOINT + 'structure/?collectionName=' + collectionSelected).subscribe(data => {
             let jsonObject: any = data.json();
+            console.log(jsonObject);
             for (var property in jsonObject) {
+                if (property == '_id') continue;
                 if (that.resource_selected_field === undefined)
                     that.resource_selected_field = property;
                 that.initialize_fields(property, jsonObject, "", that.resource_fields);
@@ -184,24 +187,23 @@ export class PolicyReviewComponent {
                 },
                 error => {
                     this.msgs = [];
-                    this.msgs.push({ severity: 'error', summary: 'Error Message', detail: error });
+                    this.msgs.push({ severity: 'error', summary: 'Error Message', detail: error.text() });
                 }
             );
         }
         else {
             this.http.post(AppSetting.API_ENDPOINT + 'Privacy/Review/', JSON.stringify(command), this.options).subscribe(
                 data => {
-                    console.log('ok');
                     that.result = data.json();
-                    console.log(that.result);
+                    if (that.result.length == 0)
+                        this.msgs.push({ severity: 'info', summary: 'Info Message', detail: "No Policy satisfied" });
                     //let jsonObject: any = data.json()[0];
                     //for (var property in jsonObject) {
                     //    that.result_property_names.push(property);
                     //}
                 },
                 error => {
-                    this.msgs = [];
-                    this.msgs.push({ severity: 'error', summary: 'Error Message', detail: error });
+                    this.msgs.push({ severity: 'error', summary: 'Error Message', detail: error.text() });
                 }
             );
         }

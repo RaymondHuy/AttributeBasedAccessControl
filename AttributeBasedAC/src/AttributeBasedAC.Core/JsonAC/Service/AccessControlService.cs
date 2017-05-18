@@ -38,8 +38,14 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             EffectResult effect = CollectionAccessControlProcess();
             if (effect == EffectResult.Deny)
                 return new ResponseContext(EffectResult.Deny, null);
+            else if(effect == EffectResult.Permit)
+                return new ResponseContext(EffectResult.Permit, null);
 
             var accessControlRecordPolicies = _accessControlPolicyRepository.GetPolicies(collectionName, action, true);
+            
+            if(accessControlRecordPolicies.Count == 0)
+                return new ResponseContext(EffectResult.Deny, null);
+
             string policyCombining = _accessControlPolicyRepository.GetPolicyCombining(accessControlRecordPolicies);
 
             ICollection<JObject> _resource = new List<JObject>();
@@ -74,7 +80,12 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             EffectResult result = EffectResult.NotApplicable;
 
             ICollection<AccessControlPolicy> collectionPolicies = _accessControlPolicyRepository.GetPolicies(_collectionName, _action, false);
+
+            if (collectionPolicies.Count == 0)
+                return EffectResult.NotApplicable;
+
             string policyCombining = _accessControlPolicyRepository.GetPolicyCombining(collectionPolicies);
+
             var targetPolicies = new List<AccessControlPolicy>();
             foreach (var policy in collectionPolicies)
             {

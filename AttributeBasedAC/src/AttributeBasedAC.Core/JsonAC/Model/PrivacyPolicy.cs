@@ -22,9 +22,6 @@ namespace AttributeBasedAC.Core.JsonAC.Model
         [BsonElement("target")]
         public Function Target { get; set; }
 
-        [BsonElement("action")]
-        public string Action { get; set; }
-
         [BsonElement("is_attribute_resource_required")]
         public bool IsAttributeResourceRequired { get; set; }
 

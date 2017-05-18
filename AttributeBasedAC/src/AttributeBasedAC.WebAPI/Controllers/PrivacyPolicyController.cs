@@ -19,25 +19,28 @@ namespace AttributeBasedAC.WebAPI.Controllers
 {
     public class PrivacyPolicyController : Controller
     {
-        private readonly IAccessControlPrivacyService _accessControlPrivacyService;
+        private readonly ISecurityService _securityService;
         private readonly ISubjectRepository _subjectRepository;
         private readonly IResourceRepository _resourceRepository;
         private readonly IPrivacyDomainRepository _privacyDomainRepository;
         private readonly IConditionalExpressionService _conditionalExpressionService;
         private readonly IPrivacyPolicyRepository _privacyPolicyRepository;
+        private readonly IPrivacyService _privacyService;
 
         public PrivacyPolicyController(
-            IAccessControlPrivacyService accessControlPrivacyService,
+            ISecurityService securityService,
             ISubjectRepository subjectRepository,
             IResourceRepository resourceRepository,
             IConditionalExpressionService conditionalExpressionService,
-            IPrivacyPolicyRepository privacyPolicyRepository)
+            IPrivacyPolicyRepository privacyPolicyRepository,
+            IPrivacyService privacyService)
         {
-            _accessControlPrivacyService = accessControlPrivacyService;
+            _securityService = securityService;
             _subjectRepository = subjectRepository;
             _resourceRepository = resourceRepository;
             _conditionalExpressionService = conditionalExpressionService;
             _privacyPolicyRepository = privacyPolicyRepository;
+            _privacyService = privacyService;
         }
 
         [HttpPost]
@@ -46,22 +49,16 @@ namespace AttributeBasedAC.WebAPI.Controllers
         {
             var userFilter = Builders<BsonDocument>.Filter.Eq("_id", ObjectId.Parse(command.UserID));
             var subject = _subjectRepository.GetUniqueUser(JsonAccessControlSetting.UserDefaultCollectionName, userFilter);
-            var environment = string.IsNullOrEmpty(command.Environment) ? null : JObject.Parse(command.Environment);
+            var environment = string.IsNullOrEmpty(command.Environment) || command.Environment == "{}" ? null : JObject.Parse(command.Environment);
             var resource = _resourceRepository.GetCollectionDataWithCustomFilter(command.ResourceName, null);
             var action = command.Action;
-            var result = _accessControlPrivacyService.ExecuteSecurityProcess(subject, resource, action, command.ResourceName, environment);
+            var result = _securityService.ExecuteProcess(subject, resource, action, command.ResourceName, environment);
 
             if (result.Effect == EffectResult.Deny)
                 return "Deny";
-
-            var builder = new StringBuilder();
-            builder.Append("[");
-            foreach (var json in result.Data)
-            {
-                builder.Append(json.ToString());
-            }
-            builder.Append("]");
-            return builder.ToString();
+            if (result.Effect == EffectResult.NotApplicable)
+                return "Not Applicable";
+            return result.Data == null ? "": result.Data.ToString();
         }
 
 
@@ -69,6 +66,11 @@ namespace AttributeBasedAC.WebAPI.Controllers
         [Route("api/PrivacyPolicy")]
         public void Create([FromBody]PrivacyPolicyInsertCommand command)
         {
+            bool IsResourceRequired = false;
+
+            if (command.Target.Contains("\"Resource."))
+                IsResourceRequired = true;
+
             var fieldRules = new List<FieldRule>();
             var target = _conditionalExpressionService.Parse(command.Target);
             foreach (var rule in command.Rules)
@@ -81,16 +83,18 @@ namespace AttributeBasedAC.WebAPI.Controllers
                     Condition = condition
                 };
                 fieldRules.Add(fieldRule);
+
+                if (!IsResourceRequired)
+                    IsResourceRequired = rule.Condition.Contains("\"Resource.");
             }
 
             var policy = new PrivacyPolicy()
             {
                 CollectionName = command.CollectionName,
-                Action = command.Action,
                 Description = command.Description,
                 PolicyId = command.PolicyID,
                 Rules = fieldRules,
-                IsAttributeResourceRequired = true,
+                IsAttributeResourceRequired = IsResourceRequired,
                 Target = target
             };
             _privacyPolicyRepository.Add(policy);
@@ -103,9 +107,8 @@ namespace AttributeBasedAC.WebAPI.Controllers
             JObject user = string.IsNullOrEmpty(command.UserJsonData) ? new JObject() : JObject.Parse(command.UserJsonData);
             JObject resource = string.IsNullOrEmpty(command.ResourceJsonData) ? new JObject() : JObject.Parse(command.ResourceJsonData);
             JObject environment = string.IsNullOrEmpty(command.EnvironmentJsonData) ? new JObject() : JObject.Parse(command.EnvironmentJsonData);
-
-            var policies = _privacyPolicyRepository.GetPolicies(command.CollectionName, command.Action, null);
-            var relativePolicies = _accessControlPrivacyService.Review(policies, user, resource, environment);
+            
+            var relativePolicies = _privacyService.Review(user, resource, environment);
 
             return relativePolicies.Select(p => p.PolicyId).ToList();
         }

@@ -80,7 +80,7 @@ namespace CreateAndSetupDatabase.UserDefaultDatabase
             var data = new List<Department>();
             data.Add(new Department
             {
-                DateCreated = "18/5/2017",
+                DateCreated = "5/15/2017",
                 DeptId = "MAS_01",
                 DeptNumber = 30,
                 IsDeleted = false,
@@ -88,12 +88,12 @@ namespace CreateAndSetupDatabase.UserDefaultDatabase
                 NumberDevelopers = 10,
                 Tax = 12.5,
                 Technologies = new string[] { "Android", "iOS" },
-                Leader = new Leader { Name = "John", Info = new PersonalInfo { DOB = "20/10/1990", Phone = "0123456789", SSN = "123-aa-ssss", Salary = 200.15 } },
+                Leader = new Leader { Name = "John", Info = new PersonalInfo { DOB = "10/12/1990", Phone = "0123456789", SSN = "123-aa-ssss", Salary = 200.15 } },
                 Projects = new Project[] { new Project { Language = "English", Name = "ERP" }, new Project { Language = "Vietnamese", Name = "CRM" } }
             });
             data.Add(new Department
             {
-                DateCreated = "28/4/2012",
+                DateCreated = "4/4/2012",
                 DeptId = "MAS_02",
                 DeptNumber = 50,
                 IsDeleted = false,
@@ -106,7 +106,7 @@ namespace CreateAndSetupDatabase.UserDefaultDatabase
             });
             data.Add(new Department
             {
-                DateCreated = "22/4/2014",
+                DateCreated = "2/4/2014",
                 DeptId = "MAS_03",
                 DeptNumber = 32,
                 IsDeleted = false,
@@ -114,7 +114,7 @@ namespace CreateAndSetupDatabase.UserDefaultDatabase
                 NumberDevelopers = 13,
                 Tax = 12.5,
                 Technologies = new string[] { "C++", "COBOL", "SQL" },
-                Leader = new Leader { Name = "John", Info = new PersonalInfo { DOB = "20/10/1990", Phone = "0123456789", SSN = "123-aa-ssss", Salary = 200.15 } },
+                Leader = new Leader { Name = "John", Info = new PersonalInfo { DOB = "5/10/1990", Phone = "0123456789", SSN = "123-aa-ssss", Salary = 200.15 } },
                 Projects = new Project[] { new Project { Language = "English", Name = "E-learning" }, new Project { Language = "Chinese", Name = "E-commerce" } }
             });
             data.Add(new Department

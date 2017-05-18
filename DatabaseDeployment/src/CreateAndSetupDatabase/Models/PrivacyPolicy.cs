@@ -24,9 +24,6 @@ namespace CreateAndSetupDatabase
         [BsonIgnoreIfNull]
         public Function Target { get; set; }
 
-        [BsonElement("action")]
-        public string Action { get; set; }
-
         [BsonElement("is_attribute_resource_required")]
         public bool IsAttributeResourceRequired { get; set; }
 
@@ -43,7 +40,6 @@ namespace CreateAndSetupDatabase
             data.Add(new PrivacyPolicy
             {
                 CollectionName = "Department",
-                Action = "Read",
                 Description = "",
                 IsAttributeResourceRequired = false,
                 PolicyId = "policy 01",
@@ -59,14 +55,14 @@ namespace CreateAndSetupDatabase
                             new FieldEffect { Name="tax", FunctionApply="DefaultDomainPrivacy.Hide"},
                             new FieldEffect { Name="number_developers", FunctionApply="DefaultDomainPrivacy.Show"},
                             new FieldEffect { Name="technologies", FunctionApply = "DefaultDomainPrivacy.Show" },
-                            new FieldEffect { Name="leader.Name", FunctionApply = "DefaultDomainPrivacy.Show"},
+                            new FieldEffect { Name="leader.name", FunctionApply = "DefaultDomainPrivacy.Show"},
                             new FieldEffect { Name="leader.info.phone", FunctionApply = "DefaultDomainPrivacy.Show"},
                             new FieldEffect { Name="leader.info.ssn", FunctionApply = "DefaultDomainPrivacy.Show"},
                             new FieldEffect { Name="leader.info.date_of_birth", FunctionApply="DateTimeDomain.ShowYear"},
                             new FieldEffect { Name="leader.info.salary", FunctionApply="DefaultDomainPrivacy.Hide"},
                             new FieldEffect { Name="dept_no", FunctionApply = "DefaultDomainPrivacy.Show" },
                             new FieldEffect { Name="location", FunctionApply = "DefaultDomainPrivacy.Hide" },
-                            new FieldEffect { Name="projects", FunctionApply="Policy projects"}
+                            new FieldEffect { Name="projects", FunctionApply="DepartmentProjects.policy02"}
                         }
                     }
                 }
@@ -74,10 +70,9 @@ namespace CreateAndSetupDatabase
             data.Add(new PrivacyPolicy
             {
                 CollectionName = "Department.projects",
-                Action = "Read",
                 Description = "",
                 IsAttributeResourceRequired = true,
-                PolicyId = "policy 02",
+                PolicyId = "policy02",
                 Target = null,
                 Rules = new List<FieldRule> {
                     new FieldRule {

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using AttributeBasedAC.Core.JsonAC;
 using System.Reflection;
+using AttributeBasedAC.Core.JsonAC.UserDefinedFunction;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -17,10 +18,8 @@ namespace AttributeBasedAC.WebAPI.Controllers
         [Route("api/function")]
         public IEnumerable<string> Get()
         {
-            var methods = typeof(UserDefinedFunctionFactory).GetMethods();
-            return methods.Select(m => m.Name)
-                          .Where(m => !m.Equals("GetHashCode") && !m.Equals("ToString") && !m.Equals("GetType") && !m.Equals("Equals"))
-                          .ToList();
+            var function = UserDefinedFunctionPluginFactory.GetInstance();
+            return function.GetAllRegisteredFunction();
         }
     }
 }

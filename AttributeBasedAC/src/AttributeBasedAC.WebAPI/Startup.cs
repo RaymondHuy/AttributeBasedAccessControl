@@ -11,6 +11,9 @@ using AttributeBasedAC.Core.JsonAC.Repository;
 using AttributeBasedAC.Core.JsonAC.Service;
 using MongoDB.Driver;
 using AttributeBasedAC.Core.JsonAC.PrivacyDomainFunction;
+using AttributeBasedAC.Core.JsonAC.Infrastructure;
+using AttributeBasedAC.Core.JsonAC.UserDefinedFunction;
+using AttributeBasedAC.WebAPI.Middlewares;
 
 namespace AttributeBasedAC.WebAPI
 {
@@ -24,6 +27,14 @@ namespace AttributeBasedAC.WebAPI
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
+
+            var mongoDbConfig = Configuration.GetSection("MongoDbConfiguration");
+            var policyDb = mongoDbConfig["PolicyDb"];
+            var userDb = mongoDbConfig["UserDb"];
+
+            JsonAccessControlSetting.UserDefaultDatabaseName = userDb;
+            JsonAccessControlSetting.UserDefaultCollectionName = mongoDbConfig["AccountCollection"];
+            JsonAccessControlSetting.PrivacyAccessControlDbName = policyDb;
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -43,10 +54,15 @@ namespace AttributeBasedAC.WebAPI
             services.AddScoped<IPrivacyPolicyRepository, PrivacyPolicyMongoDbRepository>();
 
             services.AddScoped<IConditionalExpressionService, ConditionalExpressionService>();
-            services.AddScoped<IAccessControlPrivacyService, AccessControlPrivacyService>();
+            services.AddScoped<IAccessControlService, AccessControlService>();
+            services.AddScoped<IPrivacyService, PrivacyService>();
+            services.AddScoped<ISecurityService, SecurityService>();
 
             var privacyDomainFactory = PrivacyDomainPluginFactory.GetInstance();
             privacyDomainFactory.RegisterDefaultPlugin();
+
+            var functionFactory = UserDefinedFunctionPluginFactory.GetInstance();
+            functionFactory.RegisterDefaultPlugin();
 
             services.AddCors(options =>
             {
@@ -64,6 +80,7 @@ namespace AttributeBasedAC.WebAPI
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
             app.UseCors("CorsPolicy");
+            app.UseMiddleware(typeof(ErrorHandlingMiddleware));
             app.UseMvc();
         }
     }

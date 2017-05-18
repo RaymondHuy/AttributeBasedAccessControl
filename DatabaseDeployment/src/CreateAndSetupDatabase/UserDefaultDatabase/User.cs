@@ -9,14 +9,11 @@ namespace CreateAndSetupDatabase.UserDefaultDatabase
 {
     public class User
     {
-        [BsonElement("dept_id")]
+        [BsonElement("name")]
         public string Name { get; set; }
 
         [BsonElement("email")]
         public string Email { get; set; }
-
-        [BsonElement("password")]
-        public string Password { get; set; }
 
         [BsonElement("phone")]
         public string Phone { get; set; }
@@ -27,7 +24,7 @@ namespace CreateAndSetupDatabase.UserDefaultDatabase
         [BsonElement("active")]
         public bool Active { get; set; }
 
-        [BsonElement("Role")]
+        [BsonElement("role")]
         public string Role { get; set; }
     }
 
@@ -42,7 +39,6 @@ namespace CreateAndSetupDatabase.UserDefaultDatabase
                 Age = 30,
                 Email = "John@gmail.com",
                 Name = "John",
-                Password = "bfaebfiubaliaybgslisgdlisaygd",
                 Phone = "0123456789",
                 Role = "Admin"
             });
@@ -52,7 +48,6 @@ namespace CreateAndSetupDatabase.UserDefaultDatabase
                 Age = 32,
                 Email = "Alice@gmail.com",
                 Name = "Alice",
-                Password = "aakkakakakakddefef",
                 Phone = "147852963",
                 Role = "Manager"
             });
@@ -62,7 +57,6 @@ namespace CreateAndSetupDatabase.UserDefaultDatabase
                 Age = 42,
                 Email = "Bob@gmail.com",
                 Name = "Bob",
-                Password = "wwerqefddafadf",
                 Phone = "555899315483",
                 Role = "Admin"
             });
@@ -72,7 +66,6 @@ namespace CreateAndSetupDatabase.UserDefaultDatabase
                 Age = 29,
                 Email = "Beck@gmail.com",
                 Name = "Beck",
-                Password = "eqwerfjpaijlisgdlisaygd",
                 Phone = "789456123",
                 Role = "Developer"
             });
@@ -82,7 +75,6 @@ namespace CreateAndSetupDatabase.UserDefaultDatabase
                 Age = 29,
                 Email = "Scot@gmail.com",
                 Name = "Scot",
-                Password = "aaaaaaaaaa",
                 Phone = "56483135146846",
                 Role = "Admin"
             });

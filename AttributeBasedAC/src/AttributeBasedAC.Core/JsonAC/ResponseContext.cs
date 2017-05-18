@@ -17,12 +17,22 @@ namespace AttributeBasedAC.Core.JsonAC
     {
         public EffectResult Effect { get; set; }
 
-        public ICollection<JObject> Data { get; set; }
+        public JArray Data { get; set; }
 
-        public ResponseContext(EffectResult effect, ICollection<JObject> data)
+        public ICollection<JObject> JsonObjects { get; set; }
+
+        public string Message { get; set; }
+
+        public ResponseContext(EffectResult effect, JArray data, string message = null)
         {
             Effect = effect;
             Data = data;
+            Message = message;
+        }
+        public ResponseContext(EffectResult effect, ICollection<JObject> data)
+        {
+            Effect = effect;
+            JsonObjects = data;
         }
     }
 }

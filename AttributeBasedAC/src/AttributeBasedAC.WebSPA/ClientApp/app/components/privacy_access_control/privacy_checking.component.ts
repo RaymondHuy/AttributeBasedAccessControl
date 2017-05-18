@@ -33,7 +33,7 @@ export class PrivacyComponent {
     private environment_field: string;
     private environment_value: string;
     private environment_object: string;
-    private environment_result: string;
+    private environment_result: string = '';
     private environment_field_options: string[] = ['purpose', 'start_time', 'end_time'];
     private environment_filtered_field: string[];
 
@@ -64,7 +64,7 @@ export class PrivacyComponent {
                 if (property == '_id') continue;
                 let object = jsonObject[property];
                 if (!Array.isArray(object) && typeof object !== 'object') {
-                    that.user_property_names.push(property);   
+                    that.user_property_names.push(property);
                 }
             }
             that.users = data.json();
@@ -196,15 +196,21 @@ export class PrivacyComponent {
         let that = this;
         this.http.post(AppSetting.API_ENDPOINT + 'privacy/check/', JSON.stringify(command), this.options).subscribe(
             data => {
-                that.result = data.json();
-                let jsonObject: any = data.json()[0];
-                for (var property in jsonObject) {
-                    that.result_property_names.push(property);
+                if (data.text() == 'Deny') {
+                    this.msgs.push({ severity: 'error', summary: 'Error Message', detail: 'Denied' });
+                } else if (data.text() == 'Not Applicable') {
+                    this.msgs.push({ severity: 'error', summary: 'Error Message', detail: 'Not Applicable' });
+                } else {
+                    that.result = data.json();
+                    let jsonObject: any = data.json()[0];
+                    for (var property in jsonObject) {
+                        that.result_property_names.push(property);
+                    }
                 }
             },
             error => {
                 this.msgs = [];
-                this.msgs.push({ severity: 'error', summary: 'Error Message', detail: error });
+                this.msgs.push({ severity: 'error', summary: 'Error Message', detail: error.text() });
             }
         );
     }

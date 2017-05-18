@@ -29,18 +29,32 @@ namespace AttributeBasedAC.Core.NewtonsoftExtension
                 var rawArray = (JArray)rawObject.SelectToken(field);
                 var privacyArray = (JArray)privacyObject.SelectToken(field);
                 int currentIndex = 0;
-
+                
                 foreach (var element in rawArray)
                 {
-                    var nextRawObject = (JObject)element;
-                    var pathIndexObject = field + "[" + currentIndex + "]";
+                    if (element is JObject)
+                    {
+                        var nextRawObject = (JObject)element;
+                        var pathIndexObject = field + "[" + currentIndex + "]";
 
-                    if (privacyObject.SelectToken(pathIndexObject) == null)
-                        privacyArray.Add(new JObject());
+                        if (privacyObject.SelectToken(pathIndexObject) == null)
+                            privacyArray.Add(new JObject());
 
-                    var nextPrivacyObject = (JObject)privacyObject.SelectToken(pathIndexObject);
-                    nextPrivacyObject.AddNewFieldFromPath(nextRawObject, pathField, startIndex + 1, privacyFunction);
+                        var nextPrivacyObject = (JObject)privacyObject.SelectToken(pathIndexObject);
+                        nextPrivacyObject.AddNewFieldFromPath(nextRawObject, pathField, startIndex + 1, privacyFunction);
 
+                    }
+                    else
+                    {
+                        string className = privacyFunction.Split('.')[0];
+                        string functionName = privacyFunction.Split('.')[1];
+                        var privacyDomainFactory = PrivacyDomainPluginFactory.GetInstance();
+                        Type type = privacyDomainFactory.GetDomainType(className);
+                        MethodInfo method = type.GetMethod(functionName);
+                        string param = rawObject[field][currentIndex].ToString();
+                        string result = (string)method.Invoke(null, new object[] { param });
+                        privacyArray.Add(result);
+                    }
                     ++currentIndex;
                 }
             }

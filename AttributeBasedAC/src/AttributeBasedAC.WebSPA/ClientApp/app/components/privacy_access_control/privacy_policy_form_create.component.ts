@@ -169,7 +169,7 @@ export class PrivacyPolicyFormCreateComponent {
                 },
                 error => {
                     this.msgs = [];
-                    this.msgs.push({ severity: 'error', summary: 'Error Message', detail: error });
+                    this.msgs.push({ severity: 'error', summary: 'Error Message', detail: error.text() });
                 }
             );
         }
@@ -378,7 +378,6 @@ export class PrivacyPolicyFormCreateComponent {
             "PolicyID": this.policy_id,
             "CollectionName": this.collection_selected_name,
             "Description": this.description,
-            "Action": this.selected_action,
             "Target": this.target_result,
             "Rules": this.privacy_rules
         }
@@ -390,7 +389,7 @@ export class PrivacyPolicyFormCreateComponent {
             },
             error => {
                 this.msgs = [];
-                this.msgs.push({ severity: 'error', summary: 'Error Message', detail: error });
+                this.msgs.push({ severity: 'error', summary: 'Error Message', detail: error.text() });
             }
         );
     }
