@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace AttributeBasedAC.WebAPI.Controllers
 {
-    public class PrivacyController : Controller
+    public class PrivacyPolicyController : Controller
     {
         private readonly IAccessControlPrivacyService _accessControlPrivacyService;
         private readonly ISubjectRepository _subjectRepository;
@@ -26,18 +26,16 @@ namespace AttributeBasedAC.WebAPI.Controllers
         private readonly IConditionalExpressionService _conditionalExpressionService;
         private readonly IPrivacyPolicyRepository _privacyPolicyRepository;
 
-        public PrivacyController(
+        public PrivacyPolicyController(
             IAccessControlPrivacyService accessControlPrivacyService,
             ISubjectRepository subjectRepository,
             IResourceRepository resourceRepository,
-            IPrivacyDomainRepository privacyDomainRepository,
             IConditionalExpressionService conditionalExpressionService,
             IPrivacyPolicyRepository privacyPolicyRepository)
         {
             _accessControlPrivacyService = accessControlPrivacyService;
             _subjectRepository = subjectRepository;
             _resourceRepository = resourceRepository;
-            _privacyDomainRepository = privacyDomainRepository;
             _conditionalExpressionService = conditionalExpressionService;
             _privacyPolicyRepository = privacyPolicyRepository;
         }
@@ -66,19 +64,13 @@ namespace AttributeBasedAC.WebAPI.Controllers
             return builder.ToString();
         }
 
-        [HttpGet]
-        [Route("api/PrivacyFunctions")]
-        public IEnumerable<string> GetPrivacyFunctions()
-        {
-            return _privacyDomainRepository.GetAllPrivacyFunctionName();
-        }
 
         [HttpPost]
         [Route("api/PrivacyPolicy")]
         public void Create([FromBody]PrivacyPolicyInsertCommand command)
         {
             var fieldRules = new List<FieldRule>();
-
+            var target = _conditionalExpressionService.Parse(command.Target);
             foreach (var rule in command.Rules)
             {
                 var condition = _conditionalExpressionService.Parse(rule.Condition);
@@ -98,7 +90,8 @@ namespace AttributeBasedAC.WebAPI.Controllers
                 Description = command.Description,
                 PolicyId = command.PolicyID,
                 Rules = fieldRules,
-                IsAttributeResourceRequired = true
+                IsAttributeResourceRequired = true,
+                Target = target
             };
             _privacyPolicyRepository.Add(policy);
         }
@@ -117,21 +110,6 @@ namespace AttributeBasedAC.WebAPI.Controllers
             return relativePolicies.Select(p => p.PolicyId).ToList();
         }
 
-        [HttpGet]
-        [Route("api/PrivacyFunction")]
-        public IEnumerable<string> GetPrivacyFunction(string name)
-        {
-            return _privacyDomainRepository.GetPrivacyFunctionNames(name);
-        }
-
-        [HttpGet]
-        [Route("api/PrivacyDomain")]
-        public IEnumerable<string> GetAllPrivacyDomain()
-        {
-            var container = PrivacyDomainPluginFactory.GetInstance();
-
-            return container.GetAllDomainType();
-        }
 
     }
 }

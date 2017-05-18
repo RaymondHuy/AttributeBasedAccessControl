@@ -1,18 +1,50 @@
-﻿<div class="col-lg-12">
-    <p-messages [value]="msgs"></p-messages>
-</div>
+﻿<p-growl [value]="msgs"></p-growl>
 <h1 style="text-align:center">Privacy Domain</h1>
 <div class="row">
     <div class="col-lg-12">
+        <h3>Registered Domain</h3>
+    </div>
+    <div class="col-lg-12">
         <div class="col-lg-4 form-group">
             <label>Domains :</label>
-            <p-dropdown [options]="domain_names" [(ngModel)]="domain_selected_name"
+            <p-dropdown [options]="configured_domain_names" [(ngModel)]="configured_domain_selected_name"
                         [style]="{'width':'200px'}" (onChange)="onSelectDomainName($event.value)"></p-dropdown>
         </div>
+        
+    </div>
+    <div class="col-lg-12" style="margin-bottom:10px;">
+        <label>Functions</label>
+        <p-dataTable [value]="configured_privacy_domain_functions_view" [editable]="true">
+            <p-column field="DomainName" header="Domain Name"></p-column>
+            <p-column field="FunctionName" header="Function Name" [style]="{'width':'320px'}"></p-column>
+            <p-column field="Priority" header="Priority" [editable]="true"></p-column>
+        </p-dataTable>
+    </div>
+    <div class="col-lg-12" style="margin-bottom:10px;">
+        <div class="col-lg-4 ">
+            <button type="button" pButton icon="fa-save" (click)="updatePriorityFunctions()" label="Update Priority"></button>
+        </div>
+    </div>
+    <div class="col-lg-12" style="margin-bottom:20px;">
+        <label>Fields</label>
+        <p-dataTable [value]="configured_privacy_domain_fields_view" [editable]="true">
+            <p-column field="DomainName" header="Domain Name"></p-column>
+            <p-column field="FieldName" header="Field Name"></p-column>
+        </p-dataTable>
+    </div>
+    <div class="col-lg-12">
         <div class="col-lg-4 form-group">
             <label>Collection :</label>
-            <p-dropdown [options]="domain_names" [(ngModel)]="domain_selected_name"
-                        [style]="{'width':'200px'}" (onChange)="onSelectDomainName($event.value)"></p-dropdown>
+            <p-dropdown [options]="collection_names" [(ngModel)]="collection_selected_name"
+                        [style]="{'width':'200px'}" (onChange)="onSelectCollectionName($event.value)"></p-dropdown>
+        </div>
+        <div class="col-lg-4 form-group">
+            <label>Fields :</label>
+            <p-dropdown [options]="resource_fields" [(ngModel)]="resource_selected_field"
+                        [style]="{'width':'200px'}"></p-dropdown>
+        </div>
+        <div class="col-lg-4">
+            <button type="button" pButton icon="fa-plus" (click)="addField()" label="Add"></button>
         </div>
     </div>
 </div>

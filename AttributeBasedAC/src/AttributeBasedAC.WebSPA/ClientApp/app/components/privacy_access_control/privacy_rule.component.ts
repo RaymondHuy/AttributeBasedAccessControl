@@ -85,9 +85,9 @@ export class AccessControlPolicyFormCreateComponent {
             that.selected_function_name = names[0];
         });
         this.http.get(AppSetting.API_ENDPOINT + 'subject/fields/').subscribe(data => {
-            
             let jsonObject: any = data.json();
             for (var property in jsonObject) {
+                if (property == '_id') continue;
                 if (that.selected_subject_field === undefined)
                     that.selected_subject_field = property;
                 that.initialize_fields(property, jsonObject, "", that.subject_fields);
@@ -114,9 +114,13 @@ export class AccessControlPolicyFormCreateComponent {
         this.resource_fields = [];
         this.http.get(AppSetting.API_ENDPOINT + 'structure/?collectionName=' + collectionSelected).subscribe(data => {
             let jsonObject: any = data.json();
+            let initialize_resource_selected: boolean = false;
             for (var property in jsonObject) {
-                if (that.resource_selected_field === undefined)
+                if (property == '_id') continue;
+                if (!initialize_resource_selected) {
+                    initialize_resource_selected = true;
                     that.resource_selected_field = property;
+                }
                 that.initialize_fields(property, jsonObject, "", that.resource_fields);
             }
         })

@@ -90,6 +90,7 @@ export class PrivacyPolicyFormCreateComponent {
         this.http.get(AppSetting.API_ENDPOINT + 'subject/fields/').subscribe(data => {
             let jsonObject: any = data.json();
             for (var property in jsonObject) {
+                if (property == '_id') continue;
                 if (that.selected_subject_field === undefined)
                     that.selected_subject_field = property;
                 that.initialize_fields(property, jsonObject, "", that.subject_fields);
@@ -118,9 +119,13 @@ export class PrivacyPolicyFormCreateComponent {
         this.field_effect_options = [];
         this.http.get(AppSetting.API_ENDPOINT + 'structure/?collectionName=' + collectionSelected).subscribe(data => {
             let jsonObject: any = data.json();
+            let initialize_resource_selected: boolean = false;
             for (var property in jsonObject) {
-                if (that.resource_selected_field === undefined)
+                if (property == '_id') continue;
+                if (!initialize_resource_selected) {
+                    initialize_resource_selected = true;
                     that.resource_selected_field = property;
+                }
                 that.initialize_field_effects(property, jsonObject, "", that.resource_fields);
                 that.field_effects = [];
                 for (let item of that.resource_fields) {
@@ -292,6 +297,13 @@ export class PrivacyPolicyFormCreateComponent {
             this.target_result += ", ";
         } else {
             this.current_rule_result += ", "
+        }
+    }
+    clear_rule(isTarget: boolean) {
+        if (isTarget) {
+            this.target_result = "";
+        } else {
+            this.current_rule_result = "";
         }
     }
     //#endregion

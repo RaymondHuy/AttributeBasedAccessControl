@@ -13,5 +13,11 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
         IEnumerable<string> GetAllPrivacyFunctionName();
 
         IEnumerable<string> GetPrivacyFunctionNames(string fieldName);
+
+        IEnumerable<PrivacyDomain> GetAll();
+
+        void UpdateDomainField(string domainName, string fieldName);
+
+        void UpdatePriorityFunctions(string domainName, ICollection<PriorityFunction> priorities);
     }
 }

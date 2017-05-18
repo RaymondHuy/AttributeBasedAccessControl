@@ -48,6 +48,11 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
             return result;
         }
 
+        IEnumerable<PrivacyDomain> IPrivacyDomainRepository.GetAll()
+        {
+            return _mongoCollection.Find(_ => true).ToList();         
+        }
+
         IEnumerable<string> IPrivacyDomainRepository.GetPrivacyFunctionNames(string fieldName)
         {
             var result = new List<string>();
@@ -66,6 +71,20 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
             result.Add("DefaultDomainPrivacy.Show");
             result.Add("DefaultDomainPrivacy.Hide");
             return result;
+        }
+
+        void IPrivacyDomainRepository.UpdateDomainField(string domainName, string fieldName)
+        {
+            var filter = Builders<PrivacyDomain>.Filter.Eq("domain_name", domainName);
+            var update = Builders<PrivacyDomain>.Update.AddToSet("fields", fieldName);
+            _mongoCollection.UpdateOne(filter, update);
+        }
+
+        void IPrivacyDomainRepository.UpdatePriorityFunctions(string domainName, ICollection<PriorityFunction> priorities)
+        {
+            var filter = Builders<PrivacyDomain>.Filter.Eq("domain_name", domainName);
+            var update = Builders<PrivacyDomain>.Update.Set("hierarchy", priorities);
+            _mongoCollection.UpdateOne(filter, update);
         }
     }
 }
