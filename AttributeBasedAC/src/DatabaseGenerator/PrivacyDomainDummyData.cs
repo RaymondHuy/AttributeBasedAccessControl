@@ -1,4 +1,5 @@
 ﻿using AttributeBasedAC.Core.JsonAC.Model;
+using AttributeBasedAC.Core.JsonAC.Service;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -51,6 +52,30 @@ namespace DatabaseGenerator
                     IsArrayFieldDomain = true,
                     Functions = new PriorityFunction[1] { new PriorityFunction { Name = "policy02", Priority = 1 } }
                 });
+        }
+
+        public static void InsertPrivacyDomainForDemo(string policyDb, IConditionalExpressionService expression)
+        {
+            var data = new List<PrivacyDomain>();
+            IMongoClient _client = new MongoClient();
+            IMongoDatabase _database = _client.GetDatabase(policyDb);
+
+            var privacyCollection = _database.GetCollection<PrivacyDomain>("PrivacyDomain");
+            data.Add(new PrivacyDomain()
+            {
+                DomainName = "DepartmentProjects",
+                Fields = new string[1] { "Department.projects" },
+                IsArrayFieldDomain = true,
+                Functions = new PriorityFunction[1] { new PriorityFunction() { Name = "Policy3", Priority = 1 } }
+            });
+
+            data.Add(new PrivacyDomain()
+            {
+                DomainName = "DefaultDomainPrivacy",
+                Fields = new string[0] { },
+                IsArrayFieldDomain = false,
+                Functions = new PriorityFunction[2] { new PriorityFunction() { Name = "Hide", Priority = 1 }, new PriorityFunction() { Name = "Show", Priority = 2 } }
+            });
         }
     }
 }

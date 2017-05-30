@@ -237,14 +237,12 @@ namespace DatabaseGenerator
         {
             string[] Targets = new string[]
             {
-                "BooleanEqual ( Subject.active , 'true' )"
+                "StringEqual ( Subject.role , 'intern' )"
             };
             string[] Rules = new string[]
             {
-                "IntegerGreaterThan ( Resource.info.salary , '1500' )",
-                "IntegerLessThan ( Resource.info.salary , '1000' )",
-                "IntegerGreaterThan ( Resource.number_developers , '50000' ) AND IntegerGreaterThan ( Subject.age , '15' ) AND DateGreaterThan ( Resource.leader.info.date_of_birth , '1/1/1995' )",
-                "IntegerGreaterThan ( Resource.number_developers , '15' ) AND IntegerGreaterThan ( Subject.age , '15' ) AND DateGreaterThan ( Resource.leader.info.date_of_birth , '1/1/1995' )"
+                "StringEqual ( Environment.purpose , 'analysis' )",
+                "StringEqual ( Resource.dept_name , 'OPERATIONS' )"
             };
             var data = new List<PrivacyPolicy>();
 
@@ -596,6 +594,98 @@ namespace DatabaseGenerator
 
             #endregion
             privacyCollection.InsertManyAsync(data);
+        }
+
+        public static void InsertPolicyForDemo(string policyDB, IConditionalExpressionService expression)
+        {
+            string[] Targets = new string[]
+            {
+                "StringEqual ( Subject.role , 'intern' )"
+            };
+            string[] Rules = new string[]
+            {
+                "StringEqual ( Environment.purpose , 'analysis' )",
+                "StringEqual ( Resource.dept_name , 'OPERATIONS' )",
+                "StringEqual ( Resource.language , 'English' )",
+                "StringEqual ( Resource.language , 'Spanish' )"
+            };
+            var data = new List<PrivacyPolicy>();
+
+            IMongoClient _client = new MongoClient();
+            IMongoDatabase _database = _client.GetDatabase(policyDB);
+
+            var privacyCollection = _database.GetCollection<PrivacyPolicy>("PrivacyPolicy");
+
+            data.Add(new PrivacyPolicy
+            {
+                CollectionName = "Department",
+                Description = "....",
+                IsAttributeResourceRequired = true,
+                PolicyId = "policy 1",
+                Target = expression.Parse(Targets[0]),
+                Rules = new FieldRule[] {
+                    new FieldRule {
+                        Identifer = "rule 1",
+                        FieldEffects = new FieldEffect[] {
+                            new FieldEffect { Name="dept_id", FunctionApply="DefaultDomainPrivacy.Show" },
+                            new FieldEffect { Name="_id", FunctionApply="DefaultDomainPrivacy.Hide" },
+                            new FieldEffect { Name="dept_no", FunctionApply="DefaultDomainPrivacy.Hide" },
+                            new FieldEffect { Name="dept_name", FunctionApply="DefaultDomainPrivacy.Show" },
+                            new FieldEffect { Name="leader.name", FunctionApply="DefaultDomainPrivacy.Show" },
+                            new FieldEffect { Name="leader.phone", FunctionApply="DefaultDomainPrivacy.Hide" },
+                            new FieldEffect { Name="location", FunctionApply="DefaultDomainPrivacy.Show" },
+                            new FieldEffect { Name="projects", FunctionApply="DepartmentProjects.Policy3" }
+                        },
+                        Condition = expression.Parse(Rules[1]) }
+                }
+            });
+            data.Add(new PrivacyPolicy
+            {
+                CollectionName = "Department",
+                Description = "....",
+                IsAttributeResourceRequired = false,
+                PolicyId = "policy 2",
+                Target = expression.Parse(Targets[0]),
+                Rules = new FieldRule[] {
+                    new FieldRule {
+                        Identifer = "rule 1",
+                        FieldEffects = new FieldEffect[] {
+                            new FieldEffect { Name="dept_id", FunctionApply="DefaultDomainPrivacy.Show" },
+                            new FieldEffect { Name="_id", FunctionApply="DefaultDomainPrivacy.Hide" },
+                            new FieldEffect { Name="dept_no", FunctionApply="DefaultDomainPrivacy.Hide" },
+                            new FieldEffect { Name="dept_name", FunctionApply="Optional" },
+                            new FieldEffect { Name="leader.name", FunctionApply="DefaultDomainPrivacy.Show" },
+                            new FieldEffect { Name="leader.phone", FunctionApply="DefaultDomainPrivacy.Hide" },
+                            new FieldEffect { Name="location", FunctionApply="DefaultDomainPrivacy.Show" },
+                            new FieldEffect { Name="projects", FunctionApply="Optional" }
+                        },
+                        Condition = expression.Parse(Rules[0]) }
+                }
+            });
+            data.Add(new PrivacyPolicy
+            {
+                CollectionName = "Department",
+                Description = "....",
+                IsAttributeResourceRequired = true,
+                PolicyId = "Policy3",
+                Target = null,
+                Rules = new FieldRule[] {
+                    new FieldRule {
+                        Identifer = "rule 1",
+                        FieldEffects = new FieldEffect[] {
+                            new FieldEffect { Name="name", FunctionApply="DefaultDomainPrivacy.Show" },
+                            new FieldEffect { Name="language", FunctionApply="DefaultDomainPrivacy.Hide" }
+                        },
+                        Condition = expression.Parse(Rules[2]) },
+                    new FieldRule {
+                        Identifer = "rule 2",
+                        FieldEffects = new FieldEffect[] {
+                            new FieldEffect { Name="name", FunctionApply="DefaultDomainPrivacy.Show" },
+                            new FieldEffect { Name="language", FunctionApply="DefaultDomainPrivacy.Hide" }
+                        },
+                        Condition = expression.Parse(Rules[3]) },
+                }
+            });
         }
     }
 }

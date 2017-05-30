@@ -180,5 +180,55 @@ namespace DatabaseGenerator
 
             acPolicyCollection.InsertMany(data);
         }
+
+        public static void InsertPolicyForDemo(string policyDb, IConditionalExpressionService expression)
+        {
+            string[] Targets = new string[]
+            {
+                "BooleanEqual ( Subject.active , 'true' )"
+            };
+            string[] Rules = new string[]
+            {
+                "StringEqual ( Subject.role , 'intern' ) Or StringEqual ( Subject.role , 'doctor' )",
+                
+                "IntegerGreaterThan ( Resource.number_developers , '12' )"
+            };
+            var data = new List<AccessControlPolicy>();
+
+            IMongoClient _client = new MongoClient();
+            IMongoDatabase _database = _client.GetDatabase(policyDb);
+
+            var acPolicyCollection = _database.GetCollection<AccessControlPolicy>("AccessControlPolicy");
+
+            data.Add(new AccessControlPolicy
+            {
+                Action = "read",
+                CollectionName = "Department",
+                Description = "....",
+                IsAttributeResourceRequired = false,
+                PolicyId = "policy 1",
+                RuleCombining = "permit-overrides",
+                Target = expression.Parse(Targets[0]),
+                Rules = new AccessControlRule[] {
+                    new AccessControlRule { Id = "rule 1", Effect = "Permit", Condition = expression.Parse(Rules[0]) }
+                }
+            });
+
+            data.Add(new AccessControlPolicy
+            {
+                Action = "read",
+                CollectionName = "Department",
+                Description = "....",
+                IsAttributeResourceRequired = false,
+                PolicyId = "policy 2",
+                RuleCombining = "permit-overrides",
+                Target = expression.Parse(Targets[1]),
+                Rules = new AccessControlRule[] {
+                    new AccessControlRule { Id = "rule 2", Effect = "Permit", Condition = expression.Parse(Rules[1]) }
+                }
+            });
+
+            acPolicyCollection.InsertMany(data);
+        }
     }
 }

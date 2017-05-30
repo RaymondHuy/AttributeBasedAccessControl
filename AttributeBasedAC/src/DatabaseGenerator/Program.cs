@@ -60,8 +60,9 @@ namespace DatabaseGenerator
                     IMongoClient _client = new MongoClient();
                     IMongoDatabase _database = _client.GetDatabase(policyDb);
                     var expressionService = scope.Resolve<IConditionalExpressionService>();
-                    AccessControlPolicyDummyData.InsertFivePoliciesForTestingPerformance(policyDb, expressionService);
-                    PrivacyPolicyDummyData.InsertNestedPrivacyPolicies(policyDb, expressionService);
+                    AccessControlPolicyDummyData.InsertPolicyForDemo(policyDb, expressionService);
+                    PrivacyPolicyDummyData.InsertPolicyForDemo(policyDb, expressionService);
+                    PrivacyDomainDummyData.InsertPrivacyDomainForDemo(policyDb, expressionService);
                 }
                 Console.WriteLine("Success");
             }
