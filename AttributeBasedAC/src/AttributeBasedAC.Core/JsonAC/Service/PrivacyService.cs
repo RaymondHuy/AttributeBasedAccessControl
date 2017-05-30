@@ -6,6 +6,7 @@ using AttributeBasedAC.Core.JsonAC.Model;
 using Newtonsoft.Json.Linq;
 using AttributeBasedAC.Core.JsonAC.Repository;
 using AttributeBasedAC.Core.NewtonsoftExtension;
+using System.Threading;
 
 namespace AttributeBasedAC.Core.JsonAC.Service
 {
@@ -14,7 +15,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
         private readonly IConditionalExpressionService _expressionService;
         private readonly IPrivacyDomainRepository _privacyDomainRepository;
         private readonly IPrivacyPolicyRepository _privacyPolicyRepository;
-        
+
         private JObject _user;
         private JObject _environment;
         private string _collectionName;
@@ -43,23 +44,39 @@ namespace AttributeBasedAC.Core.JsonAC.Service
 
             _collectionPrivacyRules = GetFieldCollectionRules();
             var privacyRecords = new JArray();
-            //Parallel.ForEach(_resource, record =>
-            //{
-            //    var privacyField = GetPrivacyRecordField(record, policies);
-            //    var privacyRecord = PrivacyProcessing(record, privacyField);
-            //    Console.WriteLine(privacyRecord);
-            //    privacyRecords.Add(privacyRecord);
-            //});
-            foreach (var record in resource)
+            int count = 0;
+            if (resource.Length > 1000)
             {
-                var privacyFields = GetPrivacyRecordField(record);
-                if (privacyFields.Count > 0)
+                Parallel.ForEach(resource, record =>
                 {
-                    var privacyRecord = PrivacyProcessing(record, privacyFields);
-                    privacyRecords.Add(privacyRecord);
+                    var privacyFields = GetPrivacyRecordField(record);
+                    if (privacyFields.Count > 0)
+                    {
+                        var privacyRecord = PrivacyProcessing(record, privacyFields);
+                        //Console.WriteLine("Executing privacy for record: " + record["_id"]["$oid"]);
+                        lock (privacyRecords)
+                            privacyRecords.Add(privacyRecord);
+                        
+                        ++count;
+                    }
+                });
+            }
+            else
+            {
+                foreach (var record in resource)
+                {
+                    var privacyFields = GetPrivacyRecordField(record);
+                    if (privacyFields.Count > 0)
+                    {
+                        var privacyRecord = PrivacyProcessing(record, privacyFields);
+                        privacyRecords.Add(privacyRecord);
+                        ++count;
+                    }
                 }
             }
-            if(privacyRecords.Count == 0)
+            Console.WriteLine(count);
+            Console.WriteLine(privacyRecords.Count);
+            if (privacyRecords.Count == 0)
                 return new ResponseContext(EffectResult.Permit, privacyRecords, "No privacy rules is satisfied");
 
             return new ResponseContext(EffectResult.Permit, privacyRecords);

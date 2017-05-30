@@ -26,6 +26,7 @@ namespace AttributeBasedAC.Core.JsonAC.UserDefinedFunction
             RegisterPlugin(typeof(IntegerFunction));
             RegisterPlugin(typeof(DoubleFunction));
             RegisterPlugin(typeof(DateTimeFunction));
+            RegisterPlugin(typeof(LogicalOperatorFunction));
         }
 
         public void RegisterPlugin(Type plugin)

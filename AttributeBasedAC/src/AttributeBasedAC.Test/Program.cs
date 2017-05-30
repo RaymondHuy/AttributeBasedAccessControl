@@ -17,6 +17,7 @@ using System.Diagnostics;
 using AttributeBasedAC.Test.WebApiTesting;
 using AttributeBasedAC.Core.JsonAC.Infrastructure;
 using AttributeBasedAC.Core.JsonAC.UserDefinedFunction;
+using AttributeBasedAC.Test.ExternalFunction;
 
 namespace AttributeBasedAC.Test
 {
@@ -68,8 +69,9 @@ namespace AttributeBasedAC.Test
         public static void Main(string[] args)
         {
             UserDefinedFunctionPluginFactory.GetInstance().RegisterDefaultPlugin();
-            IConditionalExpressionService exp = new ConditionalExpressionService();
-            exp.Parse("IntegerGreaterThan ( 20 , 30 ) ");
+            UserDefinedFunctionPluginFactory.GetInstance().RegisterPlugin(typeof(SalaryFunction));
+            MethodInfo f = UserDefinedFunctionPluginFactory.GetInstance().GetFunction("BooleanEqual");
+            Console.WriteLine(f.Invoke(null, new object[] { "false", "True" }));
             return;
             var builder = new ContainerBuilder();
             builder.RegisterType<MongoClient>().As<IMongoClient>();

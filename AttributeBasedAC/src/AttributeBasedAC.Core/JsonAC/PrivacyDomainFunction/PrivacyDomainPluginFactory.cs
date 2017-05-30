@@ -24,6 +24,8 @@ namespace AttributeBasedAC.Core.JsonAC.PrivacyDomainFunction
             _container.Add("DateTimeDomain", typeof(DateTimeDomain));
             _container.Add("DefaultDomainPrivacy", typeof(DefaultDomainPrivacy));
             _container.Add("SSNDomainPrivacy", typeof(SSNDomainPrivacy));
+            _container.Add("PhoneDomain", typeof(PhoneDomainPrivacy));
+            _container.Add("AddressDomainPrivacy", typeof(AddressDomainPrivacy));
         }
         public void RegisterPlugin(Type plugin)
         {

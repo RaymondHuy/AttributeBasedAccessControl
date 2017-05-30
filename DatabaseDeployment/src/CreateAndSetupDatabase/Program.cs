@@ -10,6 +10,7 @@ namespace CreateAndSetupDatabase
 {
     public class Program
     {
+        
         public static IConfiguration Configuration;
         public static void Main(string[] args)
         {
@@ -74,7 +75,7 @@ namespace CreateAndSetupDatabase
                 new PrivacyDomain
                 {
                     DomainName = "DateTimeDomain",
-                    Fields = new string[] { "Department.date_created", "Departmentleader.info.date_of_birth" },
+                    Fields = new string[] { "Department.date_created", "Department.leader.info.date_of_birth" },
                     IsArrayFieldDomain = false,
                     Functions = new PriorityFunction[3] { new PriorityFunction { Name = "ShowDayAndMonth", Priority = 1 }, new PriorityFunction { Name = "ShowMonthAndYear", Priority = 2 }, new PriorityFunction { Name = "ShowYear", Priority = 3 } }
                 });

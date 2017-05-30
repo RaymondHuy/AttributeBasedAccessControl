@@ -1,0 +1,11 @@
+2.1)	
+Data is getting at a very high speed from various sources in varied formats such as text, video, speech, images etc. The advent of Social Network Service, smartphones, and other data generated from consumer devices like Laptop, SmartTV, Tablets is leading to an explosion of data.Big Data is used to describe data which has massive volume, varied structure and is generated at high velocity.
+The following figures describe the statistics of the social networking site Facebook.
+ 
+                   Figure[] Number of monthly active Facebook users. (in millions).
+3Vs (volume, variety and velocity) are three defining properties or dimesions of Big Data
+-	Volume: Volume in Big Data refers to the size of data. Video, musics, large images which is getting from social media channels can increase the storage system to Terabytes or Petabytes. As the database grows the applications and architecture built to support the data needs to be reevaluated quite often. Moreover, the storage and the time for processing data is highly considered too which makes the huge volume of data to be the biggest challenge for Big Data technologies.
+
+-	Variety: Data can be stored in multiple format. Different types of data are introduced from various sources like social sites, sensor devices, mobiles and smart phones. Compared to text or RDBMS data the data generated here varies from videos, audio, photos and various other unstructured formats. There is no control over the structure of the data these days, new sources and structures of data are being created at a rapid speed which leads to a technology challenge to consume and analyze this disparate data.
+
+-	Velocity: Velocity in Big Data refers to the measure of how fast the data is coming in. With the new sources of data such as social and mobile applications, data streaming has become important for the organizations to speedily process the data in real time. Reacting and processing quickly enough to deal with the velocity of data is one more challenge for the big data technology.

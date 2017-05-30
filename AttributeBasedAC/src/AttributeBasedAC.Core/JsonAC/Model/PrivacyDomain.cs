@@ -10,7 +10,6 @@ namespace AttributeBasedAC.Core.JsonAC.Model
     [BsonIgnoreExtraElements]
     public class PrivacyDomain
     {
-        public ObjectId Id { get; set; }
 
         [BsonElement("domain_name")]
         public string DomainName { get; set; }

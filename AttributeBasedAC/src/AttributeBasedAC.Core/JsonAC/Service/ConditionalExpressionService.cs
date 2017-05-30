@@ -94,7 +94,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
         Function IConditionalExpressionService.Parse(string condition)
         {
             var queue = PolandNotationProcess(condition);
-            var queueBuilder = new Queue<Function>();
+            var stackBuilder = new Stack<Function>();
             while (queue.Any())
             {
                 string keyword = queue.Dequeue();
@@ -109,9 +109,9 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                     int count = method.GetParameters().Length;
                     for (int i = 0; i < count; i++)
                     {
-                        function.Parameters.Add(queueBuilder.Dequeue());
+                        function.Parameters.Insert(0, stackBuilder.Pop());
                     }
-                    queueBuilder.Enqueue(function);
+                    stackBuilder.Push(function);
                 }
                 else if (keyword.Equals("AND"))
                 {
@@ -120,9 +120,9 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                         FunctionName = "And",
                         Parameters = new List<Function>()
                     };
-                    function.Parameters.Add(queueBuilder.Dequeue());
-                    function.Parameters.Add(queueBuilder.Dequeue());
-                    queueBuilder.Enqueue(function);
+                    function.Parameters.Insert(0, stackBuilder.Pop());
+                    function.Parameters.Insert(0, stackBuilder.Pop());
+                    stackBuilder.Push(function);
                 }
                 else if (keyword.Equals("OR"))
                 {
@@ -131,9 +131,9 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                         FunctionName = "Or",
                         Parameters = new List<Function>()
                     };
-                    function.Parameters.Add(queueBuilder.Dequeue());
-                    function.Parameters.Add(queueBuilder.Dequeue());
-                    queueBuilder.Enqueue(function);
+                    function.Parameters.Insert(0, stackBuilder.Pop());
+                    function.Parameters.Insert(0, stackBuilder.Pop());
+                    stackBuilder.Push(function);
                 }
                 else if (keyword.Equals("NOT"))
                 {
@@ -142,8 +142,8 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                         FunctionName = "Not",
                         Parameters = new List<Function>()
                     };
-                    function.Parameters.Add(queueBuilder.Dequeue());
-                    queueBuilder.Enqueue(function);
+                    function.Parameters.Add(stackBuilder.Pop());
+                    stackBuilder.Push(function);
                 }
                 else if (keyword.Contains("."))
                 {
@@ -153,11 +153,11 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                         ResourceID = keyword.Substring(0, idxResourceName),
                         Value = keyword.Substring(idxResourceName + 1)
                     };
-                    queueBuilder.Enqueue(function);
+                    stackBuilder.Push(function);
                 }
-                else queueBuilder.Enqueue(new Function() { Value = keyword });
+                else stackBuilder.Push(new Function() { Value = keyword });
             }
-            return queueBuilder.Dequeue();
+            return stackBuilder.Pop();
         }
 
         private bool? CheckRelativeFunction(Function function, JObject user, JObject resource, JObject environment)
@@ -305,7 +305,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             var queue = new Queue<string>();
 
             var resultFunction = new Function();
-            string[] keywords = condition.Split(' ');
+            ICollection<string> keywords = ParseTokens(condition);
             #region Poland Notation
             foreach (var keyword in keywords)
             {
@@ -413,6 +413,39 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                     return true;
             }
             return false;
+        }
+
+        private ICollection<string> ParseTokens(string s)
+        {
+            var result = new List<string>();
+            string[] tokens = s.Split(' ');
+            for (int i = 0; i < s.Length; i++)
+            {
+                string keyword = s[i].ToString();
+                string token = "";
+                if (keyword.Equals(",") || keyword.Equals(" ") || keyword.Equals("")) continue;
+                if (keyword.Equals("'"))
+                {
+                    ++i;
+                    while (i < s.Length)
+                    {
+                        if (s[i].Equals('\'')) break;
+                        else token += s[i].ToString();
+                        ++i;
+                    }
+                }
+                else
+                {
+                    while (i < s.Length)
+                    {
+                        if (s[i].Equals('\'') || s[i].Equals(' ')) break;
+                        else token += s[i].ToString();
+                        ++i;
+                    }
+                }
+                result.Add(token);
+            }
+            return result;
         }
     }
 }

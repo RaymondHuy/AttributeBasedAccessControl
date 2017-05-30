@@ -31,3 +31,14 @@ export class PrivacyRule {
         this.FieldEffects = fieldEffects;
     }
 }
+export class PrivacyPolicy {
+    public PolicyID: string;
+    public Description: string;
+    public CollectionName: string;
+
+    constructor(policyID: string, description: string, collectionName: string) {
+        this.PolicyID = policyID;
+        this.Description = description;
+        this.CollectionName = collectionName;
+    }
+}

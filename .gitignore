@@ -9,6 +9,10 @@
 /AttributeBasedAC/src/AttributeBasedAC.WebAPI/project.lock.json
 /AttributeBasedAC/src/AttributeBasedAC.Core/project.lock.json
 
+/AttributeBasedAC/src/DatabaseGenerator/project.lock.json
+/AttributeBasedAC/src/DatabaseGenerator/obj/Debug/**/*.*
+/AttributeBasedAC/src/DatabaseGenerator/bin/Debug/*.*
+
 /DatabaseDeployment/src/CreateAndSetupDatabase/bin/Debug/*.*
 /DatabaseDeployment/src/CreateAndSetupDatabase/obj/Debug/*.*
 /DatabaseDeployment/src/CreateAndSetupDatabase/project.lock.json

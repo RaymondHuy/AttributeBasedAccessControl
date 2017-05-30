@@ -230,7 +230,11 @@ export class PrivacyPolicyFormCreateComponent {
             this.msgs.push({ severity: 'error', summary: 'Error Message', detail: 'Constant value can not be null' });
             return;
         }
-        this.current_rule_result += this.constant_value + " ";
+        if (this.constant_value.indexOf('\'') != -1) {
+            this.msgs.push({ severity: 'error', summary: 'Error Message', detail: 'Constant value can not contain \' character' });
+            return;
+        }
+        this.current_rule_result += "'" + this.constant_value + "' ";
     }
 
     add_constant_value_to_target() {
@@ -238,7 +242,11 @@ export class PrivacyPolicyFormCreateComponent {
             this.msgs.push({ severity: 'error', summary: 'Error Message', detail: 'Constant value can not be null' });
             return;
         }
-        this.target_result += this.constant_value + " ";
+        if (this.constant_value.indexOf('\'') != -1) {
+            this.msgs.push({ severity: 'error', summary: 'Error Message', detail: 'Constant value can not contain \' character' });
+            return;
+        }
+        this.target_result += "'" + this.constant_value + "' ";
     }
 
     add_environment_value_to_rule() {

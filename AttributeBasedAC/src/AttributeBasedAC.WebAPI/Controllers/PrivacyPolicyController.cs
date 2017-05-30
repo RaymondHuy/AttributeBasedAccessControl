@@ -11,6 +11,7 @@ using MongoDB.Driver;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -52,13 +53,15 @@ namespace AttributeBasedAC.WebAPI.Controllers
             var environment = string.IsNullOrEmpty(command.Environment) || command.Environment == "{}" ? null : JObject.Parse(command.Environment);
             var resource = _resourceRepository.GetCollectionDataWithCustomFilter(command.ResourceName, null);
             var action = command.Action;
+            Stopwatch s1 = Stopwatch.StartNew();
             var result = _securityService.ExecuteProcess(subject, resource, action, command.ResourceName, environment);
-
+            s1.Stop();
+            Console.WriteLine(s1.ElapsedMilliseconds);
             if (result.Effect == EffectResult.Deny)
                 return "Deny";
             if (result.Effect == EffectResult.NotApplicable)
                 return "Not Applicable";
-            return result.Data == null ? "": result.Data.ToString();
+            return result.Data == null ? "" : result.Data.ToString();
         }
 
 
@@ -107,12 +110,18 @@ namespace AttributeBasedAC.WebAPI.Controllers
             JObject user = string.IsNullOrEmpty(command.UserJsonData) ? new JObject() : JObject.Parse(command.UserJsonData);
             JObject resource = string.IsNullOrEmpty(command.ResourceJsonData) ? new JObject() : JObject.Parse(command.ResourceJsonData);
             JObject environment = string.IsNullOrEmpty(command.EnvironmentJsonData) ? new JObject() : JObject.Parse(command.EnvironmentJsonData);
-            
+
             var relativePolicies = _privacyService.Review(user, resource, environment);
 
             return relativePolicies.Select(p => p.PolicyId).ToList();
         }
 
+        [HttpGet]
+        [Route("api/PrivacyPolicy")]
+        public IEnumerable<PrivacyPolicy> PrivacyPolicy()
+        {
+            return _privacyPolicyRepository.GetAll();
+        }
 
     }
 }

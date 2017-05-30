@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AttributeBasedAC.Core.JsonAC.Model;
 using Newtonsoft.Json.Linq;
 using AttributeBasedAC.Core.JsonAC.Repository;
+using System.Threading;
 
 namespace AttributeBasedAC.Core.JsonAC.Service
 {
@@ -38,24 +39,36 @@ namespace AttributeBasedAC.Core.JsonAC.Service
             EffectResult effect = CollectionAccessControlProcess();
             if (effect == EffectResult.Deny)
                 return new ResponseContext(EffectResult.Deny, null);
-            else if(effect == EffectResult.Permit)
-                return new ResponseContext(EffectResult.Permit, null);
+            else if (effect == EffectResult.Permit)
+                return new ResponseContext(EffectResult.Permit, resource);
 
             var accessControlRecordPolicies = _accessControlPolicyRepository.GetPolicies(collectionName, action, true);
-            
-            if(accessControlRecordPolicies.Count == 0)
+
+            if (accessControlRecordPolicies.Count == 0)
                 return new ResponseContext(EffectResult.Deny, null);
 
             string policyCombining = _accessControlPolicyRepository.GetPolicyCombining(accessControlRecordPolicies);
 
             ICollection<JObject> _resource = new List<JObject>();
-
-            foreach (var record in resource)
+            if (resource.Length > 1000)
             {
-                if (RowAccessControlProcess(record, policyCombining, accessControlRecordPolicies) != null)
-                    _resource.Add(record);
+                Parallel.ForEach(resource, record =>
+                {
+                    if (RowAccessControlProcess(record, policyCombining, accessControlRecordPolicies) != null)
+                    {
+                        lock (_resource)
+                            _resource.Add(record);
+                    }
+                });
             }
-
+            else
+            {
+                foreach (var record in resource)
+                {
+                    if (RowAccessControlProcess(record, policyCombining, accessControlRecordPolicies) != null)
+                        _resource.Add(record);
+                }
+            }
             if (_resource.Count == 0)
                 return new ResponseContext(EffectResult.Deny, null);
 

@@ -1,0 +1,40 @@
+﻿<div class="row">
+    <div class="col-lg-12"><h3 style="color: blue">Access Control Management</h3></div>
+    <div class="col-lg-12">
+        <p-dataTable [value]="access_controls" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50]" [rows]="10">
+            <p-column field="PolicyID" header="Policy ID" [sortable]="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="Description" header="Description" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="CollectionName" header="Collection Name" [sortable]="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="RuleCombining" header="Rule Combining" [sortable]="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="Action" header="Action" [sortable]="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column styleClass="col-button">
+                <template let-car="rowData" pTemplate="body">
+                    <button type="button" pButton (click)="select_access_control(car)" icon="fa-share"></button>
+                </template>
+            </p-column>
+            <p-column styleClass="col-button">
+                <template let-car="rowData" pTemplate="body">
+                    <button type="button" class="ui-button-danger" pButton (click)="delete_privacy_policy(car)" icon="fa-trash"></button>
+                </template>
+            </p-column>
+        </p-dataTable>
+    </div>
+    <div class="col-lg-12"><h3 style="color: blue">Privacy Management</h3></div>
+    <div class="col-lg-12">
+        <p-dataTable [value]="privacy_policy" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50]" [rows]="10">
+            <p-column field="PolicyID" header="Policy ID" [sortable]="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="Description" header="Description" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="CollectionName" header="Collection Name" [sortable]="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column styleClass="col-button">
+                <template let-car="rowData" pTemplate="body">
+                    <button type="button" pButton (click)="select_privacy_policy(car)" icon="fa-share"></button>
+                </template>
+            </p-column>
+            <p-column styleClass="col-button">
+                <template let-car="rowData" pTemplate="body">
+                    <button type="button" class="ui-button-danger" pButton (click)="delete_privacy_policy(car)" icon="fa-trash"></button>
+                </template>
+            </p-column>
+        </p-dataTable>
+    </div>
+</div>

@@ -27,6 +27,8 @@ export class PrivacyDomainComponent {
     private configured_privacy_domain_fields: PrivacyDomainField[] = [];
     private configured_privacy_domain_fields_view: PrivacyDomainField[] = [];
 
+    private domain_name: string;
+
     private json_helper: any;
     private msgs: Message[] = [];
 
@@ -145,5 +147,12 @@ export class PrivacyDomainComponent {
                 this.msgs.push({ severity: 'error', summary: 'Error Message', detail: error });
             }
         );
+    }
+    private addDomain() {
+        let name: string = this.domain_name;
+        this.http.post(AppSetting.API_ENDPOINT + 'PrivacyDomain', JSON.stringify(name), this.options).subscribe(
+            data => {
+                this.msgs.push({ severity: 'info', summary: 'Info Message', detail: 'Insert Domain Successfully' });
+        });
     }
 }

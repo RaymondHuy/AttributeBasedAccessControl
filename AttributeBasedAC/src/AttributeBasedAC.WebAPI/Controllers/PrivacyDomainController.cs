@@ -64,5 +64,21 @@ namespace AttributeBasedAC.WebAPI.Controllers
         {
             _privacyDomainRepository.UpdatePriorityFunctions(command.DomainName, command.PriorityFunctions);
         }
+
+
+        [HttpPost]
+        [Route("api/PrivacyDomain")]
+        public void PrivacyDomain([FromBody]string name)
+        {
+            _privacyDomainRepository.InsertDomain(
+                new PrivacyDomain()
+                {
+                    DomainName = name,
+                    Functions = new PriorityFunction[0],
+                    Fields = new string[0],
+                    IsArrayFieldDomain = false
+                });
+            return;
+        }
     }
 }

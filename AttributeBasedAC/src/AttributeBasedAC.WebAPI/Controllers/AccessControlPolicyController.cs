@@ -81,6 +81,11 @@ namespace AttributeBasedAC.WebAPI.Controllers
 
             return relativePolicies.Select(p => p.PolicyId).ToList();
         }
-        
+        [HttpGet]
+        [Route("api/AccessControlPolicy")]
+        public IEnumerable<AccessControlPolicy> AccessControlPolicy()
+        {
+            return _accessControlPolicyRepository.GetAll();
+        }
     }
 }

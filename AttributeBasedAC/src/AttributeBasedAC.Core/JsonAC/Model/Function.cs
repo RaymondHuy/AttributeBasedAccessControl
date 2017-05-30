@@ -15,7 +15,7 @@ namespace AttributeBasedAC.Core.JsonAC.Model
 
         [BsonElement("parameters")]
         [BsonIgnoreIfNull]
-        public ICollection<Function> Parameters { get; set; }
+        public List<Function> Parameters { get; set; }
 
         [BsonElement("value")]
         [BsonIgnoreIfNull]

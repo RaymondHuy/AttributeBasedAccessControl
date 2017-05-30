@@ -9,3 +9,19 @@
         this.Effect = effect;
     }
 }
+
+export class AccessControl {
+    public PolicyID: string;
+    public Description: string;
+    public CollectionName: string;
+    public RuleCombining: string;
+    public Action: string;
+
+    constructor(policyID: string, description: string, collectionName: string, ruleCombining: string, action:string="read") {
+        this.PolicyID = policyID;
+        this.CollectionName = collectionName;
+        this.Description = description;
+        this.RuleCombining = ruleCombining;
+        this.Action = action;
+    }
+}

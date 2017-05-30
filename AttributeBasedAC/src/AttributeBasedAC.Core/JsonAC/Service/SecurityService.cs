@@ -20,10 +20,13 @@ namespace AttributeBasedAC.Core.JsonAC.Service
         ResponseContext ISecurityService.ExecuteProcess(JObject user, JObject[] resource, string action, string collectionName, JObject environment)
         {
             var result = _accessControlService.ExecuteProcess(user, resource, action, collectionName, environment);
+            //var temp = result.JsonObjects.Count;
             if (result.Effect == EffectResult.Permit)
             {
-                result = _privacyService.ExecuteProcess(user, resource, action, collectionName, environment);
+                result = _privacyService.ExecuteProcess(user, result.JsonObjects.ToArray(), action, collectionName, environment);
             }
+            //Console.WriteLine("Initian length "  + resource.Length);
+            //Console.WriteLine("final " + temp);
             return result;
         }
     }

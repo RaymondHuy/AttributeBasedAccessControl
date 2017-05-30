@@ -86,5 +86,11 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
             var update = Builders<PrivacyDomain>.Update.Set("hierarchy", priorities);
             _mongoCollection.UpdateOne(filter, update);
         }
+
+        void IPrivacyDomainRepository.InsertDomain(PrivacyDomain domain)
+        {
+            _mongoCollection.InsertOne(domain);
+            return;
+        }
     }
 }
