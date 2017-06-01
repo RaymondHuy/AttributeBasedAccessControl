@@ -191,7 +191,7 @@ namespace DatabaseGenerator
             {
                 "StringEqual ( Subject.role , 'intern' ) Or StringEqual ( Subject.role , 'doctor' )",
                 
-                "IntegerGreaterThan ( Resource.number_developers , '12' )"
+                "IntegerGreaterThan ( Resource.dept_id , '8' )"
             };
             var data = new List<AccessControlPolicy>();
 
@@ -222,13 +222,20 @@ namespace DatabaseGenerator
                 IsAttributeResourceRequired = false,
                 PolicyId = "policy 2",
                 RuleCombining = "permit-overrides",
-                Target = expression.Parse(Targets[1]),
+                Target = expression.Parse(Targets[0]),
                 Rules = new AccessControlRule[] {
                     new AccessControlRule { Id = "rule 2", Effect = "Permit", Condition = expression.Parse(Rules[1]) }
                 }
             });
 
             acPolicyCollection.InsertMany(data);
+
+            var ruleCombiningDB = _database.GetCollection<AccessControlPolicyCombining>("AccessControlPolicyCombiningConfiguration");
+            var rules = new List<AccessControlPolicyCombining>();
+            rules.Add(new AccessControlPolicyCombining() { Algorithm = "permit-overrides", PolicyIds = new string[2] { "policy 1", "policy 2"} });
+            ruleCombiningDB.InsertMany(rules);
         }
+
+
     }
 }

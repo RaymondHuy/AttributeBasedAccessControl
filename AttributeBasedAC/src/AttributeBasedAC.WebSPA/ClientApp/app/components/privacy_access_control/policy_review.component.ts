@@ -4,6 +4,7 @@ import { SelectItem, Message, ConfirmationService } from 'primeng/primeng';
 
 import { AppSetting } from '../../models/app_setting';
 import { AccessControl } from '../../models/access_control_rule.model';
+import { PrivacyPolicy } from '../../models/privacy_rule.model';
 
 @Component({
     selector: 'policy_review',
@@ -50,6 +51,7 @@ export class PolicyReviewComponent {
     //#endregion
 
     private access_controls: AccessControl[] = [];
+    private privacy_policies: PrivacyPolicy[] = [];
 
     private json_helper: any;
     private msgs: Message[] = [];
@@ -177,41 +179,36 @@ export class PolicyReviewComponent {
         this.result = [];
         this.result_property_names = [];
         let that = this;
-        this.access_controls.push(new AccessControl("Policy_1", "policy for admin", "Department", "permit-overrides"));
-        this.access_controls.push(new AccessControl("Policy_5", "policy for admin", "Employee", "permit-overrides"));
-        return;
-        //if (this.selected_policy_type == 'Access Control') {
-        //    this.http.post(AppSetting.API_ENDPOINT + 'AccessControl/Review/', JSON.stringify(command), this.options).subscribe(
-        //        data => {
-        //            console.log('ok');
-        //            that.result = data.json();
-        //            console.log(that.result);
-        //            //let jsonObject: any = data.json()[0];
-        //            //for (var property in jsonObject) {
-        //            //    that.result_property_names.push(property);
-        //            //}
-        //        },
-        //        error => {
-        //            this.msgs = [];
-        //            this.msgs.push({ severity: 'error', summary: 'Error Message', detail: error.text() });
-        //        }
-        //    );
-        //}
-        //else {
-        //    this.http.post(AppSetting.API_ENDPOINT + 'Privacy/Review/', JSON.stringify(command), this.options).subscribe(
-        //        data => {
-        //            that.result = data.json();
-        //            if (that.result.length == 0)
-        //                this.msgs.push({ severity: 'info', summary: 'Info Message', detail: "No Policy satisfied" });
-        //            //let jsonObject: any = data.json()[0];
-        //            //for (var property in jsonObject) {
-        //            //    that.result_property_names.push(property);
-        //            //}
-        //        },
-        //        error => {
-        //            this.msgs.push({ severity: 'error', summary: 'Error Message', detail: error.text() });
-        //        }
-        //    );
-        //}
+        if (this.selected_policy_type == 'Access Control') {
+            this.http.post(AppSetting.API_ENDPOINT + 'AccessControl/Review/', JSON.stringify(command), this.options).subscribe(
+                data => {
+                    this.access_controls = [];
+                    this.privacy_policies = [];
+                    let policies = data.json();
+                    for (let policy of policies) {
+                        this.access_controls.push(new AccessControl(policy.policyId, policy.description, policy.collectionName, policy.ruleCombining));
+                    }
+                },
+                error => {
+                    this.msgs = [];
+                    this.msgs.push({ severity: 'error', summary: 'Error Message', detail: error.text() });
+                }
+            );
+        }
+        else {
+            this.http.post(AppSetting.API_ENDPOINT + 'Privacy/Review/', JSON.stringify(command), this.options).subscribe(
+                data => {
+                    this.access_controls = [];
+                    this.privacy_policies = [];
+                    let policies = data.json();
+                    for (let policy of policies) {
+                        this.privacy_policies.push(new PrivacyPolicy(policy.policyId, policy.description, policy.collectionName));
+                    }
+                },
+                error => {
+                    this.msgs.push({ severity: 'error', summary: 'Error Message', detail: error.text() });
+                }
+            );
+        }
     }
 }

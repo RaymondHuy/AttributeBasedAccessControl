@@ -201,6 +201,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
                         privacyRecord.AddNewFieldFromPath(fieldName, record, privacyField[fieldName]);
                     }
                 }
+                else privacyRecord[fieldName] = "";
             }
             return privacyRecord;
         }

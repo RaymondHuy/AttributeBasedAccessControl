@@ -76,6 +76,7 @@ namespace DatabaseGenerator
                 IsArrayFieldDomain = false,
                 Functions = new PriorityFunction[2] { new PriorityFunction() { Name = "Hide", Priority = 1 }, new PriorityFunction() { Name = "Show", Priority = 2 } }
             });
+            privacyCollection.InsertMany(data);
         }
     }
 }

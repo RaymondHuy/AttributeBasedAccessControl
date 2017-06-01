@@ -664,7 +664,7 @@ namespace DatabaseGenerator
             });
             data.Add(new PrivacyPolicy
             {
-                CollectionName = "Department",
+                CollectionName = "Department.projects",
                 Description = "....",
                 IsAttributeResourceRequired = true,
                 PolicyId = "Policy3",
@@ -686,6 +686,7 @@ namespace DatabaseGenerator
                         Condition = expression.Parse(Rules[3]) },
                 }
             });
+            privacyCollection.InsertMany(data);
         }
     }
 }
