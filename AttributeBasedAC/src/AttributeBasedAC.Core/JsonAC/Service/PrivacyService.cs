@@ -183,6 +183,7 @@ namespace AttributeBasedAC.Core.JsonAC.Service
 
             foreach (var fieldName in privacyField.Keys)
             {
+                if (fieldName == "_id") continue;
                 if (privacyField[fieldName] != "Optional")
                 {
                     string json = record.SelectToken(fieldName).ToString();

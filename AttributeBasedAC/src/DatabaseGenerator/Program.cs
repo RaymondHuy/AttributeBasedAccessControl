@@ -4,6 +4,7 @@ using AttributeBasedAC.Core.JsonAC.Repository;
 using AttributeBasedAC.Core.JsonAC.Service;
 using AttributeBasedAC.Core.JsonAC.UserDefinedFunction;
 using Autofac;
+using DatabaseGenerator.Model;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using System;
@@ -63,6 +64,8 @@ namespace DatabaseGenerator
                     AccessControlPolicyDummyData.InsertPolicyForDemo(policyDb, expressionService);
                     PrivacyPolicyDummyData.InsertPolicyForDemo(policyDb, expressionService);
                     PrivacyDomainDummyData.InsertPrivacyDomainForDemo(policyDb, expressionService);
+                    UserRepository.InsertPolicyForDemo(userDb, expressionService);
+                    DepartmentRepository.InsertPolicyForDemo(userDb, expressionService);
                 }
                 Console.WriteLine("Success");
             }

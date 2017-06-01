@@ -202,6 +202,9 @@ export class PrivacyComponent {
                     this.msgs.push({ severity: 'error', summary: 'Error Message', detail: 'Not Applicable' });
                 } else {
                     that.result = data.json();
+                    if (that.result.length == 0) {
+                        this.msgs.push({ severity: 'info', summary: 'Info Message', detail: 'User doesnot have right to access resource' });
+                    }
                     let jsonObject: any = data.json()[0];
                     for (var property in jsonObject) {
                         that.result_property_names.push(property);
