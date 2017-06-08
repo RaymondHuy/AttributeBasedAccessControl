@@ -58,6 +58,10 @@ export class SubPrivacyPolicyFormCreateComponent {
     private field_effect_options: FieldEffectOption[] = [];
     private privacy_rules: PrivacyRule[] = [];
 
+    private configured_domain_names: SelectItem[] = [];
+    private configured_domain_selected_name: string = '';
+    private priority: number = 1;
+
     private json_helper: any;
     private msgs: Message[] = [];
 
@@ -72,12 +76,11 @@ export class SubPrivacyPolicyFormCreateComponent {
         var that = this;
 
         //#region call web api for option data
-        this.http.get(AppSetting.API_ENDPOINT + 'collections/').subscribe(data => {
+        this.http.get(AppSetting.API_ENDPOINT + 'ArrayFields/').subscribe(data => {
             let collections: any[] = data.json();
             for (var name of collections) {
                 that.collection_names.push({ label: name, value: name });
             }
-            that.collection_names.push({ label: 'Department.projects', value: 'Department.projects' });
             that.collection_selected_name = collections[0];
             that.onSelectCollectionName(collections[0]);
         });
@@ -104,6 +107,13 @@ export class SubPrivacyPolicyFormCreateComponent {
             }
             that.privacy_functions.push({ label: 'Optional', value: 'Optional' });
         });
+        this.http.get(AppSetting.API_ENDPOINT + 'PrivacyDomainField/').subscribe(data => {
+            let collections: any[] = data.json();
+            for (var domain of collections) {
+                that.configured_domain_names.push({ label: domain.domainName, value: domain.domainName });
+            }
+            that.configured_domain_selected_name = that.configured_domain_names[0].label;
+        });
         //#endregion
         //#region hard code for options
         this.actions.push({ label: 'read', value: 'read' });
@@ -118,10 +128,10 @@ export class SubPrivacyPolicyFormCreateComponent {
         var that = this;
         this.resource_fields = [];
         this.field_effect_options = [];
-        this.http.get(AppSetting.API_ENDPOINT + 'structure/?collectionName=' + collectionSelected).subscribe(data => {
+        this.http.get(AppSetting.API_ENDPOINT + 'SubStructure/?fieldName=' + collectionSelected).subscribe(data => {
             let jsonObject: any = data.json();
             let initialize_resource_selected: boolean = false;
-            for (var property in jsonObject) {
+            for (var property in jsonObject[0]) {
                 if (property == '_id') continue;
                 if (!initialize_resource_selected) {
                     initialize_resource_selected = true;
@@ -383,18 +393,27 @@ export class SubPrivacyPolicyFormCreateComponent {
             this.msgs.push({ severity: 'error', summary: 'Error Message', detail: 'Rules can not be null' });
             return;
         }
+        if (this.priority == null) {
+            this.msgs.push({ severity: 'error', summary: 'Error Message', detail: 'Priority can not be null' });
+            return;
+        }
+        if (this.configured_domain_selected_name == '') {
+            this.msgs.push({ severity: 'error', summary: 'Error Message', detail: 'Please create a new domain and add this field to that' });
+            return;
+        }
         let command = {
             "PolicyID": this.policy_id,
             "CollectionName": this.collection_selected_name,
             "Description": this.description,
-            "Target": this.target_result,
-            "Rules": this.privacy_rules
+            "Rules": this.privacy_rules,
+            "DomainName": this.configured_domain_selected_name,
+            "Priority": this.priority
         }
         let that = this;
-        this.http.post(AppSetting.API_ENDPOINT + 'PrivacyPolicy', JSON.stringify(command), this.options).subscribe(
+        this.http.post(AppSetting.API_ENDPOINT + 'SubPrivacyPolicy', JSON.stringify(command), this.options).subscribe(
             data => {
                 that.reset();
-                this.msgs.push({ severity: 'info', summary: 'Info Message', detail: "Privacy Policy added successfully" });
+                this.msgs.push({ severity: 'info', summary: 'Info Message', detail: "Sub Privacy Policy added successfully" });
             },
             error => {
                 this.msgs = [];

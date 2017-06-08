@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Driver;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +32,21 @@ namespace AttributeBasedAC.WebAPI.Controllers
                                    .First();
             var jsonSetting = new JsonWriterSettings { OutputMode = JsonOutputMode.Strict };
             return exampleStructure.ToJson(jsonSetting);
+        }
+
+        [HttpGet]
+        [Route("api/SubStructure")]
+        public string GetFieldStructure(string fieldName)
+        {
+            var array = fieldName.Split('.');
+            var exampleStructure = _mongoClient.GetDatabase(JsonAccessControlSetting.UserDefaultDatabaseName)
+                                   .GetCollection<BsonDocument>(array[0])
+                                   .Find(_ => true)
+                                   .First();
+            var jsonSetting = new JsonWriterSettings { OutputMode = JsonOutputMode.Strict };
+            var json = exampleStructure.ToJson(jsonSetting);
+            string result = JObject.Parse(json).SelectToken("projects").ToString();
+            return result;
         }
 
         [HttpGet]

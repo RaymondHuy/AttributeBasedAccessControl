@@ -18,7 +18,7 @@ import { SubPrivacyPolicyFormCreateComponent } from './components/privacy_access
 
 import {
     ButtonModule, GrowlModule, DropdownModule, AutoCompleteModule, InputTextModule, DataTableModule,
-    SharedModule, InputTextareaModule, MessagesModule, PanelModule, AccordionModule, FieldsetModule
+    SharedModule, InputTextareaModule, MessagesModule, PanelModule, AccordionModule, FieldsetModule, ConfirmDialogModule
 } from 'primeng/primeng';
 
 @NgModule({
@@ -58,7 +58,7 @@ import {
         GrowlModule,
         DropdownModule,
         AutoCompleteModule, InputTextareaModule, MessagesModule, AccordionModule,
-        InputTextModule, DataTableModule, SharedModule, PanelModule, FieldsetModule
+        InputTextModule, DataTableModule, SharedModule, PanelModule, FieldsetModule, ConfirmDialogModule
     ]
 })
 export class AppModule {

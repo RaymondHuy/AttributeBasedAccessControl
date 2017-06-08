@@ -28,6 +28,8 @@ export class PrivacyDomainComponent {
     private configured_privacy_domain_fields_view: PrivacyDomainField[] = [];
 
     private domain_name: string;
+    private function_name: string = '';
+    private priority_function: number = 1;
 
     private json_helper: any;
     private msgs: Message[] = [];
@@ -50,7 +52,13 @@ export class PrivacyDomainComponent {
             that.collection_selected_name = collections[0];
             that.onSelectCollectionName(collections[0]);
         });
-
+        this.initialize_domains();
+    }
+    initialize_domains() {
+        this.configured_domain_names = [];
+        this.configured_privacy_domain_functions = [];
+        this.configured_privacy_domain_fields = [];
+        let that = this;
         this.http.get(AppSetting.API_ENDPOINT + 'PrivacyDomainField/').subscribe(data => {
             let collections: any[] = data.json();
             for (var domain of collections) {
@@ -125,6 +133,22 @@ export class PrivacyDomainComponent {
             }
         );
     }
+    private add_function() {
+        let command = {
+            "DomainName": this.configured_domain_selected_name,
+            "Priority": { "Name": this.function_name, "Priority": this.priority_function } 
+        };
+        this.http.post(AppSetting.API_ENDPOINT + 'PrivacyDomainFunction', JSON.stringify(command), this.options).subscribe(
+            data => {
+                this.initialize_domains();
+                this.msgs.push({ severity: 'info', summary: 'Info Message', detail: 'Function Added Successfully' });
+            },
+            error => {
+                this.msgs = [];
+                this.msgs.push({ severity: 'error', summary: 'Error Message', detail: error });
+            }
+        );
+    }
     private addField() {
         let fieldName = this.collection_selected_name + "." + this.resource_selected_field;
         for (let field of this.configured_privacy_domain_fields_view) {
@@ -137,9 +161,9 @@ export class PrivacyDomainComponent {
             "DomainName": this.configured_domain_selected_name,
             "FieldName": fieldName
         };
-        console.log(command);
         this.http.post(AppSetting.API_ENDPOINT + 'DomainField', JSON.stringify(command), this.options).subscribe(
             data => {
+                this.initialize_domains();
                 this.msgs.push({ severity: 'info', summary: 'Info Message', detail: 'Field Added Successfully' });
             },
             error => {
@@ -152,7 +176,9 @@ export class PrivacyDomainComponent {
         let name: string = this.domain_name;
         this.http.post(AppSetting.API_ENDPOINT + 'PrivacyDomain', JSON.stringify(name), this.options).subscribe(
             data => {
+                this.initialize_domains();
                 this.msgs.push({ severity: 'info', summary: 'Info Message', detail: 'Insert Domain Successfully' });
-        });
+
+            });
     }
 }

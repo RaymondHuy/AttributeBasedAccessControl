@@ -600,7 +600,7 @@ namespace DatabaseGenerator
         {
             string[] Targets = new string[]
             {
-                "StringEqual ( Subject.role , 'intern' )"
+                "StringEqual ( Subject.role , 'intern' ) OR StringEqual ( Subject.role , 'doctor' )"
             };
             string[] Rules = new string[]
             {
@@ -632,11 +632,13 @@ namespace DatabaseGenerator
                             new FieldEffect { Name="dept_no", FunctionApply="DefaultDomainPrivacy.Hide" },
                             new FieldEffect { Name="dept_name", FunctionApply="DefaultDomainPrivacy.Show" },
                             new FieldEffect { Name="leader.name", FunctionApply="DefaultDomainPrivacy.Show" },
-                            new FieldEffect { Name="leader.phone", FunctionApply="DefaultDomainPrivacy.Hide" },
+                            new FieldEffect { Name="leader.phone", FunctionApply="PhoneDomain.FirstThreeDigits" },
                             new FieldEffect { Name="location", FunctionApply="DefaultDomainPrivacy.Show" },
-                            new FieldEffect { Name="projects", FunctionApply="DepartmentProjects.Policy3" }
+                            new FieldEffect { Name="projects", FunctionApply="DepartmentProjects.Policy3" },
+                            new FieldEffect { Name="date_created", FunctionApply="DateTimeDomain.ShowYear" },
+                            new FieldEffect { Name="address", FunctionApply="AddressDomainPrivacy.ShowStreetName" },
                         },
-                        Condition = expression.Parse(Rules[1]) }
+                        Condition = expression.Parse(Rules[0]) }
                 }
             });
             data.Add(new PrivacyPolicy
@@ -655,9 +657,11 @@ namespace DatabaseGenerator
                             new FieldEffect { Name="dept_no", FunctionApply="DefaultDomainPrivacy.Hide" },
                             new FieldEffect { Name="dept_name", FunctionApply="Optional" },
                             new FieldEffect { Name="leader.name", FunctionApply="DefaultDomainPrivacy.Show" },
-                            new FieldEffect { Name="leader.phone", FunctionApply="DefaultDomainPrivacy.Hide" },
+                            new FieldEffect { Name="leader.phone", FunctionApply="PhoneDomain.LastThreeDigits" },
                             new FieldEffect { Name="location", FunctionApply="DefaultDomainPrivacy.Show" },
-                            new FieldEffect { Name="projects", FunctionApply="Optional" }
+                            new FieldEffect { Name="projects", FunctionApply="Optional" },
+                            new FieldEffect { Name="date_created", FunctionApply="DateTimeDomain.ShowDayAndMonth" },
+                            new FieldEffect { Name="address", FunctionApply="AddressDomainPrivacy.ShowDistrictNumber" }
                         },
                         Condition = expression.Parse(Rules[0]) }
                 }
@@ -673,8 +677,8 @@ namespace DatabaseGenerator
                     new FieldRule {
                         Identifer = "rule 1",
                         FieldEffects = new FieldEffect[] {
-                            new FieldEffect { Name="name", FunctionApply="DefaultDomainPrivacy.Show" },
-                            new FieldEffect { Name="language", FunctionApply="DefaultDomainPrivacy.Hide" }
+                            new FieldEffect { Name="name", FunctionApply="DefaultDomainPrivacy.Hide" },
+                            new FieldEffect { Name="language", FunctionApply="DefaultDomainPrivacy.Show" }
                         },
                         Condition = expression.Parse(Rules[2]) },
                     new FieldRule {

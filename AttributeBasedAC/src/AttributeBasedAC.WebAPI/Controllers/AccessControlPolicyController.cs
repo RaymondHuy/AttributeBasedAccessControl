@@ -9,6 +9,8 @@ using AttributeBasedAC.Core.JsonAC.Repository;
 using AttributeBasedAC.Core.JsonAC.Model;
 using MongoDB.Bson;
 using Newtonsoft.Json.Linq;
+using AttributeBasedAC.WebAPI.ViewModel;
+using AttributeBasedAC.WebAPI.Utilities;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -83,9 +85,31 @@ namespace AttributeBasedAC.WebAPI.Controllers
         }
         [HttpGet]
         [Route("api/AccessControlPolicy")]
-        public IEnumerable<AccessControlPolicy> AccessControlPolicy()
+        public IEnumerable<AccessControlPolicyViewModel> AccessControlPolicy()
         {
-            return _accessControlPolicyRepository.GetAll();
+            var accessControlPolicies = _accessControlPolicyRepository.GetAll();
+            var result = new List<AccessControlPolicyViewModel>();
+            foreach (var policy in accessControlPolicies)
+            {
+                result.Add(new AccessControlPolicyViewModel()
+                {
+                    PolicyId = policy.PolicyId,
+                    Action = policy.Action,
+                    CollectionName = policy.Action,
+                    Description = policy.Description,
+                    IsAttributeResourceRequired = policy.IsAttributeResourceRequired,
+                    RuleCombining = policy.RuleCombining,
+                    Target = FunctionUtility.Convert(policy.Target)
+                });
+            }
+            return result;
         }
+        [HttpDelete]
+        [Route("api/AccessControlPolicy")]
+        public void AccessControlPolicy(string policyID)
+        {
+            _accessControlPolicyRepository.Delete(policyID);
+        }
+
     }
 }

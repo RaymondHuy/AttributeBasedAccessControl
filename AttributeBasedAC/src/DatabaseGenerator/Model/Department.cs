@@ -22,6 +22,8 @@ namespace DatabaseGenerator.Model
     {
         public int dept_id { get; set; }
 
+        public string date_created { get; set; }
+
         public string dept_name { get; set; }
 
         public string dept_no { get; set; }
@@ -31,6 +33,8 @@ namespace DatabaseGenerator.Model
         public Leader leader { get; set; }
 
         public Project[] projects { get; set; }
+
+        public string address { get; set; }
     }
 
     public static class DepartmentRepository
@@ -58,7 +62,27 @@ namespace DatabaseGenerator.Model
                 projects = new Project[2] {
                     new Project() { name = "ERP", language = "English"},
                     new Project() { name = "ERP2", language= "Spanish"}
-                }
+                },
+                date_created = "8/6/2010",
+                address = "958, Corscot, Lane"
+            });
+            data.Add(new Department()
+            {
+                dept_id = 15,
+                dept_no = "D15",
+                dept_name = "ACCOUNTING",
+                location = "Viet Nam",
+                leader = new Leader()
+                {
+                    name = "Nguyen",
+                    phone = "097826564985"
+                },
+                projects = new Project[2] {
+                    new Project() { name = "MyCity", language = "English"},
+                    new Project() { name = "SAP", language= "Spanish"}
+                },
+                date_created = "4/4/2002",
+                address = "9, Springview, Center"
             });
             data.Add(new Department()
             {
@@ -74,7 +98,9 @@ namespace DatabaseGenerator.Model
                 projects = new Project[2] {
                     new Project() { name = "CRM", language = "English"},
                     new Project() { name = "CRM2", language= "Spanish"}
-                }
+                },
+                date_created = "2/7/2010",
+                address = "9, Springview, Center"
             });
             data.Add(new Department()
             {
@@ -90,7 +116,9 @@ namespace DatabaseGenerator.Model
                 projects = new Project[2] {
                     new Project() { name = "Banking", language = "English"},
                     new Project() { name = "Banking2", language= "Spanish"}
-                }
+                },
+                date_created = "1/1/2000",
+                address = "958, Corscot, Lane"
             });
 
 

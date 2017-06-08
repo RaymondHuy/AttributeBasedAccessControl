@@ -26,15 +26,14 @@
     <div class="col-lg-12">
         <div class="col-lg-4 form-group">
             <label>Functions :</label>
-            <p-dropdown [options]="configured_domain_names" [(ngModel)]="configured_domain_selected_name"
-                        [style]="{'width':'200px'}" (onChange)="onSelectDomainName($event.value)"></p-dropdown>
+            <input type="text" size="25" pInputText [(ngModel)]="function_name" />
         </div>
         <div class="col-lg-4 form-group">
             <label style="padding-right:5px">Priority :</label>
-            <input type="number" size="20" pInputText />
+            <input type="number" size="20" pInputText [(ngModel)]="priority_function"/>
         </div>
         <div class="col-lg-4 form-group">
-            <button type="button" pButton icon="fa-plus" (click)="addField()" label="Add Function"></button>
+            <button type="button" pButton icon="fa-plus" (click)="add_function()" label="Add Function"></button>
         </div>
     </div>
     <div class="col-lg-12" style="margin-bottom:10px;">

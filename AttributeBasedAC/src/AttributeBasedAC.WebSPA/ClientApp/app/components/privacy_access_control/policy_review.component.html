@@ -90,11 +90,8 @@
             <p-column field="CollectionName" header="Collection Name" [sortable]="true" [filter]="true" filterMatchMode="contains"></p-column>
             <p-column field="RuleCombining" header="Rule Combining" [sortable]="true" [filter]="true" filterMatchMode="contains"></p-column>
             <p-column field="Action" header="Action" [sortable]="true" [filter]="true" filterMatchMode="contains"></p-column>
-            <p-column styleClass="col-button">
-                <template let-car="rowData" pTemplate="body">
-                    <button type="button" pButton (click)="select_access_control(car)" icon="fa-share"></button>
-                </template>
-            </p-column>
+            <p-column field="Target" header="Target" [filter]="true" filterMatchMode="contains"></p-column>
+            
             <p-column styleClass="col-button">
                 <template let-car="rowData" pTemplate="body">
                     <button type="button" class="ui-button-danger" pButton (click)="delete_privacy_policy(car)" icon="fa-trash"></button>
@@ -107,11 +104,7 @@
             <p-column field="PolicyID" header="Policy ID" [sortable]="true" [filter]="true" filterMatchMode="contains"></p-column>
             <p-column field="Description" header="Description" [filter]="true" filterMatchMode="contains"></p-column>
             <p-column field="CollectionName" header="Collection Name" [sortable]="true" [filter]="true" filterMatchMode="contains"></p-column>
-            <p-column styleClass="col-button">
-                <template let-car="rowData" pTemplate="body">
-                    <button type="button" pButton (click)="select_access_control(car)" icon="fa-share"></button>
-                </template>
-            </p-column>
+            <p-column field="Target" header="Target" [filter]="true" filterMatchMode="contains"></p-column>
             <p-column styleClass="col-button">
                 <template let-car="rowData" pTemplate="body">
                     <button type="button" class="ui-button-danger" pButton (click)="delete_privacy_policy(car)" icon="fa-trash"></button>

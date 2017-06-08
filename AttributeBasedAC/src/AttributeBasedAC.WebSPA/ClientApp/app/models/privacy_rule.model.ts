@@ -35,10 +35,12 @@ export class PrivacyPolicy {
     public PolicyID: string;
     public Description: string;
     public CollectionName: string;
+    public Target: string;
 
-    constructor(policyID: string, description: string, collectionName: string) {
+    constructor(policyID: string, description: string, collectionName: string, target: string) {
         this.PolicyID = policyID;
         this.Description = description;
         this.CollectionName = collectionName;
+        this.Target = target;
     }
 }

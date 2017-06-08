@@ -21,7 +21,7 @@ namespace AttributeBasedAC.Core.JsonAC.PrivacyDomainFunction
             string[] arr = s.Split(',');
             if (arr.Length > 0)
                 return arr[0];
-            else throw new PrivacyDomainException();
+            else return s;
         }
 
         public static string ShowStreetName(string s)
@@ -29,7 +29,7 @@ namespace AttributeBasedAC.Core.JsonAC.PrivacyDomainFunction
             string[] arr = s.Split(',');
             if (arr.Length > 1)
                 return arr[1];
-            else throw new PrivacyDomainException();
+            else return s;
         }
 
         public static string ShowDistrictNumber(string s)
@@ -37,7 +37,7 @@ namespace AttributeBasedAC.Core.JsonAC.PrivacyDomainFunction
             string[] arr = s.Split(',');
             if (arr.Length > 2)
                 return arr[2];
-            else throw new PrivacyDomainException();
+            else return s;
         }
     }
 }

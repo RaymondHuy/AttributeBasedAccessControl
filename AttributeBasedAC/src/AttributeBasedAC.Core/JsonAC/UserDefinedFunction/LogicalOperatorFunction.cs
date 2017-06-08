@@ -41,5 +41,14 @@ namespace AttributeBasedAC.Core.JsonAC.UserDefinedFunction
                 return (b1 == true) || (b2 == true);
             else throw new UserDefinedFunctionException("Can not execute Or function between two parameters : " + s1 + " " + s2);
         }
+
+        public static bool Not(string s1)
+        {
+            bool b1 = false;
+            bool valid = bool.TryParse(s1, out b1);
+            if (valid)
+                return !b1;
+            else throw new UserDefinedFunctionException("Can not execute Not function of parameters : " + s1 );
+        }
     }
 }

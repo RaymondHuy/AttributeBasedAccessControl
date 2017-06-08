@@ -20,5 +20,7 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
         void Add(AccessControlPolicy policy);
 
         ICollection<AccessControlPolicy> GetPoliciesWithFilter(dynamic filter);
+
+        void Delete(string policyID);
     }
 }

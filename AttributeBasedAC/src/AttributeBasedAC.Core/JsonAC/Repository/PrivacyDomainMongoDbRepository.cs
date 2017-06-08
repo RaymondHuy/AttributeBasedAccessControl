@@ -92,5 +92,12 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
             _mongoCollection.InsertOne(domain);
             return;
         }
+
+        void IPrivacyDomainRepository.AddPriorityFunctions(string domainName, PriorityFunction priority)
+        {
+            var filter = Builders<PrivacyDomain>.Filter.Eq("domain_name", domainName);
+            var update = Builders<PrivacyDomain>.Update.Push("hierarchy", priority);
+            _mongoCollection.UpdateOne(filter, update);
+        }
     }
 }

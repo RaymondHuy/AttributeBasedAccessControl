@@ -21,5 +21,7 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
         void UpdatePriorityFunctions(string domainName, ICollection<PriorityFunction> priorities);
 
         void InsertDomain(PrivacyDomain domain);
+
+        void AddPriorityFunctions(string domainName, PriorityFunction priority);
     }
 }

@@ -13,7 +13,6 @@ namespace AttributeBasedAC.Core.JsonAC.Service
 {
     public class ConditionalExpressionService : IConditionalExpressionService
     {
-        private MethodInfo[] methods;
         bool IConditionalExpressionService.Evaluate(Function function, JObject user, JObject resource, JObject environment)
         {
             var parameters = new List<string>();

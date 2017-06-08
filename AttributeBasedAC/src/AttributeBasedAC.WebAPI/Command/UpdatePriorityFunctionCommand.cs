@@ -12,4 +12,11 @@ namespace AttributeBasedAC.WebAPI.Command
 
         public ICollection<PriorityFunction> PriorityFunctions { get; set; }
     }
+
+    public class InsertPriorityFunctionCommand
+    {
+        public string DomainName { get; set; }
+
+        public PriorityFunction Priority { get; set; }
+    }
 }

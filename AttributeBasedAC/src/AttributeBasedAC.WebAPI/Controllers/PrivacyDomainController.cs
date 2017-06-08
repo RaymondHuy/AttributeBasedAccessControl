@@ -30,6 +30,14 @@ namespace AttributeBasedAC.WebAPI.Controllers
         }
 
         [HttpGet]
+        [Route("api/UnregisteredPrivacyFunctions")]
+        public IEnumerable<string> GetUnRegisteredPrivacyFunctions()
+        {
+            var plugin = PrivacyDomainPluginFactory.GetInstance();
+            return plugin.GetAllDomainType();
+        }
+
+        [HttpGet]
         [Route("api/PrivacyFunction")]
         public IEnumerable<string> GetPrivacyFunction(string name)
         {
@@ -79,6 +87,13 @@ namespace AttributeBasedAC.WebAPI.Controllers
                     IsArrayFieldDomain = false
                 });
             return;
+        }
+
+        [HttpPost]
+        [Route("api/PrivacyDomainFunction")]
+        public void PrivacyDomain([FromBody]InsertPriorityFunctionCommand command)
+        {
+            _privacyDomainRepository.AddPriorityFunctions(command.DomainName, command.Priority);
         }
     }
 }

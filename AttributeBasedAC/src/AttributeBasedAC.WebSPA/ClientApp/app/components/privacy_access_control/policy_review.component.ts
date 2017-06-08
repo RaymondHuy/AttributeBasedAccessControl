@@ -186,7 +186,7 @@ export class PolicyReviewComponent {
                     this.privacy_policies = [];
                     let policies = data.json();
                     for (let policy of policies) {
-                        this.access_controls.push(new AccessControl(policy.policyId, policy.description, policy.collectionName, policy.ruleCombining));
+                        this.access_controls.push(new AccessControl(policy.policyId, policy.description, policy.collectionName, policy.ruleCombining, policy.target, policy.action));
                     }
                 },
                 error => {
@@ -202,7 +202,7 @@ export class PolicyReviewComponent {
                     this.privacy_policies = [];
                     let policies = data.json();
                     for (let policy of policies) {
-                        this.privacy_policies.push(new PrivacyPolicy(policy.policyId, policy.description, policy.collectionName));
+                        this.privacy_policies.push(new PrivacyPolicy(policy.policyId, policy.description, policy.collectionName, policy.target));
                     }
                 },
                 error => {

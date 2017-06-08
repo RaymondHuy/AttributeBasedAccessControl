@@ -76,6 +76,48 @@ namespace DatabaseGenerator
                 IsArrayFieldDomain = false,
                 Functions = new PriorityFunction[2] { new PriorityFunction() { Name = "Hide", Priority = 1 }, new PriorityFunction() { Name = "Show", Priority = 2 } }
             });
+
+            data.Add(new PrivacyDomain()
+            {
+                DomainName = "PhoneDomain",
+                Fields = new string[1] { "Department.leader.phone" },
+                IsArrayFieldDomain = false,
+                Functions = new PriorityFunction[2] { new PriorityFunction() { Name = "FirstThreeDigits", Priority = 1 }, new PriorityFunction() { Name = "LastThreeDigits", Priority = 2 } }
+            });
+
+            data.Add(new PrivacyDomain()
+            {
+                DomainName = "DateTimeDomain",
+                Fields = new string[1] { "User.date_of_birth" },
+                IsArrayFieldDomain = false,
+                Functions = new PriorityFunction[3] {
+                    new PriorityFunction() { Name = "ShowDayAndMonth", Priority = 1 },
+                    new PriorityFunction() { Name = "ShowMonthAndYear", Priority = 2 },
+                    new PriorityFunction() { Name = "ShowYear", Priority = 3 }
+                }
+            });
+            data.Add(new PrivacyDomain()
+            {
+                DomainName = "SSNDomainPrivacy",
+                Fields = new string[1] { "User.ssn" },
+                IsArrayFieldDomain = false,
+                Functions = new PriorityFunction[3] {
+                    new PriorityFunction() { Name = "AreaNumber", Priority = 1 },
+                    new PriorityFunction() { Name = "GroupNumber", Priority = 2 },
+                    new PriorityFunction() { Name = "SerialNumber", Priority = 3 }
+                }
+            });
+            data.Add(new PrivacyDomain()
+            {
+                DomainName = "AddressDomainPrivacy",
+                Fields = new string[2] { "User.address", "Department.address" },
+                IsArrayFieldDomain = false,
+                Functions = new PriorityFunction[3] {
+                    new PriorityFunction() { Name = "ShowStreetNumber", Priority = 1 },
+                    new PriorityFunction() { Name = "ShowStreetName", Priority = 2 },
+                    new PriorityFunction() { Name = "ShowDistrictNumber", Priority = 3 }
+                }
+            });
             privacyCollection.InsertMany(data);
         }
     }

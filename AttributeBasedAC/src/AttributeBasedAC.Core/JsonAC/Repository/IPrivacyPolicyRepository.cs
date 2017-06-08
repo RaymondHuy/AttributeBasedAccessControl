@@ -15,5 +15,10 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
         void Add(PrivacyPolicy privacyPolicy);
 
         PrivacyPolicy GetPolicy(string policyID);
+
+        void Delete(string policyID);
+
+        ICollection<string> GetArrayFieldName();
+
     }
 }

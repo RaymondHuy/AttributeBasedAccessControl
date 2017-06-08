@@ -21,6 +21,22 @@ namespace AttributeBasedAC.WebAPI.Command
         public ICollection<PrivacyRuleViewModel> Rules { get; set; }
     }
 
+    public class SubPrivacyPolicyInsertCommand
+    {
+        public string PolicyID { get; set; }
+
+        public string CollectionName { get; set; }
+
+        public string Description { get; set; }
+        
+
+        public ICollection<PrivacyRuleViewModel> Rules { get; set; }
+
+        public string DomainName { get; set; }
+
+        public int Priority { get; set; }
+    }
+
     public class PrivacyRuleViewModel
     {
         public string Condition { get; set; }

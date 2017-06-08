@@ -5,6 +5,8 @@ using AttributeBasedAC.Core.JsonAC.PrivacyDomainFunction;
 using AttributeBasedAC.Core.JsonAC.Repository;
 using AttributeBasedAC.Core.JsonAC.Service;
 using AttributeBasedAC.WebAPI.Command;
+using AttributeBasedAC.WebAPI.Utilities;
+using AttributeBasedAC.WebAPI.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -34,7 +36,8 @@ namespace AttributeBasedAC.WebAPI.Controllers
             IResourceRepository resourceRepository,
             IConditionalExpressionService conditionalExpressionService,
             IPrivacyPolicyRepository privacyPolicyRepository,
-            IPrivacyService privacyService)
+            IPrivacyService privacyService,
+            IPrivacyDomainRepository privacyDomainRepository)
         {
             _securityService = securityService;
             _subjectRepository = subjectRepository;
@@ -42,6 +45,7 @@ namespace AttributeBasedAC.WebAPI.Controllers
             _conditionalExpressionService = conditionalExpressionService;
             _privacyPolicyRepository = privacyPolicyRepository;
             _privacyService = privacyService;
+            _privacyDomainRepository = privacyDomainRepository;
         }
 
         [HttpPost]
@@ -102,6 +106,42 @@ namespace AttributeBasedAC.WebAPI.Controllers
             };
             _privacyPolicyRepository.Add(policy);
         }
+        [HttpPost]
+        [Route("api/SubPrivacyPolicy")]
+        public void Create([FromBody]SubPrivacyPolicyInsertCommand command)
+        {
+            bool IsResourceRequired = true;
+
+            var fieldRules = new List<FieldRule>();
+            foreach (var rule in command.Rules)
+            {
+                var condition = _conditionalExpressionService.Parse(rule.Condition);
+                var fieldRule = new FieldRule()
+                {
+                    Identifer = rule.RuleID,
+                    FieldEffects = rule.FieldEffects,
+                    Condition = condition
+                };
+                fieldRules.Add(fieldRule);
+
+                if (!IsResourceRequired)
+                    IsResourceRequired = rule.Condition.Contains("\"Resource.");
+            }
+
+            var policy = new PrivacyPolicy()
+            {
+                CollectionName = command.CollectionName,
+                Description = command.Description,
+                PolicyId = command.PolicyID,
+                Rules = fieldRules,
+                IsAttributeResourceRequired = IsResourceRequired
+            };
+            _privacyPolicyRepository.Add(policy);
+
+            var priorty = new PriorityFunction() { Name = command.PolicyID, Priority = command.Priority };
+            _privacyDomainRepository.AddPriorityFunctions(command.DomainName, priorty);
+
+        }
 
         [HttpPost]
         [Route("api/Privacy/Review")]
@@ -118,10 +158,35 @@ namespace AttributeBasedAC.WebAPI.Controllers
 
         [HttpGet]
         [Route("api/PrivacyPolicy")]
-        public IEnumerable<PrivacyPolicy> PrivacyPolicy()
+        public IEnumerable<PrivacyPolicyViewModel> PrivacyPolicy()
         {
-            return _privacyPolicyRepository.GetAll();
+            var policies = _privacyPolicyRepository.GetAll();
+            var result = new List<PrivacyPolicyViewModel>();
+            foreach (var policy in policies)
+            {
+                result.Add(new PrivacyPolicyViewModel()
+                {
+                    CollectionName = policy.CollectionName,
+                    Description = policy.Description,
+                    PolicyId = policy.PolicyId,
+                    Target = FunctionUtility.Convert(policy.Target)
+                });
+            }
+            return result;
         }
 
+        [HttpDelete]
+        [Route("api/PrivacyPolicy")]
+        public void PrivacyPolicy(string policyID)
+        {
+            _privacyPolicyRepository.Delete(policyID);
+        }
+
+        [HttpGet]
+        [Route("api/ArrayFields")]
+        public IEnumerable<string> ArrayFields()
+        {
+            return _privacyPolicyRepository.GetArrayFieldName();
+        }
     }
 }

@@ -3,6 +3,7 @@ using System.Linq;
 using AttributeBasedAC.Core.JsonAC.Model;
 using MongoDB.Driver;
 using AttributeBasedAC.Core.JsonAC.Infrastructure;
+using System;
 
 namespace AttributeBasedAC.Core.JsonAC.Repository
 {
@@ -21,6 +22,15 @@ namespace AttributeBasedAC.Core.JsonAC.Repository
             var Collec = MongoDB.GetCollection<AccessControlPolicy>(JsonAccessControlSetting.AccessControlCollectionName);
             
             Collec.InsertOneAsync(policy);
+        }
+
+        void IAccessControlPolicyRepository.Delete(string policyID)
+        {
+            var MongoDB = _mongoClient.GetDatabase(JsonAccessControlSetting.PrivacyAccessControlDbName);
+            var Collec = MongoDB.GetCollection<AccessControlPolicy>(JsonAccessControlSetting.AccessControlCollectionName);
+            var builder = Builders<AccessControlPolicy>.Filter;
+            var filter = builder.Eq("policy_id", policyID);
+            Collec.DeleteOne(filter);
         }
 
         ICollection<AccessControlPolicy> IAccessControlPolicyRepository.GetAll()

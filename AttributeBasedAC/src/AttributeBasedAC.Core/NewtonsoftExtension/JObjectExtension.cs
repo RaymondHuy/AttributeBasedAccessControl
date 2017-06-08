@@ -11,7 +11,6 @@ namespace AttributeBasedAC.Core.NewtonsoftExtension
 {
     public static class JObjectExtension
     {
-        private static string _defaultNamespace = "AttributeBasedAC.Core.JsonAC.PrivacyDomainFunction";
         public static void AddNewFieldFromPath(this JObject jObject, string pathField, JObject rawObject, string privacyFunction)
         {
             var nestedFields = pathField.Split(new char[] { '.' });
