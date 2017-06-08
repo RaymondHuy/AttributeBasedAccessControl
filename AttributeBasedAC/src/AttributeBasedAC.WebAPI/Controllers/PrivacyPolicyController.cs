@@ -145,7 +145,7 @@ namespace AttributeBasedAC.WebAPI.Controllers
 
         [HttpPost]
         [Route("api/Privacy/Review")]
-        public IEnumerable<PrivacyPolicy> Review([FromBody]PolicyReviewCommand command)
+        public IEnumerable<PrivacyPolicyViewModel> Review([FromBody]PolicyReviewCommand command)
         {
             JObject user = string.IsNullOrEmpty(command.UserJsonData) ? new JObject() : JObject.Parse(command.UserJsonData);
             JObject resource = string.IsNullOrEmpty(command.ResourceJsonData) ? new JObject() : JObject.Parse(command.ResourceJsonData);
@@ -153,7 +153,18 @@ namespace AttributeBasedAC.WebAPI.Controllers
 
             var relativePolicies = _privacyService.Review(user, resource, environment);
 
-            return relativePolicies;
+            var result = new List<PrivacyPolicyViewModel>();
+            foreach (var policy in relativePolicies)
+            {
+                result.Add(new PrivacyPolicyViewModel()
+                {
+                    CollectionName = policy.CollectionName,
+                    Description = policy.Description,
+                    PolicyId = policy.PolicyId,
+                    Target = FunctionUtility.Convert(policy.Target)
+                });
+            }
+            return result;
         }
 
         [HttpGet]

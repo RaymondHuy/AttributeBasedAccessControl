@@ -19,7 +19,7 @@ namespace AttributeBasedAC.WebAPI.Controllers
         public IEnumerable<string> Get()
         {
             var function = UserDefinedFunctionPluginFactory.GetInstance();
-            return function.GetAllRegisteredFunction();
+            return function.GetAllRegisteredFunction().Where(f=>f != "And" && f != "Or" && f != "Not");
         }
     }
 }

@@ -92,11 +92,6 @@
             <p-column field="Action" header="Action" [sortable]="true" [filter]="true" filterMatchMode="contains"></p-column>
             <p-column field="Target" header="Target" [filter]="true" filterMatchMode="contains"></p-column>
             
-            <p-column styleClass="col-button">
-                <template let-car="rowData" pTemplate="body">
-                    <button type="button" class="ui-button-danger" pButton (click)="delete_privacy_policy(car)" icon="fa-trash"></button>
-                </template>
-            </p-column>
         </p-dataTable>
     </div>
     <div class="col-lg-12" *ngIf="privacy_policies.length > 0" style="padding-top:15px">
@@ -105,11 +100,7 @@
             <p-column field="Description" header="Description" [filter]="true" filterMatchMode="contains"></p-column>
             <p-column field="CollectionName" header="Collection Name" [sortable]="true" [filter]="true" filterMatchMode="contains"></p-column>
             <p-column field="Target" header="Target" [filter]="true" filterMatchMode="contains"></p-column>
-            <p-column styleClass="col-button">
-                <template let-car="rowData" pTemplate="body">
-                    <button type="button" class="ui-button-danger" pButton (click)="delete_privacy_policy(car)" icon="fa-trash"></button>
-                </template>
-            </p-column>
+            
         </p-dataTable>
     </div>
 </div>

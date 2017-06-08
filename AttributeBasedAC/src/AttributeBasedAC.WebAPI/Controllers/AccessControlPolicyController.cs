@@ -73,15 +73,28 @@ namespace AttributeBasedAC.WebAPI.Controllers
 
         [HttpPost]
         [Route("api/AccessControl/Review")]
-        public IEnumerable<AccessControlPolicy> Review([FromBody]PolicyReviewCommand command)
+        public IEnumerable<AccessControlPolicyViewModel> Review([FromBody]PolicyReviewCommand command)
         {
             JObject user = string.IsNullOrEmpty(command.UserJsonData) ? new JObject() : JObject.Parse(command.UserJsonData);
             JObject resource = string.IsNullOrEmpty(command.ResourceJsonData) ? new JObject() : JObject.Parse(command.ResourceJsonData);
             JObject environment = string.IsNullOrEmpty(command.EnvironmentJsonData) ? new JObject() : JObject.Parse(command.EnvironmentJsonData);
 
             var relativePolicies = _accessControlService.Review(user, resource, environment);
-
-            return relativePolicies;
+            var result = new List<AccessControlPolicyViewModel>();
+            foreach (var policy in relativePolicies)
+            {
+                result.Add(new AccessControlPolicyViewModel()
+                {
+                    PolicyId = policy.PolicyId,
+                    Action = policy.Action,
+                    CollectionName = policy.Action,
+                    Description = policy.Description,
+                    IsAttributeResourceRequired = policy.IsAttributeResourceRequired,
+                    RuleCombining = policy.RuleCombining,
+                    Target = FunctionUtility.Convert(policy.Target)
+                });
+            }
+            return result;
         }
         [HttpGet]
         [Route("api/AccessControlPolicy")]
